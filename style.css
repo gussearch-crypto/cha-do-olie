@@ -81,3 +81,14 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
 .quick,.quick *{opacity:1!important}
 .quick small{color:#777451!important}
 .quick b{color:#3f4328!important}
+
+/* Bloco adicionar à agenda */
+.calendarPanel{max-width:980px;margin:28px auto;padding:30px 36px;background:#fff9eb;border:1px solid #d8cfad;border-radius:24px;display:flex;gap:22px;align-items:flex-start;box-shadow:0 12px 28px rgba(73,66,38,.10)}
+.calendarPanel>svg{width:34px;height:34px;color:#687944;flex:none}
+.calendarPanel h2{margin:5px 0 4px;color:#4d5b32}
+.calendarPanel p{margin:0 0 18px;color:#6f6a4c}
+.calendarActions{display:flex;gap:12px;flex-wrap:wrap}
+.calendarActions .linkbtn{display:inline-flex;align-items:center;gap:8px}
+.calendarIcs{border:1px solid #7a844f;background:#fffaf0;color:#566238;border-radius:999px;padding:13px 20px;font-weight:700;cursor:pointer}
+.calendarIcs:hover{background:#f3efd9}
+@media(max-width:700px){.calendarPanel{margin:20px 16px;padding:24px;flex-direction:column}.calendarActions{flex-direction:column}.calendarActions>*{width:100%;justify-content:center;text-align:center}}
