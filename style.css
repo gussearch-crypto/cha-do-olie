@@ -194,3 +194,28 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
    height:auto!important;
  }
 }
+
+/* Mobile final: enquadramento da banda */
+@media(max-width:480px){
+ .hero{
+   min-height:790px!important;
+   background-size:auto 72%!important;
+   background-position:58% bottom!important;
+   background-repeat:no-repeat!important;
+ }
+}
+@media(max-width:390px){
+ .hero{
+   min-height:740px!important;
+   background-size:auto 69%!important;
+   background-position:58% bottom!important;
+ }
+}
+@media(max-width:360px){
+ .hero{
+   min-height:700px!important;
+   height:auto!important;
+   background-size:auto 67%!important;
+   background-position:58% bottom!important;
+ }
+}
