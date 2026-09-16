@@ -2,10 +2,9 @@ import React,{useState,useEffect} from 'react';
 import{createRoot}from'react-dom/client';
 import{Search,MapPin,CalendarDays,Clock3,Gift,Baby,CheckCircle2,Heart,ChevronRight,Users,ArrowLeft,Music2,ExternalLink}from'lucide-react';
 import'./style.css';
-import heroAsset from './ChatGPT Image Sep 16, 2026, 12_47_30 PM.png';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/invite-api';
 const amazon='https://www.amazon.com.br/baby-reg/gustavo-henrique-janeiro-2027-sopaulo/K6BQ3XFQQ9IO?ref_=cm_sw_r_cp_ud_dp_17SYTR1MP6FTCSNQMQHC';
-const hero=heroAsset;
+const hero='/images/banner-oliver.png';
 async function api(payload){if(!import.meta.env.VITE_SUPABASE_URL)throw new Error('Supabase não configurado');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Erro');return d}
 function App(){
  const[q,setQ]=useState(''),[matches,setMatches]=useState([]),[selected,setSelected]=useState(null),[step,setStep]=useState('search'),[pin,setPin]=useState('');
