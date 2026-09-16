@@ -26,3 +26,14 @@ main{background:transparent!important}
 body::before{content:"";position:fixed;z-index:-2;inset:0;background:#f5edd4 url('/images/background-oliver.png') center top/cover no-repeat;pointer-events:none}
 body::after{content:"";position:fixed;z-index:-1;inset:0;background:rgba(248,240,215,.06);pointer-events:none}
 @media(max-width:760px){body::before{background-size:auto 100%;background-position:center top}}
+
+/* Hierarquia global de camadas: background < cabeçalho/hero < conteúdo */
+html,body,#root{position:relative;min-height:100%;isolation:isolate}
+body{z-index:0}
+body::before{z-index:-2!important}
+body::after{z-index:-1!important}
+header,.topbar,.nav{position:relative;z-index:30!important}
+.hero{position:relative;z-index:20!important}
+.eventPanel,.quick,.rsvpShell,.features,.closing,footer{position:relative;z-index:10!important}
+.eventPanel{isolation:isolate}
+.rsvpShell::before,.rsvpShell::after{pointer-events:none!important;z-index:-1!important}
