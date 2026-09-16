@@ -15,11 +15,14 @@
 .heroShade{background:linear-gradient(90deg,rgba(247,239,216,.30) 0%,rgba(247,239,216,.10) 36%,rgba(247,239,216,0) 54%)!important}
 @media(max-width:760px){.hero{background-position:66% center!important;background-size:auto 100%!important}.heroShade{background:linear-gradient(180deg,rgba(247,239,216,.88) 0%,rgba(247,239,216,.48) 38%,rgba(247,239,216,0) 64%)!important}}
 
-/* Background oficial aplicado ao conteúdo abaixo do hero */
+/* Background oficial: somente atrás do conteúdo abaixo do hero */
 body{background:#f5edd4!important}
-main{background:#f5edd4}
-.quick,.rsvpShell,.features,.eventPanel,.closing,footer{position:relative;z-index:1}
-.hero~*{background-image:none}
-.rsvpShell::before{content:"";position:fixed;z-index:-2;inset:68px 0 0;background:url('/images/background-oliver.png') center top/cover no-repeat;pointer-events:none}
-.rsvpShell::after{content:"";position:fixed;z-index:-1;inset:68px 0 0;background:rgba(248,240,215,.10);pointer-events:none}
-@media(max-width:760px){.rsvpShell::before{inset:60px 0 0;background-size:auto 100%;background-position:center top}.rsvpShell::after{inset:60px 0 0}}
+main{background:transparent!important}
+.hero{position:relative;z-index:2}
+.hero~*{position:relative;z-index:1}
+.hero~*::before{content:none!important}
+.rsvpShell::before,.rsvpShell::after{content:none!important}
+.hero~.eventPanel,.hero~.rsvpShell,.hero~.quick,.hero~.features,.hero~.closing{background-color:transparent}
+body::before{content:"";position:fixed;z-index:-2;inset:0;background:#f5edd4 url('/images/background-oliver.png') center top/cover no-repeat;pointer-events:none}
+body::after{content:"";position:fixed;z-index:-1;inset:0;background:rgba(248,240,215,.06);pointer-events:none}
+@media(max-width:760px){body::before{background-size:auto 100%;background-position:center top}}
