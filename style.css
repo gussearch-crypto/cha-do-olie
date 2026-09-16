@@ -9,3 +9,8 @@
 .features>div:nth-child(1) i{color:var(--leaf);background:#e4e5c8}.features>div:nth-child(2) i{color:var(--red);background:#f6d5ca}.features>div:nth-child(3) i{color:var(--orange);background:#f8dfbd}.features>div:nth-child(4) i{color:var(--blue);background:#d8e7ed}
 .rsvpShell{background:#fffaf1}.searchbox{box-shadow:0 6px 18px #4f50371a}.eventPanel>div:nth-child(1) svg{color:var(--red)}.eventPanel>div:nth-child(2) svg{color:var(--blue)}.eventPanel>div:nth-child(3) svg{color:var(--leaf)}
 @media(max-width:760px){.hero{background-position:68% 100%!important;background-size:auto 72%!important}}
+
+/* Header banner supplied for the invitation */
+.hero{background-image:url('/images/banner-oliver.png')!important;background-position:center center!important;background-size:cover!important;background-repeat:no-repeat!important}
+.heroShade{background:linear-gradient(90deg,rgba(247,239,216,.30) 0%,rgba(247,239,216,.10) 36%,rgba(247,239,216,0) 54%)!important}
+@media(max-width:760px){.hero{background-position:66% center!important;background-size:auto 100%!important}.heroShade{background:linear-gradient(180deg,rgba(247,239,216,.88) 0%,rgba(247,239,216,.48) 38%,rgba(247,239,216,0) 64%)!important}}
