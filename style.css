@@ -176,3 +176,21 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
    background-position:right bottom!important;
  }
 }
+
+/* Mobile pequeno: mascotes maiores, preservando o grupo */
+@media(max-width:480px){
+ .hero{
+   background-size:auto 64%!important;
+   background-position:right bottom!important;
+   background-repeat:no-repeat!important;
+   min-height:430px!important;
+ }
+}
+@media(max-width:360px){
+ .hero{
+   background-size:auto 62%!important;
+   background-position:right bottom!important;
+   min-height:430px!important;
+   height:auto!important;
+ }
+}
