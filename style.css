@@ -67,3 +67,17 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
 .eventPanel,.eventPanel *{opacity:1!important}
 .eventPanel small,.eventPanel .label{color:#777451!important}
 .eventPanel strong,.eventPanel b,.eventPanel a,.eventPanel span{color:#3f4328}
+
+/* Correção: Data/Horário/Local usa a classe .quick */
+.quick{
+  background:#fff9eb!important;
+  background-image:none!important;
+  opacity:1!important;
+  border:1px solid #d8cfad!important;
+  box-shadow:0 12px 28px rgba(73,66,38,.18)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.quick,.quick *{opacity:1!important}
+.quick small{color:#777451!important}
+.quick b{color:#3f4328!important}
