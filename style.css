@@ -158,3 +158,21 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
 @media(max-width:360px){
  .hero{background-position:right bottom!important}
 }
+
+/* Telas pequenas: preserva todos os mascotes do banner */
+@media(max-width:480px){
+ .hero{
+   background-size:contain!important;
+   background-position:right bottom!important;
+   background-repeat:no-repeat!important;
+   background-color:#f3ead1!important;
+   min-height:430px!important;
+ }
+}
+@media(max-width:360px){
+ .hero{
+   height:440px!important;
+   background-size:contain!important;
+   background-position:right bottom!important;
+ }
+}
