@@ -92,3 +92,12 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
 .calendarIcs{border:1px solid #7a844f;background:#fffaf0;color:#566238;border-radius:999px;padding:13px 20px;font-weight:700;cursor:pointer}
 .calendarIcs:hover{background:#f3efd9}
 @media(max-width:700px){.calendarPanel{margin:20px 16px;padding:24px;flex-direction:column}.calendarActions{flex-direction:column}.calendarActions>*{width:100%;justify-content:center;text-align:center}}
+
+/* Agenda dentro da confirmação */
+.result .calendarPanel{margin:28px auto 0;max-width:760px;padding:26px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:none;background:#fffaf0}
+.result .calendarPanel>svg{margin:0 auto 4px}
+.result .calendarPanel>div{width:100%;text-align:center}
+.result .calendarPanel h3{margin:4px 0 6px;color:#4d5b32;text-align:center}
+.result .calendarPanel p{text-align:center;margin:0 0 16px}
+.result .calendarActions{justify-content:center;align-items:center}
+.result .calendarActions a,.result .calendarActions button{display:inline-flex;align-items:center;justify-content:center}
