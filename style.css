@@ -37,3 +37,10 @@ header,.topbar,.nav{position:relative;z-index:30!important}
 .eventPanel,.quick,.rsvpShell,.features,.closing,footer{position:relative;z-index:10!important}
 .eventPanel{isolation:isolate}
 .rsvpShell::before,.rsvpShell::after{pointer-events:none!important;z-index:-1!important}
+
+/* Correção definitiva da ordem de empilhamento */
+body::before{z-index:-2!important}
+body::after{z-index:-1!important}
+.hero{position:relative!important;z-index:10!important}
+.eventPanel,.quick,.rsvpShell,.features,.closing,footer{position:relative!important;z-index:20!important}
+header,.topbar,.nav{position:relative!important;z-index:30!important}
