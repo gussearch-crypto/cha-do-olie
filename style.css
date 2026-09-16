@@ -44,3 +44,13 @@ body::after{z-index:-1!important}
 .hero{position:relative!important;z-index:10!important}
 .eventPanel,.quick,.rsvpShell,.features,.closing,footer{position:relative!important;z-index:20!important}
 header,.topbar,.nav{position:relative!important;z-index:30!important}
+
+/* Fundo sólido para o card de Data, Horário e Local */
+.eventPanel{
+  background:rgba(255,250,239,.96)!important;
+  border:1px solid rgba(111,119,69,.22)!important;
+  border-radius:22px!important;
+  box-shadow:0 10px 30px rgba(76,69,40,.14)!important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
