@@ -421,3 +421,29 @@ button {
 .heroCopy > p {
   font-size:115%!important;
 }
+
+
+/* Admin guest panel */
+.adminPage{min-height:100vh;background:#f5eedc;font-family:'DM Sans',sans-serif;color:#344126}
+.adminLogin{width:min(520px,calc(100% - 32px));margin:12vh auto;padding:42px;background:#fffaf0;border:1px solid #ded2ad;border-radius:24px;box-shadow:0 18px 50px #4b54251a;text-align:center}
+.adminLogin h1,.adminHeading h1{margin:8px 0 10px;font-family:'DM Sans',sans-serif;font-size:2rem}
+.adminLogin input,.adminTools input{width:100%;box-sizing:border-box;border:1px solid #d8cfb5;border-radius:14px;padding:14px 16px;background:#fff;font:500 1rem 'DM Sans',sans-serif;outline:none}
+.adminLogin .primary{margin-top:14px;width:100%}
+.adminWrap{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:120px 0 60px}
+.adminHeading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
+.adminHeading button,.guestActions button{border:1px solid #cfc5a7;background:#fffaf0;border-radius:12px;padding:11px 15px;font:600 .9rem 'DM Sans',sans-serif;cursor:pointer}
+.adminStats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.adminStats div{background:#fffaf0;border:1px solid #ded2ad;border-radius:18px;padding:20px}
+.adminStats b{display:block;font-size:1.7rem;color:#667641}.adminStats span{font-size:.82rem;color:#6e715f}
+.adminTools{display:flex;align-items:center;gap:18px;background:#fffaf0;border:1px solid #ded2ad;border-radius:18px;padding:14px;margin-bottom:16px}
+.adminTools input{flex:1}.adminTools span{white-space:nowrap;font-size:.85rem;color:#737563}
+.guestList{display:grid;gap:10px}
+.guestRow{display:grid;grid-template-columns:72px 1fr auto;gap:18px;align-items:center;background:#fffaf0;border:1px solid #ded2ad;border-radius:18px;padding:18px}
+.guestNumber{font-weight:700;color:#82905a;font-size:1.05rem;text-align:center}
+.guestTitle{display:flex;align-items:center;gap:10px}.guestTitle h3{margin:0;font:700 1rem 'DM Sans',sans-serif}
+.guestMain p{margin:7px 0;color:#686b5c;font-size:.88rem}
+.guestMeta{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:#85836f}
+.status{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;border-radius:999px;background:#eee7d4}
+.status.confirmed{background:#e2ead4;color:#4c622c}.status.declined{background:#f2ded6;color:#8a4937}.status.partial{background:#e8e2cf;color:#6f622d}
+.guestActions{display:flex;gap:8px}.guestActions .primary{background:#667641;color:white;border-color:#667641}.guestActions button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:760px){.adminWrap{width:min(100% - 24px,1180px);padding-top:100px}.adminStats{grid-template-columns:1fr 1fr}.guestRow{grid-template-columns:54px 1fr}.guestActions{grid-column:1/-1;justify-content:flex-end}.adminHeading{align-items:flex-start}.adminTools{align-items:stretch;flex-direction:column}.adminTools span{padding-left:4px}}
