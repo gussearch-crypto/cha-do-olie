@@ -1,25 +1,43 @@
 /* Banner vertical exclusivo para mobile — Chá do Oliver
-   A arte mobile já possui respiro superior e composição dos 4 mascotes.
-   Usamos contain para preservar 100% da largura e evitar cortes laterais. */
+   No mobile a arte deixa de ser usada como background recortável.
+   Ela é renderizada integralmente em uma camada própria, preservando
+   toda a largura e mantendo os 4 mascotes visíveis abaixo do texto. */
 @media (max-width: 760px) {
   .hero {
-    height: min(800px, calc(100svh - 60px)) !important;
-    min-height: 680px !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding-top: 300px !important;
+    padding-bottom: 0 !important;
+    background-image: none !important;
+    background-color: #f5edd4 !important;
+    overflow: hidden !important;
+  }
+
+  .hero::before {
+    content: '' !important;
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 1080 / 1600 !important;
     background-image: url('/images/banner-oliver-mobile.png') !important;
     background-repeat: no-repeat !important;
-    background-position: center bottom !important;
-    background-size: contain !important;
-    background-color: #f5edd4 !important;
+    background-position: center top !important;
+    background-size: 100% 100% !important;
+    z-index: 0 !important;
   }
 
   .heroShade {
-    background: linear-gradient(180deg, rgba(247,239,216,.16) 0%, rgba(247,239,216,.05) 30%, rgba(247,239,216,0) 48%) !important;
+    display: none !important;
   }
 
   .heroCopy {
-    inset: 24px 18px auto !important;
+    position: absolute !important;
+    inset: 22px 16px auto !important;
     width: auto !important;
-    height: 300px !important;
+    height: 260px !important;
     z-index: 2 !important;
     justify-content: flex-start !important;
   }
@@ -27,28 +45,27 @@
 
 @media (max-width: 480px) {
   .hero {
-    /* 1080x1600 = 1.4815x a largura. Mantém a arte inteira na viewport. */
-    height: calc(100vw * 1.4815) !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    background-position: center bottom !important;
-    background-size: 100% auto !important;
+    padding-top: 285px !important;
+  }
+
+  .hero::before {
+    width: 100% !important;
+    aspect-ratio: 1080 / 1600 !important;
+    background-size: 100% 100% !important;
   }
 
   .heroCopy {
-    inset: 20px 16px auto !important;
-    height: 285px !important;
+    inset: 18px 14px auto !important;
+    height: 250px !important;
   }
 }
 
 @media (max-width: 390px) {
   .hero {
-    height: calc(100vw * 1.4815) !important;
-    min-height: 0 !important;
-    background-size: 100% auto !important;
+    padding-top: 270px !important;
   }
 
   .heroCopy {
-    height: 270px !important;
+    height: 238px !important;
   }
 }
