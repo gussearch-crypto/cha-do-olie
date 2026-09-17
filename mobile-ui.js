@@ -10,4 +10,22 @@ function enhanceHeader(){
   window.addEventListener('resize',()=>{if(innerWidth>760)close()});
  });
 }
-const observer=new MutationObserver(enhanceHeader);observer.observe(document.documentElement,{childList:true,subtree:true});enhanceHeader();
+
+/* A arte mobile precisa ser um <img> real. O hero do React usa o banner
+   desktop como background; por isso os overrides anteriores ainda acabavam
+   exibindo/cortando essa imagem. Aqui inserimos explicitamente a arte mobile
+   completa no fluxo, logo depois do texto. */
+function enhanceMobileHero(){
+ const hero=document.querySelector('#inicio.hero');
+ if(!hero||hero.querySelector('.heroMobileArt'))return;
+ const img=document.createElement('img');
+ img.className='heroMobileArt';
+ img.src='/images/banner-oliver-mobile.png';
+ img.alt='Mascotes do Chá do Oliver';
+ img.decoding='async';
+ img.draggable=false;
+ hero.appendChild(img);
+}
+
+function enhance(){enhanceHeader();enhanceMobileHero()}
+const observer=new MutationObserver(enhance);observer.observe(document.documentElement,{childList:true,subtree:true});enhance();
