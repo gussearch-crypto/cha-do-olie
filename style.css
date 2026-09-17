@@ -346,3 +346,12 @@ nav,
 button {
   font-size:120%;
 }
+
+
+/* Event summary card — Mr Dafoe */
+.quick b,
+.quick .dateDay {
+  font-family:'Mr Dafoe',cursive!important;
+  font-weight:400!important;
+  font-style:normal!important;
+}
