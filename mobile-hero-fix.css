@@ -1,6 +1,5 @@
 /* Banner mobile — composição contínua e centralizada.
-   O texto permanece no topo e a arte vertical é sempre centralizada,
-   sem crop, sem deslocamento lateral e preservando a largura completa. */
+   Texto e arte compartilham exatamente o mesmo eixo central da viewport. */
 @media (max-width: 760px) {
   .hero {
     position: relative !important;
@@ -8,10 +7,12 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     padding: 0 !important;
+    margin: 0 !important;
     background-image: none !important;
     background-color: #f5edd4 !important;
     overflow: hidden !important;
@@ -29,19 +30,53 @@
   .heroCopy {
     position: relative !important;
     inset: auto !important;
+    left: auto !important;
+    right: auto !important;
     order: 1 !important;
     box-sizing: border-box !important;
     width: 100% !important;
+    max-width: none !important;
     height: auto !important;
     min-height: 0 !important;
-    padding: 24px 16px 14px !important;
-    margin: 0 auto !important;
+    padding: 24px 20px 14px !important;
+    margin: 0 !important;
     z-index: 2 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
     text-align: center !important;
+    transform: none !important;
+  }
+
+  .heroCopy small,
+  .heroCopy span,
+  .heroCopy h1,
+  .heroCopy p,
+  .heroCopy > a {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    text-align: center !important;
+    align-self: center !important;
+  }
+
+  .heroCopy small,
+  .heroCopy span,
+  .heroCopy h1,
+  .heroCopy p {
+    width: 100% !important;
+    max-width: 520px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .heroCopy > a {
+    width: fit-content !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    justify-content: center !important;
   }
 
   .heroMobileArt {
