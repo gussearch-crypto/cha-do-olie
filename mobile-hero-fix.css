@@ -1,4 +1,4 @@
-/* Mobile hero framing — enquadramento aprovado da banda */
+/* Mobile hero framing — composição conforme referência aprovada */
 @media (max-width: 760px) {
   .hero {
     background-image: url('/images/banner-oliver.png') !important;
@@ -7,40 +7,54 @@
   }
 
   .heroShade {
-    background: linear-gradient(180deg, rgba(243,234,209,.96) 0%, rgba(243,234,209,.82) 32%, rgba(243,234,209,.18) 53%, transparent 68%) !important;
+    background: linear-gradient(180deg, rgba(243,234,209,.97) 0%, rgba(243,234,209,.90) 31%, rgba(243,234,209,.42) 47%, transparent 62%) !important;
   }
 
   .heroCopy {
-    inset: 24px 14px auto !important;
+    inset: 28px 14px auto !important;
     width: auto !important;
-    height: 300px !important;
+    height: 310px !important;
     z-index: 2 !important;
+    justify-content: flex-start !important;
   }
 }
 
+/* Referência: título centralizado acima; banda grande ocupando toda a largura */
 @media (max-width: 480px) {
   .hero {
-    height: 790px !important;
-    min-height: 790px !important;
-    background-size: auto 72% !important;
-    background-position: 58% bottom !important;
+    height: 835px !important;
+    min-height: 835px !important;
+    background-size: auto 76% !important;
+    background-position: 55% bottom !important;
+  }
+  .heroCopy {
+    height: 335px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .hero {
+    height: 805px !important;
+    min-height: 805px !important;
+    background-size: auto 75% !important;
+    background-position: 55% bottom !important;
   }
 }
 
 @media (max-width: 390px) {
   .hero {
-    height: 740px !important;
-    min-height: 740px !important;
-    background-size: auto 69% !important;
-    background-position: 58% bottom !important;
+    height: 770px !important;
+    min-height: 770px !important;
+    background-size: auto 74% !important;
+    background-position: 55% bottom !important;
   }
 }
 
 @media (max-width: 360px) {
   .hero {
-    height: 700px !important;
-    min-height: 700px !important;
-    background-size: auto 67% !important;
-    background-position: 58% bottom !important;
+    height: 735px !important;
+    min-height: 735px !important;
+    background-size: auto 73% !important;
+    background-position: 55% bottom !important;
   }
 }
