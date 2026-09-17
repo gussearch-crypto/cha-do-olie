@@ -1,0 +1,40 @@
+/* Mobile hero framing override — keep all mascots readable without shrinking the artwork */
+@media (max-width: 760px) {
+  .hero {
+    height: 680px !important;
+    min-height: 680px !important;
+    background-image: url('/images/banner-oliver.png') !important;
+    background-size: auto 100% !important;
+    background-position: 66% center !important;
+    background-repeat: no-repeat !important;
+    background-color: #f3ead1 !important;
+  }
+
+  .heroShade {
+    background: linear-gradient(180deg, rgba(243,234,209,.96) 0%, rgba(243,234,209,.82) 32%, rgba(243,234,209,.18) 53%, transparent 68%) !important;
+  }
+
+  .heroCopy {
+    inset: 24px 14px auto !important;
+    width: auto !important;
+    height: 300px !important;
+    z-index: 2 !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .hero {
+    height: 690px !important;
+    min-height: 690px !important;
+    background-size: auto 100% !important;
+    background-position: 64% center !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero {
+    height: 670px !important;
+    min-height: 670px !important;
+    background-position: 63% center !important;
+  }
+}
