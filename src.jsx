@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import{createRoot}from'react-dom/client';
 import{Search,MapPin,CalendarDays,Clock3,Gift,Baby,CheckCircle2,Heart,ChevronRight,Users,ArrowLeft,Music2,ExternalLink}from'lucide-react';
 import'./style.css';
+import'./mobile-hero-fix.css';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/invite-api';
 const amazon='https://www.amazon.com.br/baby-reg/gustavo-henrique-janeiro-2027-sopaulo/K6BQ3XFQQ9IO?ref_=cm_sw_r_cp_ud_dp_17SYTR1MP6FTCSNQMQHC';
 const hero='/images/banner-oliver.png';
@@ -47,30 +48,13 @@ function AdminPanel(){
  const load=async(adminCode=code)=>{setLoading(true);setError('');try{const d=await api({action:'adminList',adminCode});setFamilies(d.families||[]);sessionStorage.setItem('oliverAdmin',adminCode)}catch(e){setError('Código administrativo inválido ou não foi possível carregar o painel.')}finally{setLoading(false)}};
  useEffect(()=>{if(code&&sessionStorage.getItem('oliverAdmin'))load(code)},[]);
  const makePin=async(f)=>{if(f.invite_pin_plain&&!window.confirm('Este núcleo já possui um token visível. Deseja substituí-lo?'))return;const pin=String(Math.floor(1000+Math.random()*9000));try{await api({action:'adminSetPin',adminCode:code,familyId:f.id,pin});setFamilies(families.map(x=>x.id===f.id?{...x,invite_pin_plain:pin}:x))}catch{setError('Não foi possível gerar o token.')}};
- const message=f=>`Olá, ${f.display_name}! 💛
-
-Estamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.
-
-Acesse o convite:
-${window.location.origin}
-
-Para confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:
-${f.invite_pin_plain||'[gere o token no painel]'}
-
-📅 04 de dezembro (sexta-feira)
-🕕 Das 18h às 22h
-📍 Salão Terra Mágica
-
-Traga o amor, o sorriso e a fralda: estamos em contagem regressiva! 💛`;
+ const message=f=>`Olá, ${f.display_name}! 💛\n\nEstamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.\n\nAcesse o convite:\n${window.location.origin}\n\nPara confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:\n${f.invite_pin_plain||'[gere o token no painel]'}\n\n📅 04 de dezembro (sexta-feira)\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nTraga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛`;
  const copy=async f=>{await navigator.clipboard.writeText(message(f));alert('Texto do convite copiado!')};
- const shown=families.filter(f=>(f.display_name+' '+(f.group_name||'')+' '+(f.guests||[]).map(g=>g.name).join(' ')).toLowerCase().includes(filter.toLowerCase()));
- const totalGuests=families.reduce((n,f)=>n+(f.guests?.length||0),0),confirmed=families.reduce((n,f)=>n+(f.guests||[]).filter(g=>g.attendance==='yes').length,0);
- if(!families.length)return <main className="adminPage"><section className="adminLogin"><span className="eyebrow">CHÁ DO OLIVER</span><h1>Painel de convidados</h1><p>Digite o código administrativo para acessar a lista.</p><input type="password" inputMode="numeric" value={code} onChange={e=>setCode(e.target.value)} placeholder="Código administrativo"/><button className="primary" onClick={()=>load()} disabled={loading}>{loading?'Carregando...':'Entrar no painel'}</button>{error&&<div className="error">{error}</div>}</section></main>;
- return <main className="adminPage"><header><a className="brand" href="/">Chá do Oliver</a><nav><a href="/">Ver convite</a></nav></header><section className="adminWrap"><div className="adminHeading"><div><span className="eyebrow">ADMINISTRAÇÃO</span><h1>Lista de convidados</h1><p>Organize os núcleos e copie o convite com link e token.</p></div><button onClick={()=>{sessionStorage.removeItem('oliverAdmin');setFamilies([]);setCode('')}}>Sair</button></div>
- <div className="adminStats"><div><b>{families.length}</b><span>Núcleos</span></div><div><b>{totalGuests}</b><span>Convidados</span></div><div><b>{confirmed}</b><span>Confirmados</span></div><div><b>{totalGuests-confirmed}</b><span>Demais convidados</span></div></div>
- <div className="adminTools"><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar convidado ou família..."/><span>{shown.length} núcleo(s)</span></div>
- <div className="guestList">{shown.map(f=><article className="guestRow" key={f.id}><div className="guestNumber">#{String(f.number).padStart(3,'0')}</div><div className="guestMain"><div className="guestTitle"><h3>{f.display_name}</h3><span className={'status '+f.invite_status}>{f.invite_status}</span></div><p>{(f.guests||[]).map(g=>g.name).join(' · ')}</p><div className="guestMeta"><span>{f.guests?.length||0} convidado(s)</span><span>{(f.guests||[]).filter(g=>g.attendance==='yes').length} confirmado(s)</span><span>Token: <b>{f.invite_pin_plain||'não disponível'}</b></span></div></div><div className="guestActions"><button onClick={()=>makePin(f)}>{f.invite_pin_plain?'Trocar token':'Gerar token'}</button><button className="primary" onClick={()=>copy(f)} disabled={!f.invite_pin_plain}>Copiar convite</button></div></article>)}</div>
- {error&&<div className="error">{error}</div>}</section></main>
+ const whatsapp=f=>{window.open('https://wa.me/?text='+encodeURIComponent(message(f)),'_blank','noopener,noreferrer')};
+ const shown=families.filter(f=>!filter||String(f.number||'').includes(filter)||f.display_name.toLowerCase().includes(filter.toLowerCase()));
+ if(!families.length)return <div className="adminPage"><div className="adminLogin"><Baby/><h1>Painel do Chá do Oliver</h1><p>Acesso reservado aos organizadores.</p><input type="password" value={code} onChange={e=>setCode(e.target.value)} placeholder="Código administrativo" onKeyDown={e=>e.key==='Enter'&&load()}/><button className="primary" onClick={()=>load()} disabled={!code||loading}>{loading?'Entrando...':'Acessar painel'}</button>{error&&<div className="error">{error}</div>}<a href="/">← Voltar ao convite</a></div></div>;
+ return <div className="adminPage"><div className="adminHeader"><div><span className="eyebrow">CHÁ DO OLIVER</span><h1>Painel de convidados</h1><p>{families.length} núcleos cadastrados</p></div><div className="adminHeaderActions"><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar nº ou família"/><button onClick={()=>{sessionStorage.removeItem('oliverAdmin');setFamilies([]);setCode('')}}>Sair</button><a href="/">Ver convite</a></div></div><div className="adminList">{shown.map((f,i)=><article className="adminCard" key={f.id}><div className="adminNumber">{String(f.number||i+1).padStart(2,'0')}</div><div className="adminFamily"><span className="eyebrow">NÚCLEO</span><h2>{f.display_name}</h2><p>{(f.guests||[]).map(g=>g.name).join(' · ')}</p></div><div className="adminToken"><span>Token</span><strong>{f.invite_pin_plain||'— — — —'}</strong></div><div className="adminActions"><button onClick={()=>makePin(f)}>{f.invite_pin_plain?'Trocar token':'Gerar token'}</button><button onClick={()=>copy(f)} disabled={!f.invite_pin_plain}>Copiar convite</button><button className="whatsapp" onClick={()=>whatsapp(f)} disabled={!f.invite_pin_plain}>WhatsApp</button></div></article>)}</div></div>;
 }
-const isAdmin=window.location.hash==='#painel'||window.location.pathname==='/painel'||new URLSearchParams(window.location.search).get('painel')==='1';
+
+const isAdmin=new URLSearchParams(window.location.search).get('painel')==='1'||window.location.hash==='#painel';
 createRoot(document.getElementById('root')).render(isAdmin?<AdminPanel/>:<App/>);
