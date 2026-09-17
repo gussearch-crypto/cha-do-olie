@@ -1,60 +1,42 @@
-/* Mobile hero framing — composição conforme referência aprovada */
+/* Banner vertical exclusivo para mobile — Chá do Oliver */
 @media (max-width: 760px) {
   .hero {
-    background-image: url('/images/banner-oliver.png') !important;
+    height: min(800px, calc(100svh - 60px)) !important;
+    min-height: 680px !important;
+    background-image: url('/images/banner-oliver-mobile.png') !important;
     background-repeat: no-repeat !important;
-    background-color: #f3ead1 !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-color: #f5edd4 !important;
   }
 
   .heroShade {
-    background: linear-gradient(180deg, rgba(243,234,209,.97) 0%, rgba(243,234,209,.90) 31%, rgba(243,234,209,.42) 47%, transparent 62%) !important;
+    background: linear-gradient(180deg, rgba(247,239,216,.20) 0%, rgba(247,239,216,.08) 30%, rgba(247,239,216,0) 50%) !important;
   }
 
   .heroCopy {
-    inset: 28px 14px auto !important;
+    inset: 24px 18px auto !important;
     width: auto !important;
-    height: 310px !important;
+    height: 300px !important;
     z-index: 2 !important;
     justify-content: flex-start !important;
   }
 }
 
-/* Referência: título centralizado acima; banda grande ocupando toda a largura */
 @media (max-width: 480px) {
   .hero {
-    height: 835px !important;
-    min-height: 835px !important;
-    background-size: auto 76% !important;
-    background-position: 55% bottom !important;
+    height: 740px !important;
+    min-height: 700px !important;
+    background-position: center center !important;
+    background-size: cover !important;
   }
-  .heroCopy {
-    height: 335px !important;
-  }
-}
-
-@media (max-width: 430px) {
-  .hero {
-    height: 805px !important;
-    min-height: 805px !important;
-    background-size: auto 75% !important;
-    background-position: 55% bottom !important;
-  }
+  .heroCopy { height: 300px !important; }
 }
 
 @media (max-width: 390px) {
   .hero {
-    height: 770px !important;
-    min-height: 770px !important;
-    background-size: auto 74% !important;
-    background-position: 55% bottom !important;
+    height: 700px !important;
+    min-height: 680px !important;
   }
-}
-
-@media (max-width: 360px) {
-  .hero {
-    height: 735px !important;
-    min-height: 735px !important;
-    background-size: auto 73% !important;
-    background-position: 55% bottom !important;
-  }
+  .heroCopy { height: 285px !important; }
 }
