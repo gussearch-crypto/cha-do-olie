@@ -371,3 +371,26 @@ button {
     font-size:clamp(2.1rem,9vw,3rem)!important;
   }
 }
+
+
+/* Final event information block — DM Sans + centered */
+.eventPanel,
+.eventPanel > div,
+.eventPanel b,
+.eventPanel strong,
+.eventPanel > div > span,
+.eventPanel a {
+  font-family:'DM Sans',sans-serif!important;
+}
+.eventPanel > div {
+  text-align:center!important;
+  align-items:center!important;
+  justify-content:flex-start;
+}
+.eventPanel > div > svg {
+  margin-left:auto;
+  margin-right:auto;
+}
+.eventPanel a {
+  align-self:center!important;
+}
