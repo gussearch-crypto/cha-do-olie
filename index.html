@@ -9,6 +9,9 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="module" src="/src.jsx"></script>
+  <script type="module">
+    const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
+    import(admin ? '/admin-entry.jsx' : '/src.jsx');
+  </script>
 </body>
 </html>
