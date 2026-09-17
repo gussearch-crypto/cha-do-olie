@@ -1,7 +1,6 @@
-/* Banner vertical exclusivo para mobile — Chá do Oliver
-   No mobile a arte deixa de ser usada como background recortável.
-   Ela é renderizada integralmente em uma camada própria, preservando
-   toda a largura e mantendo os 4 mascotes visíveis abaixo do texto. */
+/* Banner mobile — preserva a proporção NATURAL da arte.
+   O pseudo-elemento funciona como uma imagem responsiva real: não usa
+   cover, não recorta laterais e não depende de aspect-ratio calculado. */
 @media (max-width: 760px) {
   .hero {
     position: relative !important;
@@ -9,63 +8,49 @@
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding-top: 300px !important;
-    padding-bottom: 0 !important;
+    padding: 285px 0 0 !important;
     background-image: none !important;
     background-color: #f5edd4 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   .hero::before {
-    content: '' !important;
+    content: url('/images/banner-oliver-mobile.png') !important;
     display: block !important;
     position: relative !important;
     width: 100% !important;
-    aspect-ratio: 1080 / 1600 !important;
-    background-image: url('/images/banner-oliver-mobile.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: center top !important;
-    background-size: 100% 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+    overflow: hidden !important;
     z-index: 0 !important;
   }
 
-  .heroShade {
-    display: none !important;
+  /* Faz a imagem gerada por content ocupar a largura sem distorção. */
+  .hero::before {
+    object-fit: contain !important;
+    object-position: center top !important;
   }
+
+  .heroShade { display: none !important; }
 
   .heroCopy {
     position: absolute !important;
-    inset: 22px 16px auto !important;
+    inset: 20px 16px auto !important;
     width: auto !important;
-    height: 260px !important;
+    height: 250px !important;
     z-index: 2 !important;
     justify-content: flex-start !important;
   }
-}
 
-@media (max-width: 480px) {
-  .hero {
-    padding-top: 285px !important;
-  }
-
-  .hero::before {
-    width: 100% !important;
-    aspect-ratio: 1080 / 1600 !important;
-    background-size: 100% 100% !important;
-  }
-
-  .heroCopy {
-    inset: 18px 14px auto !important;
-    height: 250px !important;
+  /* O card de data começa somente depois do fim real da arte. */
+  .quick {
+    margin-top: -20px !important;
   }
 }
 
 @media (max-width: 390px) {
-  .hero {
-    padding-top: 270px !important;
-  }
-
-  .heroCopy {
-    height: 238px !important;
-  }
+  .hero { padding-top: 270px !important; }
+  .heroCopy { inset: 18px 14px auto !important; height: 238px !important; }
 }
