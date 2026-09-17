@@ -1,56 +1,71 @@
-/* Banner mobile — preserva a proporção NATURAL da arte.
-   O pseudo-elemento funciona como uma imagem responsiva real: não usa
-   cover, não recorta laterais e não depende de aspect-ratio calculado. */
+/* Banner mobile — composição contínua.
+   O texto permanece no topo e a arte dos mascotes começa logo abaixo,
+   sem recorte lateral e sem reservar um grande espaço artificial. */
 @media (max-width: 760px) {
   .hero {
     position: relative !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding: 285px 0 0 !important;
+    padding: 0 !important;
     background-image: none !important;
     background-color: #f5edd4 !important;
-    overflow: visible !important;
-  }
-
-  .hero::before {
-    content: url('/images/banner-oliver-mobile.png') !important;
-    display: block !important;
-    position: relative !important;
-    width: 100% !important;
-    height: auto !important;
-    max-width: 100% !important;
-    line-height: 0 !important;
-    font-size: 0 !important;
     overflow: hidden !important;
-    z-index: 0 !important;
   }
 
-  /* Faz a imagem gerada por content ocupar a largura sem distorção. */
   .hero::before {
-    object-fit: contain !important;
-    object-position: center top !important;
+    content: none !important;
+    display: none !important;
   }
 
-  .heroShade { display: none !important; }
+  .heroShade {
+    display: none !important;
+  }
 
   .heroCopy {
-    position: absolute !important;
-    inset: 20px 16px auto !important;
-    width: auto !important;
-    height: 250px !important;
+    position: relative !important;
+    inset: auto !important;
+    order: 1 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 24px 16px 14px !important;
+    margin: 0 !important;
     z-index: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
     justify-content: flex-start !important;
+    align-items: center !important;
   }
 
-  /* O card de data começa somente depois do fim real da arte. */
+  /* Imagem real adicionada ao hero pelo JSX. */
+  .heroMobileArt {
+    order: 2 !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    object-fit: contain !important;
+    object-position: center top !important;
+    line-height: 0 !important;
+  }
+
   .quick {
-    margin-top: -20px !important;
+    position: relative !important;
+    margin-top: -18px !important;
+    z-index: 3 !important;
   }
 }
 
-@media (max-width: 390px) {
-  .hero { padding-top: 270px !important; }
-  .heroCopy { inset: 18px 14px auto !important; height: 238px !important; }
+/* Desktop não exibe a arte vertical. */
+@media (min-width: 761px) {
+  .heroMobileArt {
+    display: none !important;
+  }
 }
