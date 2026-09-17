@@ -415,3 +415,9 @@ nav,
 button {
   font-size:96%;
 }
+
+
+/* Hero tagline — +15% */
+.heroCopy > p {
+  font-size:115%!important;
+}
