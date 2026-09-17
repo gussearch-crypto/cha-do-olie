@@ -394,3 +394,24 @@ button {
 .eventPanel a {
   align-self:center!important;
 }
+
+
+/* Functional typography — reduce current size by 20% */
+.heroCopy > span,
+.quick b,
+.quick .dateDay,
+.features .feature h3,
+.features .feature p,
+.eventPanel strong,
+.eventPanel > div > span,
+.rsvpShell p,
+.rsvpShell label,
+.rsvpShell input,
+.rsvpShell select,
+.rsvpShell button,
+.rsvpShell .eyebrow,
+.rsvpShell .hint,
+nav,
+button {
+  font-size:96%;
+}
