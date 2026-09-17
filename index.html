@@ -6,12 +6,14 @@
   <meta name="theme-color" content="#657442" />
   <title>Chá do Oliver</title>
   <link rel="stylesheet" href="/mobile-hero-fix.css" />
+  <link rel="stylesheet" href="/mobile-ui.css" />
 </head>
 <body>
   <div id="root"></div>
   <script type="module">
     const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
     import(admin ? '/admin-entry.jsx' : '/src.jsx');
+    import('/mobile-ui.js').catch(console.error);
     if (admin) import('/admin-countdown.js').catch(console.error);
   </script>
 </body>
