@@ -1,12 +1,13 @@
-/* Banner mobile — composição contínua.
-   O texto permanece no topo e a arte dos mascotes começa logo abaixo,
-   sem recorte lateral e sem reservar um grande espaço artificial. */
+/* Banner mobile — composição contínua e centralizada.
+   O texto permanece no topo e a arte vertical é sempre centralizada,
+   sem crop, sem deslocamento lateral e preservando a largura completa. */
 @media (max-width: 760px) {
   .hero {
     position: relative !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
@@ -34,25 +35,32 @@
     height: auto !important;
     min-height: 0 !important;
     padding: 24px 16px 14px !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     z-index: 2 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
+    text-align: center !important;
   }
 
-  /* Imagem real adicionada ao hero pelo JSX. */
   .heroMobileArt {
     order: 2 !important;
     display: block !important;
+    box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    margin: 0 !important;
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     object-fit: contain !important;
-    object-position: center top !important;
+    object-position: 50% 50% !important;
+    transform: none !important;
+    translate: none !important;
+    left: auto !important;
+    right: auto !important;
     line-height: 0 !important;
   }
 
@@ -63,7 +71,6 @@
   }
 }
 
-/* Desktop não exibe a arte vertical. */
 @media (min-width: 761px) {
   .heroMobileArt {
     display: none !important;
