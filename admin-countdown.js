@@ -1,117 +1,38 @@
 const EVENT_AT = new Date('2026-12-04T18:00:00-03:00');
 const EVENT_DAY = '2026-12-04';
+const APP_URL = 'https://cha-oliver-mvp.vercel.app/';
+const VENUE = 'Salão Terra Mágica';
+const ADDRESS = 'Av. das Nações, 151 - sobreloja, Parque Novo Oratório, Santo André - SP, 09260-000';
+const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=Av.%20das%20Na%C3%A7%C3%B5es%2C%20151%20-%20Parque%20Novo%20Orat%C3%B3rio%2C%20Santo%20Andr%C3%A9%20-%20SP%2C%2009260-000';
 
 function saoPauloDay() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit'
-  }).format(new Date());
+  return new Intl.DateTimeFormat('en-CA', {timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 }
-
 function countdown() {
-  const today = saoPauloDay();
-  if (today === EVENT_DAY) return { label: 'É hoje!', days: 0, today: true };
-  const diff = EVENT_AT.getTime() - Date.now();
-  if (diff <= 0) return { label: 'O Chá do Oliver já aconteceu', days: 0, past: true };
-  const days = Math.ceil(diff / 86400000);
-  return { label: `Faltam ${days} dias`, days };
+  const today=saoPauloDay();
+  if(today===EVENT_DAY)return{label:'É hoje!',days:0,today:true};
+  const diff=EVENT_AT.getTime()-Date.now();
+  if(diff<=0)return{label:'O Chá do Oliver já aconteceu',days:0,past:true};
+  const days=Math.ceil(diff/86400000);return{label:`Faltam ${days} dias`,days};
 }
-
-function reminderText(name, status, token) {
-  const c = countdown();
-  const access = token && !token.includes('—') ? token : '[token de acesso]';
-
-  if (c.today) {
-    return `Olá, ${name}! 💛\n\nÉ hoje! 🎉\n\nChegou o dia do Chá do Oliver! Estamos muito felizes e esperando vocês para celebrar esse momento tão especial com a gente.\n\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e informações:\nhttps://cha-oliver-mvp.vercel.app/\n\nAté daqui a pouco! 💛🦁🐼🦒🐓`;
-  }
-
-  if (status === 'pending') {
-    return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nEstamos preparando tudo com muito carinho e ainda aguardamos a confirmação de presença de vocês.\n\nPara nos ajudar com a organização, pedimos que confirmem a presença até o dia 30 de novembro de 2026. 💛\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nPara acessar a confirmação, utilize:\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEsperamos muito poder celebrar esse momento com vocês! 💛🦁🐼🦒🐓`;
-  }
-
-  if (status === 'confirmed') {
-    return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nCaso tenha algum imprevisto, você pode editar sua confirmação utilizando as mesmas informações de acesso anterior.\n\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
-  }
-
-  return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
+function locationBlock(){return `📍 ${VENUE}\n${ADDRESS}\n🗺️ Google Maps: ${MAPS_URL}`;}
+function initialInviteText(name,token){
+  const access=token&&!token.includes('—')?token:'[token do convite]';
+  return `Olá, ${name}! 💛\n\nEstamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.\n\nAcesse o convite:\n${APP_URL}\n\nPara confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:\n${access}\n\n📅 04 de dezembro (sexta-feira)\n🕕 Das 18h às 22h\n${locationBlock()}\n\nTraga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛`;
 }
-
-function addStyles() {
-  if (document.getElementById('admin-countdown-style')) return;
-  const style = document.createElement('style');
-  style.id = 'admin-countdown-style';
-  style.textContent = `
-    .countdownCard{background:#667641;color:#fffaf0;border-radius:22px;padding:20px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .countdownCard small{display:block;font-size:.68rem;letter-spacing:.14em;font-weight:700;color:#e9dfbc;margin-bottom:5px}.countdownCard strong{display:block;font-size:1.65rem}.countdownCard span{font-size:.82rem;color:#e9e5d4}
-    .guestRow.hasReminder{grid-template-columns:72px 1fr auto;align-items:center}
-    .guestRow.hasReminder .reminderAction{grid-column:3;justify-self:stretch;width:100%;box-sizing:border-box;border-top:1px solid #ded2ad;margin-top:0;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .reminderAction .reminderInfo{font-size:.76rem;color:#747762;white-space:nowrap}.reminderAction button{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #cfc5a7;background:#fffaf0;color:#45532d;border-radius:12px;padding:0 16px;font:600 .88rem 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap}.reminderAction button:hover{background:#f5f0e4}.reminderAction button svg{width:16px;height:16px}
-    @media(max-width:1050px){.guestRow.hasReminder .reminderAction{grid-column:1/-1}.reminderAction .reminderInfo{white-space:normal}}
-    @media(max-width:700px){.countdownCard{align-items:flex-start;flex-direction:column}.guestRow.hasReminder .reminderAction{align-items:stretch;flex-direction:column}.reminderAction button{width:100%}}
-  `;
-  document.head.appendChild(style);
+function reminderText(name,status,token){
+  const c=countdown();const access=token&&!token.includes('—')?token:'[token de acesso]';
+  if(c.today)return `Olá, ${name}! 💛\n\nÉ hoje! 🎉\n\nChegou o dia do Chá do Oliver! Estamos muito felizes e esperando vocês para celebrar esse momento tão especial com a gente.\n\n🕕 Das 18h às 22h\n${locationBlock()}\n\nConvite e informações:\n${APP_URL}\n\nAté daqui a pouco! 💛🦁🐼🦒🐓`;
+  if(status==='pending')return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nEstamos preparando tudo com muito carinho e ainda aguardamos a confirmação de presença de vocês.\n\nPara nos ajudar com a organização, pedimos que confirmem a presença até o dia 30 de novembro de 2026. 💛\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n${locationBlock()}\n\nConvite e confirmação de presença:\n${APP_URL}\n\nPara acessar a confirmação, utilize:\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEsperamos muito poder celebrar esse momento com vocês! 💛🦁🐼🦒🐓`;
+  if(status==='confirmed')return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n${locationBlock()}\n\nConvite e confirmação de presença:\n${APP_URL}\n\nCaso tenha algum imprevisto, você pode editar sua confirmação utilizando as mesmas informações de acesso anterior.\n\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
+  return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n${locationBlock()}\n\nConvite e confirmação de presença:\n${APP_URL}\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
 }
-
-function mountCountdown() {
-  const dashboard = document.querySelector('.dashboard');
-  if (!dashboard || document.querySelector('.countdownCard')) return;
-  const c = countdown();
-  const card = document.createElement('section');
-  card.className = 'countdownCard';
-  card.innerHTML = `<div><small>CONTAGEM REGRESSIVA</small><strong>${c.label}</strong><span>Chá do Oliver · 04/12/2026 às 18h</span></div><div>💛 🦁 🐼 🦒 🐓</div>`;
-  dashboard.insertAdjacentElement('afterend', card);
-}
-
-function getFamilyStatus(row) {
-  const status = row.querySelector('.guestTitle .status');
-  if (!status) return 'other';
-  if (status.classList.contains('confirmed')) return 'confirmed';
-  if (status.classList.contains('declined')) return 'declined';
-  if (status.classList.contains('partial')) return 'partial';
-  return 'pending';
-}
-
-function getToken(row) {
-  const meta = row.querySelector('.guestMeta');
-  if (!meta) return '';
-  const tokenSpan = [...meta.querySelectorAll('span')].find(el => el.textContent.trim().startsWith('Token:'));
-  return tokenSpan?.querySelector('b')?.textContent.trim() || '';
-}
-
-function mountReminder(row) {
-  if (row.querySelector('.reminderAction')) return;
-  const title = row.querySelector('.guestTitle h3');
-  const actions = row.querySelector('.guestActions');
-  if (!title || !actions) return;
-  const name = title.textContent.trim();
-  const status = getFamilyStatus(row);
-  const token = getToken(row);
-  const c = countdown();
-  row.classList.add('hasReminder');
-  const bar = document.createElement('div');
-  bar.className = 'reminderAction';
-  const statusInfo = status === 'pending' ? ' · aguardando confirmação até 30/11' : '';
-  bar.innerHTML = `<span class="reminderInfo">${c.today ? 'Lembrete · É hoje!' : `Lembrete · ${c.label}${statusInfo}`}</span><button type="button" aria-label="Copiar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copiar lembrete</button>`;
-  bar.querySelector('button').addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(reminderText(name, status, token));
-      const btn = bar.querySelector('button');
-      const original = btn.innerHTML;
-      btn.innerHTML = '✓ Lembrete copiado';
-      setTimeout(() => btn.innerHTML = original, 1800);
-    } catch {
-      alert('Não foi possível copiar o lembrete.');
-    }
-  });
-  actions.insertAdjacentElement('afterend', bar);
-}
-
-function enhance() {
-  addStyles();
-  mountCountdown();
-  document.querySelectorAll('.guestRow').forEach(mountReminder);
-}
-
-const observer = new MutationObserver(enhance);
-observer.observe(document.documentElement, { childList: true, subtree: true });
-enhance();
-setInterval(() => { document.querySelector('.countdownCard')?.remove(); enhance(); }, 60000);
+function addStyles(){if(document.getElementById('admin-countdown-style'))return;const style=document.createElement('style');style.id='admin-countdown-style';style.textContent=`.countdownCard{background:#667641;color:#fffaf0;border-radius:22px;padding:20px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px}.countdownCard small{display:block;font-size:.68rem;letter-spacing:.14em;font-weight:700;color:#e9dfbc;margin-bottom:5px}.countdownCard strong{display:block;font-size:1.65rem}.countdownCard span{font-size:.82rem;color:#e9e5d4}.guestRow.hasReminder{grid-template-columns:72px 1fr auto;align-items:center}.guestRow.hasReminder .reminderAction{grid-column:3;justify-self:stretch;width:100%;box-sizing:border-box;border-top:1px solid #ded2ad;margin-top:0;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.reminderAction .reminderInfo{font-size:.76rem;color:#747762;white-space:nowrap}.reminderAction button{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #cfc5a7;background:#fffaf0;color:#45532d;border-radius:12px;padding:0 16px;font:600 .88rem 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap}.reminderAction button:hover{background:#f5f0e4}.reminderAction button svg{width:16px;height:16px}@media(max-width:1050px){.guestRow.hasReminder .reminderAction{grid-column:1/-1}.reminderAction .reminderInfo{white-space:normal}}@media(max-width:700px){.countdownCard{align-items:flex-start;flex-direction:column}.guestRow.hasReminder .reminderAction{align-items:stretch;flex-direction:column}.reminderAction button{width:100%}}`;document.head.appendChild(style)}
+function mountCountdown(){const dashboard=document.querySelector('.dashboard');if(!dashboard||document.querySelector('.countdownCard'))return;const c=countdown(),card=document.createElement('section');card.className='countdownCard';card.innerHTML=`<div><small>CONTAGEM REGRESSIVA</small><strong>${c.label}</strong><span>Chá do Oliver · 04/12/2026 às 18h</span></div><div>💛 🦁 🐼 🦒 🐓</div>`;dashboard.insertAdjacentElement('afterend',card)}
+function getFamilyStatus(row){const status=row.querySelector('.guestTitle .status');if(!status)return'other';if(status.classList.contains('confirmed'))return'confirmed';if(status.classList.contains('declined'))return'declined';if(status.classList.contains('partial'))return'partial';return'pending'}
+function getToken(row){const meta=row.querySelector('.guestMeta');if(!meta)return'';const tokenSpan=[...meta.querySelectorAll('span')].find(el=>el.textContent.trim().startsWith('Token:'));return tokenSpan?.querySelector('b')?.textContent.trim()||''}
+function mountReminder(row){if(row.querySelector('.reminderAction'))return;const title=row.querySelector('.guestTitle h3'),actions=row.querySelector('.guestActions');if(!title||!actions)return;const name=title.textContent.trim(),status=getFamilyStatus(row),token=getToken(row),c=countdown();row.classList.add('hasReminder');const bar=document.createElement('div');bar.className='reminderAction';const statusInfo=status==='pending'?' · aguardando confirmação até 30/11':'';bar.innerHTML=`<span class="reminderInfo">${c.today?'Lembrete · É hoje!':`Lembrete · ${c.label}${statusInfo}`}</span><button type="button" aria-label="Copiar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copiar lembrete</button>`;bar.querySelector('button').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(reminderText(name,status,token));const btn=bar.querySelector('button'),original=btn.innerHTML;btn.innerHTML='✓ Lembrete copiado';setTimeout(()=>btn.innerHTML=original,1800)}catch{alert('Não foi possível copiar o lembrete.')}});actions.insertAdjacentElement('afterend',bar)}
+function enhance(){addStyles();mountCountdown();document.querySelectorAll('.guestRow').forEach(mountReminder)}
+// Substitui o texto do botão "Copiar convite" pela versão inicial padronizada.
+document.addEventListener('click',async e=>{const button=e.target.closest('.guestActions button');if(!button||!button.textContent.includes('Copiar convite'))return;e.preventDefault();e.stopImmediatePropagation();const row=button.closest('.guestRow'),name=row?.querySelector('.guestTitle h3')?.textContent.trim()||'Convidado',token=row?getToken(row):'';try{await navigator.clipboard.writeText(initialInviteText(name,token));alert('Texto do convite copiado!')}catch{alert('Não foi possível copiar o convite.')}},true);
+const observer=new MutationObserver(enhance);observer.observe(document.documentElement,{childList:true,subtree:true});enhance();setInterval(()=>{document.querySelector('.countdownCard')?.remove();enhance()},60000);
