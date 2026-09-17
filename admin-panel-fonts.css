@@ -1,62 +1,65 @@
-/* Tipografia do hero do painel — replica as fontes do convite.
-   Este arquivo e importado por ultimo em admin-entry.jsx para sobrescrever admin-panel.css. */
-.adminWrap:after{
-  content:'Oliver'!important;
-  white-space:normal!important;
-  top:155px!important;
-  left:7%!important;
-  width:42%!important;
-  font-family:'Mr Dafoe',cursive!important;
-  font-size:6.4rem!important;
-  font-weight:400!important;
-  line-height:.9!important;
-  color:#59633a!important;
+/* Tipografia do banner administrativo — regras diretas e independentes */
+.adminWrap::after{
+  content:'Oliver' !important;
+  white-space:normal !important;
+  position:absolute !important;
+  z-index:4 !important;
+  top:155px !important;
+  left:7% !important;
+  width:42% !important;
+  text-align:center !important;
+  color:#59633a !important;
+  font-family:'Mr Dafoe', cursive !important;
+  font-size:6.4rem !important;
+  font-weight:400 !important;
+  font-style:normal !important;
+  line-height:.9 !important;
+  letter-spacing:0 !important;
+  pointer-events:none !important;
 }
-
-.adminHeading:before{
-  content:'SAVE THE DATE\A Chá do'!important;
-  white-space:pre-line!important;
-  position:absolute!important;
-  z-index:3!important;
-  top:88px!important;
-  left:7%!important;
-  width:42%!important;
-  text-align:center!important;
-  color:#344126!important;
-  font-family:'DM Sans',sans-serif!important;
-  font-size:1rem!important;
-  font-weight:700!important;
-  line-height:1.7!important;
-  letter-spacing:.16em!important;
-  pointer-events:none!important;
+.adminHeading::before{
+  content:'SAVE THE DATE\A Chá do' !important;
+  white-space:pre-line !important;
+  position:absolute !important;
+  z-index:4 !important;
+  top:88px !important;
+  left:7% !important;
+  width:42% !important;
+  text-align:center !important;
+  color:#344126 !important;
+  font-family:'DM Sans', sans-serif !important;
+  font-size:1rem !important;
+  font-weight:700 !important;
+  font-style:normal !important;
+  line-height:1.65 !important;
+  letter-spacing:.04em !important;
+  pointer-events:none !important;
 }
-
-.adminHeading:after{
-  content:'Traga o amor, o sorriso e a fralda:\A estamos em contagem regressiva'!important;
-  white-space:pre-line!important;
-  position:absolute!important;
-  z-index:3!important;
-  top:275px!important;
-  left:7%!important;
-  width:42%!important;
-  text-align:center!important;
-  color:#344126!important;
-  font-family:'Patrick Hand',cursive!important;
-  font-size:1.55rem!important;
-  font-weight:400!important;
-  line-height:1.2!important;
-  letter-spacing:0!important;
-  pointer-events:none!important;
+.adminHeading::after{
+  content:'Traga o amor, o sorriso e a fralda:\A estamos em contagem regressiva' !important;
+  white-space:pre-line !important;
+  position:absolute !important;
+  z-index:4 !important;
+  top:275px !important;
+  left:7% !important;
+  width:42% !important;
+  text-align:center !important;
+  color:#344126 !important;
+  font-family:'Patrick Hand', cursive !important;
+  font-size:1.55rem !important;
+  font-weight:400 !important;
+  font-style:normal !important;
+  line-height:1.25 !important;
+  letter-spacing:0 !important;
+  pointer-events:none !important;
 }
-
 @media(max-width:800px){
-  .adminWrap:after{top:140px!important;left:8%!important;width:84%!important;font-size:5.5rem!important}
-  .adminHeading:before{top:62px!important;left:8%!important;width:84%!important;font-size:.9rem!important}
-  .adminHeading:after{top:250px!important;left:8%!important;width:84%!important;font-size:1.4rem!important}
+  .adminWrap::after{top:140px !important;left:8% !important;width:84% !important;font-size:5.5rem !important}
+  .adminHeading::before{top:62px !important;left:8% !important;width:84% !important;font-size:.95rem !important}
+  .adminHeading::after{top:250px !important;left:8% !important;width:84% !important;font-size:1.4rem !important}
 }
-
 @media(max-width:520px){
-  .adminWrap:after{top:128px!important;left:6%!important;width:88%!important;font-size:4.8rem!important}
-  .adminHeading:before{top:55px!important;left:6%!important;width:88%!important;font-size:.82rem!important}
-  .adminHeading:after{top:225px!important;left:6%!important;width:88%!important;font-size:1.3rem!important}
+  .adminWrap::after{top:128px !important;left:6% !important;width:88% !important;font-size:4.8rem !important}
+  .adminHeading::before{top:55px !important;left:6% !important;width:88% !important;font-size:.9rem !important}
+  .adminHeading::after{top:225px !important;left:6% !important;width:88% !important;font-size:1.25rem !important}
 }
