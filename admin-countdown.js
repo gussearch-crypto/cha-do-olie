@@ -3,7 +3,7 @@ const EVENT_DAY = '2026-12-04';
 const APP_URL = 'https://cha-oliver-mvp.vercel.app/';
 const VENUE = 'Salão Terra Mágica';
 const ADDRESS = 'Av. das Nações, 151 - sobreloja, Parque Novo Oratório, Santo André - SP, 09260-000';
-const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=Av.%20das%20Na%C3%A7%C3%B5es%2C%20151%20-%20Parque%20Novo%20Orat%C3%B3rio%2C%20Santo%20Andr%C3%A9%20-%20SP%2C%2009260-000';
+const MAPS_URL = 'https://share.google/PBbegIHEsNodcdRdk';
 
 function saoPauloDay() {
   return new Intl.DateTimeFormat('en-CA', {timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -15,7 +15,7 @@ function countdown() {
   if(diff<=0)return{label:'O Chá do Oliver já aconteceu',days:0,past:true};
   const days=Math.ceil(diff/86400000);return{label:`Faltam ${days} dias`,days};
 }
-function locationBlock(){return `📍 ${VENUE}\n${ADDRESS}\n🗺️ Google Maps: ${MAPS_URL}`;}
+function locationBlock(){return `📍 ${VENUE} - ${ADDRESS} | (${MAPS_URL})`;}
 function initialInviteText(name,token){
   const access=token&&!token.includes('—')?token:'[token do convite]';
   return `Olá, ${name}! 💛\n\nEstamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.\n\nAcesse o convite:\n${APP_URL}\n\nPara confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:\n${access}\n\n📅 04 de dezembro (sexta-feira)\n🕕 Das 18h às 22h\n${locationBlock()}\n\nTraga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛`;
@@ -33,6 +33,5 @@ function getFamilyStatus(row){const status=row.querySelector('.guestTitle .statu
 function getToken(row){const meta=row.querySelector('.guestMeta');if(!meta)return'';const tokenSpan=[...meta.querySelectorAll('span')].find(el=>el.textContent.trim().startsWith('Token:'));return tokenSpan?.querySelector('b')?.textContent.trim()||''}
 function mountReminder(row){if(row.querySelector('.reminderAction'))return;const title=row.querySelector('.guestTitle h3'),actions=row.querySelector('.guestActions');if(!title||!actions)return;const name=title.textContent.trim(),status=getFamilyStatus(row),token=getToken(row),c=countdown();row.classList.add('hasReminder');const bar=document.createElement('div');bar.className='reminderAction';const statusInfo=status==='pending'?' · aguardando confirmação até 30/11':'';bar.innerHTML=`<span class="reminderInfo">${c.today?'Lembrete · É hoje!':`Lembrete · ${c.label}${statusInfo}`}</span><button type="button" aria-label="Copiar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copiar lembrete</button>`;bar.querySelector('button').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(reminderText(name,status,token));const btn=bar.querySelector('button'),original=btn.innerHTML;btn.innerHTML='✓ Lembrete copiado';setTimeout(()=>btn.innerHTML=original,1800)}catch{alert('Não foi possível copiar o lembrete.')}});actions.insertAdjacentElement('afterend',bar)}
 function enhance(){addStyles();mountCountdown();document.querySelectorAll('.guestRow').forEach(mountReminder)}
-// Substitui o texto do botão "Copiar convite" pela versão inicial padronizada.
 document.addEventListener('click',async e=>{const button=e.target.closest('.guestActions button');if(!button||!button.textContent.includes('Copiar convite'))return;e.preventDefault();e.stopImmediatePropagation();const row=button.closest('.guestRow'),name=row?.querySelector('.guestTitle h3')?.textContent.trim()||'Convidado',token=row?getToken(row):'';try{await navigator.clipboard.writeText(initialInviteText(name,token));alert('Texto do convite copiado!')}catch{alert('Não foi possível copiar o convite.')}},true);
 const observer=new MutationObserver(enhance);observer.observe(document.documentElement,{childList:true,subtree:true});enhance();setInterval(()=>{document.querySelector('.countdownCard')?.remove();enhance()},60000);
