@@ -346,3 +346,12 @@ nav,
 button {
   font-size:120%;
 }
+
+
+/* Top event summary card — DM Sans */
+.quick,
+.quick small,
+.quick b,
+.quick .dateDay {
+  font-family:'DM Sans',sans-serif!important;
+}
