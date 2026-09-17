@@ -12,6 +12,7 @@
   <script type="module">
     const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
     import(admin ? '/admin-entry.jsx' : '/src.jsx');
+    if (admin) import('/admin-countdown.js').catch(console.error);
   </script>
 </body>
 </html>
