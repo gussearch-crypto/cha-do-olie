@@ -3,6 +3,7 @@ import{createRoot}from'react-dom/client';
 import{Baby,Users,Plus,Copy,RefreshCw,MessageCircle,ArrowLeft,Pencil,Gift,CheckCircle2,Clock3,XCircle,Mail}from'lucide-react';
 import'./style.css';
 import'./admin-panel.css';
+import'./admin-panel-fonts.css';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/invite-api';
 const APP_URL='https://cha-oliver-mvp.vercel.app/';
 async function api(payload){if(!import.meta.env.VITE_SUPABASE_URL)throw new Error('Supabase não configurado');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Erro');return d}
