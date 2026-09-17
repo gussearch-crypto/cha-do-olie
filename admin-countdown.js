@@ -16,11 +16,22 @@ function countdown() {
   return { label: `Faltam ${days} dias`, days };
 }
 
-function reminderText(name) {
+function reminderText(name, status, token) {
   const c = countdown();
+  const access = token && !token.includes('—') ? token : '[token de acesso]';
+
   if (c.today) {
     return `Olá, ${name}! 💛\n\nÉ hoje! 🎉\n\nChegou o dia do Chá do Oliver! Estamos muito felizes e esperando vocês para celebrar esse momento tão especial com a gente.\n\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e informações:\nhttps://cha-oliver-mvp.vercel.app/\n\nAté daqui a pouco! 💛🦁🐼🦒🐓`;
   }
+
+  if (status === 'pending') {
+    return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nEstamos preparando tudo com muito carinho e ainda aguardamos a confirmação de presença de vocês.\n\nPara nos ajudar com a organização, pedimos que confirmem a presença até o dia 30 de novembro de 2026. 💛\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nPara acessar a confirmação, utilize:\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEsperamos muito poder celebrar esse momento com vocês! 💛🦁🐼🦒🐓`;
+  }
+
+  if (status === 'confirmed') {
+    return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nCaso tenha algum imprevisto, você pode editar sua confirmação utilizando as mesmas informações de acesso anterior.\n\n- Nome convidado: ${name}\n- Token de acesso: ${access}\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
+  }
+
   return `Olá, ${name}! 💛\n\n${c.label} para o Chá do Oliver! 🎉\n\nPassando para lembrar do nosso encontro especial para celebrar a chegada do Oliver.\n\n📅 04 de dezembro de 2026\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n\nConvite e confirmação de presença:\nhttps://cha-oliver-mvp.vercel.app/\n\nEstamos esperando vocês com muito carinho! 💛🦁🐼🦒🐓`;
 }
 
@@ -50,20 +61,39 @@ function mountCountdown() {
   dashboard.insertAdjacentElement('afterend', card);
 }
 
+function getFamilyStatus(row) {
+  const status = row.querySelector('.guestTitle .status');
+  if (!status) return 'other';
+  if (status.classList.contains('confirmed')) return 'confirmed';
+  if (status.classList.contains('declined')) return 'declined';
+  if (status.classList.contains('partial')) return 'partial';
+  return 'pending';
+}
+
+function getToken(row) {
+  const meta = row.querySelector('.guestMeta');
+  if (!meta) return '';
+  const tokenSpan = [...meta.querySelectorAll('span')].find(el => el.textContent.trim().startsWith('Token:'));
+  return tokenSpan?.querySelector('b')?.textContent.trim() || '';
+}
+
 function mountReminder(row) {
   if (row.querySelector('.reminderAction')) return;
   const title = row.querySelector('.guestTitle h3');
   const actions = row.querySelector('.guestActions');
   if (!title || !actions) return;
   const name = title.textContent.trim();
+  const status = getFamilyStatus(row);
+  const token = getToken(row);
   const c = countdown();
   row.classList.add('hasReminder');
   const bar = document.createElement('div');
   bar.className = 'reminderAction';
-  bar.innerHTML = `<span class="reminderInfo">${c.today ? 'Lembrete · É hoje!' : `Lembrete · ${c.label}`}</span><button type="button" aria-label="Copiar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copiar lembrete</button>`;
+  const statusInfo = status === 'pending' ? ' · aguardando confirmação até 30/11' : '';
+  bar.innerHTML = `<span class="reminderInfo">${c.today ? 'Lembrete · É hoje!' : `Lembrete · ${c.label}${statusInfo}`}</span><button type="button" aria-label="Copiar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copiar lembrete</button>`;
   bar.querySelector('button').addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(reminderText(name));
+      await navigator.clipboard.writeText(reminderText(name, status, token));
       const btn = bar.querySelector('button');
       const original = btn.innerHTML;
       btn.innerHTML = '✓ Lembrete copiado';
