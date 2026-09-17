@@ -355,3 +355,19 @@ button {
 .quick .dateDay {
   font-family:'DM Sans',sans-serif!important;
 }
+
+
+/* Hero typography refinement */
+.heroCopy > span {
+  font-family:'Patrick Hand','DM Sans',sans-serif!important;
+  font-size:clamp(2rem,3vw,3.4rem)!important;
+  line-height:1!important;
+}
+.heroCopy > p {
+  font-family:'Patrick Hand','DM Sans',sans-serif!important;
+}
+@media (max-width:600px){
+  .heroCopy > span {
+    font-size:clamp(2.1rem,9vw,3rem)!important;
+  }
+}
