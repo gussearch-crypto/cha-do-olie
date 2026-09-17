@@ -219,3 +219,29 @@ header,.topbar,.nav{position:relative!important;z-index:30!important}
    background-position:58% bottom!important;
  }
 }
+
+/* Tipografia refinada: DM Sans para interface, dados e leitura */
+.heroCopy p{
+ font-family:'DM Sans',sans-serif!important;
+ font-weight:600!important;
+ letter-spacing:.01em!important;
+ line-height:1.45!important;
+ max-width:390px;
+}
+.quick small,.quick b,
+.infoGrid small,.infoGrid b,
+.location small,.location b,
+.detail small,.detail b,
+footer,.hint,
+input,button,select{
+ font-family:'DM Sans',sans-serif!important;
+}
+.quick b,.infoGrid b,.location b,.detail b{
+ font-weight:600!important;
+ letter-spacing:-.015em;
+ font-variant-numeric:tabular-nums;
+}
+nav a{
+ font-family:'DM Sans',sans-serif!important;
+ font-weight:600!important;
+}
