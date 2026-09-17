@@ -325,3 +325,24 @@ nav,
   font-family:'Patrick Hand','DM Sans',sans-serif!important;
   font-weight:400!important;
 }
+
+
+/* +20% typography for functional text */
+.heroCopy > span,
+.quick b,
+.quick .dateDay,
+.features .feature h3,
+.features .feature p,
+.eventPanel strong,
+.eventPanel > div > span,
+.rsvpShell p,
+.rsvpShell label,
+.rsvpShell input,
+.rsvpShell select,
+.rsvpShell button,
+.rsvpShell .eyebrow,
+.rsvpShell .hint,
+nav,
+button {
+  font-size:120%;
+}
