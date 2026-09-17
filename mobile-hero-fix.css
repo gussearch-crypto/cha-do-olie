@@ -1,17 +1,19 @@
-/* Banner vertical exclusivo para mobile — Chá do Oliver */
+/* Banner vertical exclusivo para mobile — Chá do Oliver
+   A arte mobile já possui respiro superior e composição dos 4 mascotes.
+   Usamos contain para preservar 100% da largura e evitar cortes laterais. */
 @media (max-width: 760px) {
   .hero {
     height: min(800px, calc(100svh - 60px)) !important;
     min-height: 680px !important;
     background-image: url('/images/banner-oliver-mobile.png') !important;
     background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: cover !important;
+    background-position: center bottom !important;
+    background-size: contain !important;
     background-color: #f5edd4 !important;
   }
 
   .heroShade {
-    background: linear-gradient(180deg, rgba(247,239,216,.20) 0%, rgba(247,239,216,.08) 30%, rgba(247,239,216,0) 50%) !important;
+    background: linear-gradient(180deg, rgba(247,239,216,.16) 0%, rgba(247,239,216,.05) 30%, rgba(247,239,216,0) 48%) !important;
   }
 
   .heroCopy {
@@ -25,18 +27,28 @@
 
 @media (max-width: 480px) {
   .hero {
-    height: 740px !important;
-    min-height: 700px !important;
-    background-position: center center !important;
-    background-size: cover !important;
+    /* 1080x1600 = 1.4815x a largura. Mantém a arte inteira na viewport. */
+    height: calc(100vw * 1.4815) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    background-position: center bottom !important;
+    background-size: 100% auto !important;
   }
-  .heroCopy { height: 300px !important; }
+
+  .heroCopy {
+    inset: 20px 16px auto !important;
+    height: 285px !important;
+  }
 }
 
 @media (max-width: 390px) {
   .hero {
-    height: 700px !important;
-    min-height: 680px !important;
+    height: calc(100vw * 1.4815) !important;
+    min-height: 0 !important;
+    background-size: 100% auto !important;
   }
-  .heroCopy { height: 285px !important; }
+
+  .heroCopy {
+    height: 270px !important;
+  }
 }
