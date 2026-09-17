@@ -41,4 +41,36 @@ function App(){
 }
 function Result({attending,giftMode,gifts,diapers}){if(!attending)return <div className="result"><Heart/><h3>Vamos sentir sua falta!</h3><p>Obrigado por nos avisar. Se quiser presentear o Oliver mesmo à distância, preparamos uma lista online.</p><a className="primary linkbtn" href={amazon} target="_blank" rel="noreferrer">Ver lista na Amazon <ExternalLink/></a></div>;return <div className="result"><CheckCircle2/><h3>Presença confirmada 💛</h3>{giftMode==='unknown'?<p>Quando quiser, volte ao site para consultar ou atualizar sua escolha.</p>:<><p>{gifts===1?'Esta é a sugestão da família:':'Estas são as sugestões para vocês:'}</p>{diapers.slice(0,gifts).map((d,i)=><div className="gift" key={i}><div className="giftIcon"><Baby/></div><div><small>{gifts>1?'SUGESTÃO '+(i+1):'SUGESTÃO DA FAMÍLIA'}</small><b>1 pacote de fraldas · tamanho {d}</b></div><div className="giftIcon"><Gift/></div><div><b>Presentinho para o Oliver</b><span>Roupinha, item de higiene, acessório ou qualquer mimo que você sentir vontade de levar.</span></div></div>)}</>}<div className="calendarPanel"><CalendarDays/><div><span className="eyebrow">NÃO ESQUEÇA A DATA</span><h3>Adicione o Chá do Oliver à sua agenda</h3><p>04 de dezembro · das 18h às 22h</p><div className="calendarActions"><a className="primary linkbtn" href={googleCalendar} target="_blank" rel="noreferrer">Adicionar ao Google Agenda <ExternalLink/></a><button className="calendarIcs" onClick={downloadCalendar}>Apple, Outlook e outros calendários</button></div></div></div></div>}
 function Info({icon,title,children}){return <div><i>{icon}</i><h3>{title}</h3><p>{children}</p></div>}
-createRoot(document.getElementById('root')).render(<App/>);
+
+function AdminPanel(){
+ const[code,setCode]=useState(sessionStorage.getItem('oliverAdmin')||''),[families,setFamilies]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(false),[filter,setFilter]=useState('');
+ const load=async(adminCode=code)=>{setLoading(true);setError('');try{const d=await api({action:'adminList',adminCode});setFamilies(d.families||[]);sessionStorage.setItem('oliverAdmin',adminCode)}catch(e){setError('Código administrativo inválido ou não foi possível carregar o painel.')}finally{setLoading(false)}};
+ useEffect(()=>{if(code&&sessionStorage.getItem('oliverAdmin'))load(code)},[]);
+ const makePin=async(f)=>{if(f.invite_pin_plain&&!window.confirm('Este núcleo já possui um token visível. Deseja substituí-lo?'))return;const pin=String(Math.floor(1000+Math.random()*9000));try{await api({action:'adminSetPin',adminCode:code,familyId:f.id,pin});setFamilies(families.map(x=>x.id===f.id?{...x,invite_pin_plain:pin}:x))}catch{setError('Não foi possível gerar o token.')}};
+ const message=f=>`Olá, ${f.display_name}! 💛
+
+Estamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.
+
+Acesse o convite:
+${window.location.origin}
+
+Para confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:
+${f.invite_pin_plain||'[gere o token no painel]'}
+
+📅 04 de dezembro (sexta-feira)
+🕕 Das 18h às 22h
+📍 Salão Terra Mágica
+
+Traga o amor, o sorriso e a fralda: estamos em contagem regressiva! 💛`;
+ const copy=async f=>{await navigator.clipboard.writeText(message(f));alert('Texto do convite copiado!')};
+ const shown=families.filter(f=>(f.display_name+' '+(f.group_name||'')+' '+(f.guests||[]).map(g=>g.name).join(' ')).toLowerCase().includes(filter.toLowerCase()));
+ const totalGuests=families.reduce((n,f)=>n+(f.guests?.length||0),0),confirmed=families.reduce((n,f)=>n+(f.guests||[]).filter(g=>g.attendance==='yes').length,0);
+ if(!families.length)return <main className="adminPage"><section className="adminLogin"><span className="eyebrow">CHÁ DO OLIVER</span><h1>Painel de convidados</h1><p>Digite o código administrativo para acessar a lista.</p><input type="password" inputMode="numeric" value={code} onChange={e=>setCode(e.target.value)} placeholder="Código administrativo"/><button className="primary" onClick={()=>load()} disabled={loading}>{loading?'Carregando...':'Entrar no painel'}</button>{error&&<div className="error">{error}</div>}</section></main>;
+ return <main className="adminPage"><header><a className="brand" href="/">Chá do Oliver</a><nav><a href="/">Ver convite</a></nav></header><section className="adminWrap"><div className="adminHeading"><div><span className="eyebrow">ADMINISTRAÇÃO</span><h1>Lista de convidados</h1><p>Organize os núcleos e copie o convite com link e token.</p></div><button onClick={()=>{sessionStorage.removeItem('oliverAdmin');setFamilies([]);setCode('')}}>Sair</button></div>
+ <div className="adminStats"><div><b>{families.length}</b><span>Núcleos</span></div><div><b>{totalGuests}</b><span>Convidados</span></div><div><b>{confirmed}</b><span>Confirmados</span></div><div><b>{totalGuests-confirmed}</b><span>Demais convidados</span></div></div>
+ <div className="adminTools"><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar convidado ou família..."/><span>{shown.length} núcleo(s)</span></div>
+ <div className="guestList">{shown.map(f=><article className="guestRow" key={f.id}><div className="guestNumber">#{String(f.number).padStart(3,'0')}</div><div className="guestMain"><div className="guestTitle"><h3>{f.display_name}</h3><span className={'status '+f.invite_status}>{f.invite_status}</span></div><p>{(f.guests||[]).map(g=>g.name).join(' · ')}</p><div className="guestMeta"><span>{f.guests?.length||0} convidado(s)</span><span>{(f.guests||[]).filter(g=>g.attendance==='yes').length} confirmado(s)</span><span>Token: <b>{f.invite_pin_plain||'não disponível'}</b></span></div></div><div className="guestActions"><button onClick={()=>makePin(f)}>{f.invite_pin_plain?'Trocar token':'Gerar token'}</button><button className="primary" onClick={()=>copy(f)} disabled={!f.invite_pin_plain}>Copiar convite</button></div></article>)}</div>
+ {error&&<div className="error">{error}</div>}</section></main>
+}
+const isAdmin=window.location.hash==='#painel'||window.location.pathname==='/painel';
+createRoot(document.getElementById('root')).render(isAdmin?<AdminPanel/>:<App/>);
