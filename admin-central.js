@@ -33,13 +33,12 @@
     const pending=guests.filter(g=>!g.attendance||g.attendance==='pending');
     const under5=yes.filter(isUnder5);
     const fivePlus=yes.filter(isFivePlus);
-    const children=yes.filter(g=>g.person_type==='child');
     const venue=yes.length-under5.length;
     const sent=fs.filter(f=>f.invite_sent).length;
     const unanswered=fs.filter(f=>f.invite_sent&&(!f.invite_status||['invited','waiting'].includes(f.invite_status))).length;
     const diapers=fs.flatMap(f=>f.diapers||[]), sizes={P:0,M:0,G:0,XG:0};
     diapers.forEach(d=>{if(sizes[d.diaper_size]!==undefined)sizes[d.diaper_size]++});
-    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,children:children.length,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,diapers:diapers.length,sizes};
+    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,diapers:diapers.length,sizes};
   }
 
   function card(label,value,detail,cls=''){
@@ -67,25 +66,20 @@
       const f=rowFamily(row); if(!f)return;
       const guests=f.guests||[];
       const tokenOk=!tokenQuery||String(f.invite_pin_plain||'').includes(tokenQuery);
-      const typeOk=typeFilter==='all'||(typeFilter==='adult'&&guests.some(g=>g.person_type!=='child'))||(typeFilter==='child'&&guests.some(g=>g.person_type==='child'))||(typeFilter==='under5'&&guests.some(isUnder5))||(typeFilter==='fiveplus'&&guests.some(isFivePlus));
+      const typeOk=typeFilter==='all'||(typeFilter==='adult'&&guests.some(g=>g.person_type!=='child'))||(typeFilter==='child'&&guests.some(g=>g.person_type==='child'));
       row.dataset.advancedHidden=(!tokenOk||!typeOk)?'1':'0';
       if(!tokenOk||!typeOk)row.style.setProperty('display','none','important');
       else if(row.style.getPropertyPriority('display')==='important')row.style.removeProperty('display');
     });
-    updateChildCounts();
   }
 
-  function updateChildCounts(){
-    const fs=realFamilies(), guests=fs.flatMap(f=>f.guests||[]);
+  function renderChildCounters(box){
+    let counters=box.querySelector('.childAgeCounters');
+    if(!counters){counters=document.createElement('div');counters.className='childAgeCounters';box.appendChild(counters)}
+    const guests=realFamilies().flatMap(f=>f.guests||[]);
     const under=guests.filter(isUnder5).length;
     const over=guests.filter(isFivePlus).length;
-    const box=document.querySelector('.advancedFilters');if(!box)return;
-    const select=box.querySelector('.personTypeFilter');
-    if(!select)return;
-    const underOpt=select.querySelector('option[value="under5"]');
-    const overOpt=select.querySelector('option[value="fiveplus"]');
-    if(underOpt)underOpt.textContent=`Crianças abaixo de 5 anos (${under})`;
-    if(overOpt)overOpt.textContent=`Crianças com 5 anos ou mais (${over})`;
+    counters.innerHTML=`<div class="childAgeCounter"><span>Crianças &lt; 5 anos</span><strong>${under}</strong></div><div class="childAgeCounter"><span>Crianças 5+ anos</span><strong>${over}</strong></div>`;
   }
 
   function renderFilters(){
@@ -93,13 +87,13 @@
     let box=tools.querySelector('.advancedFilters');
     if(!box){
       box=document.createElement('div');box.className='advancedFilters';
-      box.innerHTML='<input class="tokenSearch" inputmode="numeric" placeholder="Buscar token" aria-label="Buscar por token"><select class="personTypeFilter" aria-label="Filtrar por tipo de convidado"><option value="all">Todos os tipos</option><option value="adult">Com adulto</option><option value="child">Com criança</option><option value="under5">Crianças abaixo de 5 anos</option><option value="fiveplus">Crianças com 5 anos ou mais</option></select><button type="button" class="clearAdvanced">Limpar filtros</button>';
+      box.innerHTML='<input class="tokenSearch" inputmode="numeric" placeholder="Buscar token" aria-label="Buscar por token"><select class="personTypeFilter" aria-label="Filtrar por tipo de convidado"><option value="all">Todos os tipos</option><option value="adult">Com adulto</option><option value="child">Com criança</option></select><button type="button" class="clearAdvanced">Limpar filtros</button>';
       tools.appendChild(box);
       box.querySelector('.tokenSearch').addEventListener('input',e=>{tokenQuery=e.target.value.trim();applyAdvanced()});
       box.querySelector('.personTypeFilter').addEventListener('change',e=>{typeFilter=e.target.value;applyAdvanced()});
       box.querySelector('.clearAdvanced').addEventListener('click',()=>{tokenQuery='';typeFilter='all';box.querySelector('.tokenSearch').value='';box.querySelector('.personTypeFilter').value='all';const search=tools.querySelector(':scope > input');if(search){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}))}const group=tools.querySelector('.adminGroupFilter select');if(group){group.value='all';group.dispatchEvent(new Event('change',{bubbles:true}))}document.querySelector('.statusFilters button')?.click();document.querySelector('.sentFilters button')?.click();setTimeout(applyAdvanced,0)});
     }
-    updateChildCounts();applyAdvanced();
+    renderChildCounters(box);applyAdvanced();
   }
 
   function render(){renderCentral();renderFilters()}
