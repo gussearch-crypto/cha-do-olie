@@ -12,7 +12,8 @@
   <div id="root"></div>
   <script type="module">
     const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
-    import(admin ? '/admin-entry.jsx' : '/src.jsx');
+    if (admin) await import('/admin-central.js').catch(console.error);
+    await import(admin ? '/admin-entry.jsx' : '/src.jsx');
     import('/mobile-ui.js').catch(console.error);
     if (!admin) import('/gift-brands.js').catch(console.error);
     if (admin) {
