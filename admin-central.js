@@ -1,4 +1,4 @@
-/* Central do Evento + filtros avançados — Chá do Oliver */
+/* Filtros avançados e contadores — Chá do Oliver */
 (function(){
   let families=[];
   let tokenQuery='';
@@ -25,34 +25,6 @@
 
   function isUnder5(g){return g?.person_type==='child'&&g?.child_age_group==='under_5'}
   function isFivePlus(g){return g?.person_type==='child'&&g?.child_age_group&&g.child_age_group!=='under_5'}
-
-  function metrics(){
-    const fs=realFamilies(), guests=fs.flatMap(f=>f.guests||[]);
-    const yes=guests.filter(g=>g.attendance==='yes');
-    const no=guests.filter(g=>g.attendance==='no');
-    const pending=guests.filter(g=>!g.attendance||g.attendance==='pending');
-    const under5=yes.filter(isUnder5);
-    const fivePlus=yes.filter(isFivePlus);
-    const venue=yes.length-under5.length;
-    const sent=fs.filter(f=>f.invite_sent).length;
-    const unanswered=fs.filter(f=>f.invite_sent&&(!f.invite_status||['invited','waiting'].includes(f.invite_status))).length;
-    const diapers=fs.flatMap(f=>f.diapers||[]), sizes={P:0,M:0,G:0,XG:0};
-    diapers.forEach(d=>{if(sizes[d.diaper_size]!==undefined)sizes[d.diaper_size]++});
-    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,diapers:diapers.length,sizes};
-  }
-
-  function card(label,value,detail,cls=''){
-    return `<div class="centralCard ${cls}"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`;
-  }
-
-  function renderCentral(){
-    const heading=document.querySelector('.adminHeading');
-    if(!heading||!families.length)return;
-    let section=document.querySelector('.eventCentral');
-    if(!section){section=document.createElement('section');section.className='eventCentral';heading.insertAdjacentElement('afterend',section)}
-    const m=metrics();
-    section.innerHTML=`<div class="centralHead"><div><span class="eyebrow">CENTRAL DO EVENTO</span><h2>Visão geral do Chá do Oliver</h2><p>Indicadores operacionais sem considerar núcleos de teste.</p></div><div class="venueCapacity"><span>CONTABILIZADOS PELO SALÃO</span><strong>${m.venue} <small>/ 100</small></strong><div><i style="width:${Math.min(100,m.venue)}%"></i></div></div></div><div class="centralGrid">${card('NÚCLEOS',m.nuclei,'famílias convidadas')}${card('CONVIDADOS',m.people,'pessoas cadastradas')}${card('PRESENÇAS',m.yes,'presenças físicas','ok')}${card('A CONFIRMAR',m.pending,'pessoas pendentes','warn')}${card('NÃO IRÃO',m.no,'pessoas','no')}${card('CRIANÇAS < 5',m.under5,'confirmadas · não contam no salão')}${card('CRIANÇAS 5+',m.fivePlus,'confirmadas · contam no salão')}${card('CONVITES ENVIADOS',m.sent,`${m.notSent} ainda não enviados`,'ok')}${card('SEM RESPOSTA',m.unanswered,'núcleos já convidados','warn')}</div><div class="centralBottom"><div><b>Fraldas previstas</b><span>${m.diapers} pacote${m.diapers===1?'':'s'}</span></div>${Object.entries(m.sizes).map(([s,n])=>`<div class="centralDiaper"><b>${s}</b><strong>${n}</strong></div>`).join('')}</div>`;
-  }
 
   function rowFamily(row){
     const number=(row.querySelector('.guestNumber')?.textContent||'').replace(/\D/g,'');
@@ -96,7 +68,10 @@
     renderChildCounters(box);applyAdvanced();
   }
 
-  function render(){renderCentral();renderFilters()}
+  function render(){
+    document.querySelector('.eventCentral')?.remove();
+    renderFilters();
+  }
   const observer=new MutationObserver(()=>requestAnimationFrame(render));
   observer.observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('click',()=>setTimeout(applyAdvanced,0));
