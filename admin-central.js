@@ -86,13 +86,6 @@
     });
   }
 
-  function renderChildCounters(box){
-    let counters=box.querySelector('.childAgeCounters');
-    if(!counters){counters=document.createElement('div');counters.className='childAgeCounters';box.appendChild(counters)}
-    const guests=realFamilies().flatMap(f=>f.guests||[]);
-    counters.innerHTML=`<div class="childAgeCounter"><span>Crianças &lt; 5 anos</span><strong>${guests.filter(isUnder5).length}</strong></div><div class="childAgeCounter"><span>Crianças 5+ anos</span><strong>${guests.filter(isFivePlus).length}</strong></div>`;
-  }
-
   function renderFilters(){
     const tools=document.querySelector('.adminTools');if(!tools)return;
     let box=tools.querySelector('.advancedFilters');
@@ -104,7 +97,8 @@
       box.querySelector('.personTypeFilter').addEventListener('change',e=>{typeFilter=e.target.value;applyAdvanced()});
       box.querySelector('.clearAdvanced').addEventListener('click',()=>{tokenQuery='';typeFilter='all';box.querySelector('.tokenSearch').value='';box.querySelector('.personTypeFilter').value='all';const search=tools.querySelector(':scope > input');if(search){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}))}const group=tools.querySelector('.adminGroupFilter select');if(group){group.value='all';group.dispatchEvent(new Event('change',{bubbles:true}))}document.querySelector('.statusFilters button')?.click();document.querySelector('.sentFilters button')?.click();setTimeout(applyAdvanced,0)});
     }
-    renderChildCounters(box);applyAdvanced();
+    box.querySelector('.childAgeCounters')?.remove();
+    applyAdvanced();
   }
 
   function render(){renderCentral();renderFilters()}
