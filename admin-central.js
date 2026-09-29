@@ -1,4 +1,4 @@
-/* Central do Evento + filtros avançados — Chá do Oliver */
+/* Central do Evento + filtros avançados — Chá do Oliver | visão geral sem duplicidade */
 (function(){
   let families=[];
   let tokenQuery='';
