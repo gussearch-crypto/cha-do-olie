@@ -41,22 +41,15 @@
     const pending=guests.filter(isPendingGuest);
     const under5=yes.filter(isUnder5);
     const fivePlus=yes.filter(isFivePlus);
-    const pendingAdults=pending.filter(g=>g.person_type!=='child');
-    const pendingUnder5=pending.filter(isUnder5);
-    const pendingFivePlus=pending.filter(isFivePlus);
     const pendingFamilies=fs.filter(f=>(f.guests||[]).some(isPendingGuest)).length;
     const venue=yes.length-under5.length;
     const sent=fs.filter(f=>f.invite_sent).length;
     const unanswered=fs.filter(f=>f.invite_sent&&(!f.invite_status||['invited','waiting'].includes(f.invite_status))).length;
     const answered=fs.filter(f=>f.invite_sent&&f.invite_status&&!['invited','waiting'].includes(f.invite_status)).length;
     const responseRate=sent?Math.round((answered/sent)*100):0;
-    const missingDiaper=fs.filter(f=>{
-      const hasYes=(f.guests||[]).some(g=>g.attendance==='yes');
-      return hasYes&&!(f.diapers||[]).length;
-    }).length;
     const diapers=fs.flatMap(f=>f.diapers||[]), sizes={P:0,M:0,G:0,XG:0};
     diapers.forEach(d=>{if(sizes[d.diaper_size]!==undefined)sizes[d.diaper_size]++});
-    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,pendingFamilies,pendingAdults:pendingAdults.length,pendingUnder5:pendingUnder5.length,pendingFivePlus:pendingFivePlus.length,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,answered,responseRate,missingDiaper,diapers:diapers.length,sizes};
+    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,pendingFamilies,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,answered,responseRate,diapers:diapers.length,sizes};
   }
 
   function card(label,value,detail,cls=''){
@@ -70,9 +63,8 @@
     if(!section){section=document.createElement('section');section.className='eventCentral';heading.insertAdjacentElement('afterend',section)}
     const m=metrics();
     section.innerHTML=`<div class="centralHead"><div><span class="eyebrow">CENTRAL DO EVENTO</span><h2>Visão geral do Chá do Oliver</h2><p>Indicadores operacionais sem considerar núcleos de teste.</p></div><div class="venueCapacity"><span>CONTABILIZADOS PELO SALÃO</span><strong>${m.venue} <small>/ 100</small></strong><div><i style="width:${Math.min(100,m.venue)}%"></i></div></div></div>
-    <div class="centralGrid">${card('NÚCLEOS / CONVITES',m.nuclei,'núcleos familiares convidados')}${card('CONVIDADOS TOTAIS',m.people,'pessoas cadastradas')}${card('CONVITES ENVIADOS',m.sent,`${m.notSent} ainda não enviados`,'ok')}${card('CONVITES RESPONDIDOS',m.answered,`${m.responseRate}% dos convites enviados`,'ok')}${card('CONVITES SEM RESPOSTA',m.unanswered,'núcleos já convidados','warn')}${card('A CONFIRMAR',m.pending,`${m.pendingFamilies} núcleos · ${m.pendingAdults} adultos · ${m.pendingFivePlus} crianças 5+ · ${m.pendingUnder5} crianças < 5`,'warn')}${card('PRESENÇA',m.yes,'presenças confirmadas','ok')}${card('CRIANÇAS < 5',m.under5,'confirmadas · não contam no salão')}${card('CRIANÇAS 5+',m.fivePlus,'confirmadas · contam no salão')}${card('NÃO IRÃO',m.no,'pessoas','no')}</div>
-    <div class="centralBottom"><div><b>Fraldas previstas</b><span>${m.diapers} pacote${m.diapers===1?'':'s'}</span></div>${Object.entries(m.sizes).map(([s,n])=>`<div class="centralDiaper"><b>${s}</b><strong>${n}</strong></div>`).join('')}</div>
-    <div class="centralPending"><div><span class="eyebrow">PENDÊNCIAS</span><b>Central de acompanhamento</b></div><div><strong>${m.notSent}</strong><span>convites não enviados</span></div><div><strong>${m.unanswered}</strong><span>enviados sem resposta</span></div><div><strong>${m.pendingFamilies}</strong><span>núcleos a confirmar</span></div><div><strong>${m.missingDiaper}</strong><span>confirmados sem fralda definida</span></div></div>`;
+    <div class="centralGrid">${card('NÚCLEOS / CONVITES',m.nuclei,'núcleos familiares convidados')}${card('CONVIDADOS TOTAIS',m.people,'pessoas cadastradas')}${card('CONVITES ENVIADOS',m.sent,`${m.notSent} ainda não enviados`,'ok')}${card('CONVITES RESPONDIDOS',m.answered,`TAXA DE RESPOSTA: ${m.responseRate}%`,'ok')}${card('CONVITES SEM RESPOSTA',m.unanswered,'núcleos já convidados','warn')}${card('A CONFIRMAR',m.pending,`${m.pendingFamilies} núcleos aguardando confirmação`,'warn')}${card('PRESENÇA',m.yes,'presenças confirmadas','ok')}${card('CRIANÇAS < 5',m.under5,'confirmadas · não contam no salão')}${card('CRIANÇAS 5+',m.fivePlus,'confirmadas · contam no salão')}${card('NÃO IRÃO',m.no,'pessoas','no')}</div>
+    <div class="centralBottom"><div><b>Fraldas previstas</b><span>${m.diapers} pacote${m.diapers===1?'':'s'}</span></div>${Object.entries(m.sizes).map(([s,n])=>`<div class="centralDiaper"><b>${s}</b><strong>${n}</strong></div>`).join('')}</div>`;
   }
 
   function rowFamily(row){
@@ -117,8 +109,6 @@
 
   function render(){renderCentral();renderFilters()}
 
-  /* Observa apenas mudanças estruturais relevantes e agrupa renders por frame,
-     evitando o observer agressivo que anteriormente pesava o scroll. */
   const root=document.querySelector('#root')||document.body;
   const observer=new MutationObserver(mutations=>{
     const relevant=mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.adminHeading,.adminTools,.guestList')||n.querySelector?.('.adminHeading,.adminTools,.guestList'))));
