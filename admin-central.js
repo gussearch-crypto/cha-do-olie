@@ -1,114 +1,16 @@
 /* Central do Evento + filtros avançados — Chá do Oliver | visão geral otimizada */
 (function(){
-  let families=[];
-  let tokenQuery='';
-  let typeFilter='all';
-  let renderQueued=false;
-  const originalFetch=window.fetch.bind(window);
-
-  const isTest=f=>f?.is_test===true||String(f?.group_name||'').trim().toLowerCase()==='teste';
-  const realFamilies=()=>families.filter(f=>!isTest(f));
-
-  function scheduleRender(){
-    if(renderQueued)return;
-    renderQueued=true;
-    requestAnimationFrame(()=>{renderQueued=false;render()});
-  }
-
-  window.fetch=async function(input,init){
-    const response=await originalFetch(input,init);
-    try{
-      if(typeof init?.body==='string'){
-        const body=JSON.parse(init.body);
-        if(body?.action==='adminList'&&response.ok){
-          const data=await response.clone().json();
-          families=Array.isArray(data?.families)?data.families:[];
-          scheduleRender();
-        }
-      }
-    }catch(e){}
-    return response;
-  };
-
-  function isUnder5(g){return g?.person_type==='child'&&g?.child_age_group==='under_5'}
-  function isFivePlus(g){return g?.person_type==='child'&&g?.child_age_group&&g.child_age_group!=='under_5'}
-  function isPendingGuest(g){return !g?.attendance||g.attendance==='pending'}
-
-  function metrics(){
-    const fs=realFamilies(), guests=fs.flatMap(f=>f.guests||[]);
-    const yes=guests.filter(g=>g.attendance==='yes');
-    const no=guests.filter(g=>g.attendance==='no');
-    const pending=guests.filter(isPendingGuest);
-    const under5=yes.filter(isUnder5);
-    const fivePlus=yes.filter(isFivePlus);
-    const pendingFamilies=fs.filter(f=>(f.guests||[]).some(isPendingGuest)).length;
-    const venue=yes.length-under5.length;
-    const sent=fs.filter(f=>f.invite_sent).length;
-    const unanswered=fs.filter(f=>f.invite_sent&&(!f.invite_status||['invited','waiting'].includes(f.invite_status))).length;
-    const answered=fs.filter(f=>f.invite_sent&&f.invite_status&&!['invited','waiting'].includes(f.invite_status)).length;
-    const responseRate=sent?Math.round((answered/sent)*100):0;
-    const diapers=fs.flatMap(f=>f.diapers||[]), sizes={P:0,M:0,G:0,XG:0};
-    diapers.forEach(d=>{if(sizes[d.diaper_size]!==undefined)sizes[d.diaper_size]++});
-    return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,pendingFamilies,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,answered,responseRate,diapers:diapers.length,sizes};
-  }
-
-  function card(label,value,detail,cls=''){
-    return `<div class="centralCard ${cls}"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`;
-  }
-
-  function renderCentral(){
-    const heading=document.querySelector('.adminHeading');
-    if(!heading||!families.length)return;
-    let section=document.querySelector('.eventCentral');
-    if(!section){section=document.createElement('section');section.className='eventCentral';heading.insertAdjacentElement('afterend',section)}
-    const m=metrics();
-    section.innerHTML=`<div class="centralHead"><div><span class="eyebrow">CENTRAL DO EVENTO</span><h2>Visão geral do Chá do Oliver</h2><p>Indicadores operacionais sem considerar núcleos de teste.</p></div><div class="venueCapacity"><span>CONTABILIZADOS PELO SALÃO</span><strong>${m.venue} <small>/ 100</small></strong><div><i style="width:${Math.min(100,m.venue)}%"></i></div></div></div>
-    <div class="centralGrid">${card('NÚCLEOS / CONVITES',m.nuclei,'núcleos familiares convidados')}${card('CONVIDADOS TOTAIS',m.people,'pessoas cadastradas')}${card('CONVITES ENVIADOS',m.sent,`${m.notSent} ainda não enviados`,'ok')}${card('CONVITES RESPONDIDOS',m.answered,`TAXA DE RESPOSTA: ${m.responseRate}%`,'ok')}${card('CONVITES SEM RESPOSTA',m.unanswered,'núcleos já convidados','warn')}${card('A CONFIRMAR',m.pending,`${m.pendingFamilies} núcleos aguardando confirmação`,'warn')}${card('PRESENÇA',m.yes,'presenças confirmadas','ok')}${card('CRIANÇAS < 5',m.under5,'confirmadas · não contam no salão')}${card('CRIANÇAS 5+',m.fivePlus,'confirmadas · contam no salão')}${card('NÃO IRÃO',m.no,'pessoas','no')}</div>
-    <div class="centralBottom"><div><b>Fraldas previstas</b><span>${m.diapers} pacote${m.diapers===1?'':'s'}</span></div>${Object.entries(m.sizes).map(([s,n])=>`<div class="centralDiaper"><b>${s}</b><strong>${n}</strong></div>`).join('')}</div>`;
-  }
-
-  function rowFamily(row){
-    const number=(row.querySelector('.guestNumber')?.textContent||'').replace(/\D/g,'');
-    const title=row.querySelector('.guestTitle h3')?.textContent?.trim()||'';
-    return families.find(f=>String(f.number||'').padStart(2,'0')===number.padStart(2,'0'))||families.find(f=>f.display_name===title);
-  }
-
-  function applyAdvanced(){
-    const rows=[...document.querySelectorAll('.guestList .guestRow')];
-    rows.forEach(row=>{
-      const f=rowFamily(row);if(!f)return;
-      const guests=f.guests||[];
-      const tokenOk=!tokenQuery||String(f.invite_pin_plain||'').includes(tokenQuery);
-      const typeOk=typeFilter==='all'||(typeFilter==='adult'&&guests.some(g=>g.person_type!=='child'))||(typeFilter==='child'&&guests.some(g=>g.person_type==='child'));
-      row.dataset.advancedHidden=(!tokenOk||!typeOk)?'1':'0';
-      if(!tokenOk||!typeOk)row.style.setProperty('display','none','important');
-      else if(row.style.getPropertyPriority('display')==='important')row.style.removeProperty('display');
-    });
-  }
-
-  function renderFilters(){
-    const tools=document.querySelector('.adminTools');if(!tools)return;
-    let box=tools.querySelector('.advancedFilters');
-    if(!box){
-      box=document.createElement('div');box.className='advancedFilters';
-      box.innerHTML='<input class="tokenSearch" inputmode="numeric" placeholder="Buscar token" aria-label="Buscar por token"><select class="personTypeFilter" aria-label="Filtrar por tipo de convidado"><option value="all">Todos os tipos</option><option value="adult">Com adulto</option><option value="child">Com criança</option></select><button type="button" class="clearAdvanced">Limpar filtros</button>';
-      tools.appendChild(box);
-      box.querySelector('.tokenSearch').addEventListener('input',e=>{tokenQuery=e.target.value.trim();applyAdvanced()});
-      box.querySelector('.personTypeFilter').addEventListener('change',e=>{typeFilter=e.target.value;applyAdvanced()});
-      box.querySelector('.clearAdvanced').addEventListener('click',()=>{tokenQuery='';typeFilter='all';box.querySelector('.tokenSearch').value='';box.querySelector('.personTypeFilter').value='all';const search=tools.querySelector(':scope > input');if(search){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}))}const group=tools.querySelector('.adminGroupFilter select');if(group){group.value='all';group.dispatchEvent(new Event('change',{bubbles:true}))}document.querySelector('.statusFilters button')?.click();document.querySelector('.sentFilters button')?.click();setTimeout(applyAdvanced,0)});
-    }
-    box.querySelector('.childAgeCounters')?.remove();
-    applyAdvanced();
-  }
-
-  function render(){renderCentral();renderFilters()}
-
-  const root=document.querySelector('#root')||document.body;
-  const observer=new MutationObserver(mutations=>{
-    const relevant=mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.adminHeading,.adminTools,.guestList')||n.querySelector?.('.adminHeading,.adminTools,.guestList'))));
-    if(relevant)scheduleRender();
-  });
-  observer.observe(root,{childList:true,subtree:true});
-  document.addEventListener('click',()=>setTimeout(applyAdvanced,0),{passive:true});
-  scheduleRender();
+  let families=[],opsGuests=[];let tokenQuery='',typeFilter='all',renderQueued=false;const originalFetch=window.fetch.bind(window);
+  const isTest=f=>f?.is_test===true||String(f?.group_name||'').trim().toLowerCase()==='teste',realFamilies=()=>families.filter(f=>!isTest(f));
+  function scheduleRender(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;render()})}
+  async function hydrateOps(){try{const invite=[...performance.getEntriesByType('resource')].map(x=>x.name).find(x=>x.includes('/functions/v1/invite-api')),adminCode=sessionStorage.getItem('oliverAdmin')||'';if(!invite||!adminCode)return;const r=await originalFetch(invite.replace(/invite-api(?:\?.*)?$/,'event-ops'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'opsList',adminCode})}),d=await r.json();if(r.ok){opsGuests=d.guests||[];scheduleRender()}}catch{}}
+  window.fetch=async function(input,init){const response=await originalFetch(input,init);try{if(typeof init?.body==='string'){const body=JSON.parse(init.body);if(body?.action==='adminList'&&response.ok){const data=await response.clone().json();families=Array.isArray(data?.families)?data.families:[];scheduleRender();setTimeout(hydrateOps,0)}}}catch(e){}return response};
+  function isUnder5(g){return g?.person_type==='child'&&g?.child_age_group==='under_5'}function isFivePlus(g){return g?.person_type==='child'&&g?.child_age_group&&g.child_age_group!=='under_5'}function isPendingGuest(g){return !g?.attendance||g.attendance==='pending'}
+  function metrics(){const fs=realFamilies(),guests=fs.flatMap(f=>f.guests||[]),yes=guests.filter(g=>g.attendance==='yes'),no=guests.filter(g=>g.attendance==='no'),pending=guests.filter(isPendingGuest),under5=yes.filter(isUnder5),fivePlus=yes.filter(isFivePlus),pendingFamilies=fs.filter(f=>(f.guests||[]).some(isPendingGuest)).length,venue=yes.length-under5.length,sent=fs.filter(f=>f.invite_sent).length,unanswered=fs.filter(f=>f.invite_sent&&(!f.invite_status||['invited','waiting'].includes(f.invite_status))).length,answered=fs.filter(f=>f.invite_sent&&f.invite_status&&!['invited','waiting'].includes(f.invite_status)).length,responseRate=sent?Math.round(answered/sent*100):0,diapers=fs.flatMap(f=>f.diapers||[]),sizes={P:0,M:0,G:0,XG:0};diapers.forEach(d=>{if(sizes[d.diaper_size]!==undefined)sizes[d.diaper_size]++});const realIds=new Set(fs.flatMap(f=>(f.guests||[]).map(g=>g.id))),opMap=new Map(opsGuests.filter(g=>realIds.has(g.id)).map(g=>[g.id,g])),arrived=yes.map(g=>({...g,...(opMap.get(g.id)||{})})).filter(g=>g.checked_in_at),arrivedUnder=arrived.filter(isUnder5),arrivedAdults=arrived.filter(g=>g.person_type!=='child'),arrivedFive=arrived.filter(isFivePlus),physical=arrived.length,venueNow=arrivedAdults.length+arrivedFive.length,added=arrived.filter(g=>g.added_at_event).length;return{nuclei:fs.length,people:guests.length,yes:yes.length,no:no.length,pending:pending.length,pendingFamilies,under5:under5.length,fivePlus:fivePlus.length,venue,sent,notSent:fs.length-sent,unanswered,answered,responseRate,diapers:diapers.length,sizes,arrived:physical,waiting:Math.max(0,yes.length-physical),arrivedAdults:arrivedAdults.length,arrivedFive:arrivedFive.length,arrivedUnder:arrivedUnder.length,venueNow,added}}
+  function card(label,value,detail,cls=''){return `<div class="centralCard ${cls}"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`}
+  function renderCentral(){const heading=document.querySelector('.adminHeading');if(!heading||!families.length)return;let section=document.querySelector('.eventCentral');if(!section){section=document.createElement('section');section.className='eventCentral';heading.insertAdjacentElement('afterend',section)}const m=metrics(),pct=m.yes?Math.round(m.arrived/m.yes*100):0;section.innerHTML=`<div class="centralHead"><div><span class="eyebrow">CENTRAL DO EVENTO</span><h2>Visão geral do Chá do Oliver</h2><p>Indicadores operacionais sem considerar núcleos de teste.</p></div><div class="venueCapacity"><span>CONTABILIZADOS PELO SALÃO</span><strong>${m.venue} <small>/ 100</small></strong><div><i style="width:${Math.min(100,m.venue)}%"></i></div></div></div><div class="liveEventDashboard"><div class="liveMain"><span>NO EVENTO AGORA</span><strong>${m.arrived}</strong><small>${pct}% dos ${m.yes} confirmados já chegaram</small></div><div><span>AGUARDANDO</span><strong>${m.waiting}</strong><small>confirmados ainda não chegaram</small></div><div><span>CONTAM NO SALÃO AGORA</span><strong>${m.venueNow} <small>/ 100</small></strong><small>adultos + crianças 5+</small></div><div><span>CRIANÇAS &lt;5 PRESENTES</span><strong>${m.arrivedUnder}</strong><small>não entram na capacidade</small></div><div><span>ADICIONADOS NO EVENTO</span><strong>${m.added}</strong><small>presentes incluídos na recepção</small></div></div><div class="centralGrid">${card('NÚCLEOS / CONVITES',m.nuclei,'núcleos familiares convidados')}${card('CONVIDADOS TOTAIS',m.people,'pessoas cadastradas')}${card('CONVITES ENVIADOS',m.sent,`${m.notSent} ainda não enviados`,'ok')}${card('CONVITES RESPONDIDOS',m.answered,`TAXA DE RESPOSTA: ${m.responseRate}%`,'ok')}${card('CONVITES SEM RESPOSTA',m.unanswered,'núcleos já convidados','warn')}${card('A CONFIRMAR',m.pending,`${m.pendingFamilies} núcleos aguardando confirmação`,'warn')}${card('PRESENÇA',m.yes,'presenças confirmadas','ok')}${card('CRIANÇAS < 5',m.under5,'confirmadas · não contam no salão')}${card('CRIANÇAS 5+',m.fivePlus,'confirmadas · contam no salão')}${card('NÃO IRÃO',m.no,'pessoas','no')}</div><div class="centralBottom"><div><b>Fraldas previstas</b><span>${m.diapers} pacote${m.diapers===1?'':'s'}</span></div>${Object.entries(m.sizes).map(([s,n])=>`<div class="centralDiaper"><b>${s}</b><strong>${n}</strong></div>`).join('')}</div>`}
+  function rowFamily(row){const number=(row.querySelector('.guestNumber')?.textContent||'').replace(/\D/g,''),title=row.querySelector('.guestTitle h3')?.textContent?.trim()||'';return families.find(f=>String(f.number||'').padStart(2,'0')===number.padStart(2,'0'))||families.find(f=>f.display_name===title)}
+  function applyAdvanced(){[...document.querySelectorAll('.guestList .guestRow')].forEach(row=>{const f=rowFamily(row);if(!f)return;const guests=f.guests||[],tokenOk=!tokenQuery||String(f.invite_pin_plain||'').includes(tokenQuery),typeOk=typeFilter==='all'||(typeFilter==='adult'&&guests.some(g=>g.person_type!=='child'))||(typeFilter==='child'&&guests.some(g=>g.person_type==='child'));row.dataset.advancedHidden=(!tokenOk||!typeOk)?'1':'0';if(!tokenOk||!typeOk)row.style.setProperty('display','none','important');else if(row.style.getPropertyPriority('display')==='important')row.style.removeProperty('display')})}
+  function renderFilters(){const tools=document.querySelector('.adminTools');if(!tools)return;let box=tools.querySelector('.advancedFilters');if(!box){box=document.createElement('div');box.className='advancedFilters';box.innerHTML='<input class="tokenSearch" inputmode="numeric" placeholder="Buscar token" aria-label="Buscar por token"><select class="personTypeFilter" aria-label="Filtrar por tipo de convidado"><option value="all">Todos os tipos</option><option value="adult">Com adulto</option><option value="child">Com criança</option></select><button type="button" class="clearAdvanced">Limpar filtros</button>';tools.appendChild(box);box.querySelector('.tokenSearch').addEventListener('input',e=>{tokenQuery=e.target.value.trim();applyAdvanced()});box.querySelector('.personTypeFilter').addEventListener('change',e=>{typeFilter=e.target.value;applyAdvanced()});box.querySelector('.clearAdvanced').addEventListener('click',()=>{tokenQuery='';typeFilter='all';box.querySelector('.tokenSearch').value='';box.querySelector('.personTypeFilter').value='all';const search=tools.querySelector(':scope > input');if(search){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}))}const group=tools.querySelector('.adminGroupFilter select');if(group){group.value='all';group.dispatchEvent(new Event('change',{bubbles:true}))}document.querySelector('.statusFilters button')?.click();document.querySelector('.sentFilters button')?.click();setTimeout(applyAdvanced,0)})}box.querySelector('.childAgeCounters')?.remove();applyAdvanced()}
+  function render(){renderCentral();renderFilters()}const root=document.querySelector('#root')||document.body,observer=new MutationObserver(mutations=>{const relevant=mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.adminHeading,.adminTools,.guestList')||n.querySelector?.('.adminHeading,.adminTools,.guestList'))));if(relevant)scheduleRender()});observer.observe(root,{childList:true,subtree:true});document.addEventListener('click',()=>setTimeout(applyAdvanced,0),{passive:true});document.addEventListener('admin-sections-ready',()=>setTimeout(hydrateOps,80));window.addEventListener('oliver-admin-refresh',()=>setTimeout(hydrateOps,120));scheduleRender();setTimeout(hydrateOps,700)
 })();
