@@ -24,10 +24,11 @@
       import('/admin-activity.js').catch(console.error);
       import('/admin-group-filter.js').catch(console.error);
       import('/admin-operations.js').catch(console.error);
+      // admin-event-ops.js is the single owner of check-in mutations/rendering.
       import('/admin-event-ops.js').catch(console.error);
-      import('/admin-event-upgrades.js').catch(console.error);
       import('/admin-event-history.js').catch(console.error);
       import('/admin-sync.js').catch(console.error);
+      // This module only enriches the consolidated check-in UI (stats/filters).
       import('/admin-checkin-enhance.js').catch(console.error);
       import('/admin-tabs.js').catch(console.error);
     }
