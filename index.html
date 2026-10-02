@@ -25,7 +25,10 @@
       }
       await import(admin ? '/admin-entry.jsx' : '/src.jsx');
       import('/mobile-ui.js').catch(console.error);
-      if (!admin) import('/gift-brands.js').catch(console.error);
+      if (!admin) {
+        import('/gift-brands.js').catch(console.error);
+        import('/nav-checkin.js').catch(console.error);
+      }
       if (admin) {
         import('/admin-countdown.js').catch(console.error);
         import('/admin-invite-fix.js').catch(console.error);
