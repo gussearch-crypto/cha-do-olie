@@ -20,14 +20,16 @@
     }
     await import(admin ? '/admin-entry.jsx' : '/src.jsx');
     import('/mobile-ui.js').catch(console.error);
-    if (!admin) import('/gift-brands.js').catch(console.error);
+    if (!admin) {
+      import('/gift-brands.js').catch(console.error);
+      import('/public-checkin.js').catch(console.error);
+    }
     if (admin) {
       import('/admin-countdown.js').catch(console.error);
       import('/admin-invite-fix.js').catch(console.error);
       import('/admin-activity.js').catch(console.error);
       import('/admin-group-filter.js').catch(console.error);
       import('/admin-operations.js').catch(console.error);
-      // Estrutura operacional permanece; mutações de chegada pertencem somente ao Lite.
       import('/admin-event-ops.js').catch(console.error);
       import('/admin-event-history.js').catch(console.error);
       import('/admin-sync.js').catch(console.error);
