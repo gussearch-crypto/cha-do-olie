@@ -130,3 +130,27 @@ export function categoryBudgets(expenses, budgets = {}, categories = []) {
     return {category, budget, contracted, remaining:defined ? (cents(budget) - cents(contracted)) / 100 : null};
   });
 }
+
+export function saveExpenseWithActions(data, expense, actionIds) {
+  const selected = actionIds === undefined ? null : new Set(actionIds.filter(Boolean));
+  return {...data, expenses:data.expenses.some(e=>e.id===expense.id)?data.expenses.map(e=>e.id===expense.id?expense:e):[expense,...data.expenses],
+    tasks:selected === null ? data.tasks : data.tasks.map(t=>selected.has(t.id)?{...t,expenseId:expense.id,cost:true}:t.expenseId===expense.id?{...t,expenseId:''}:t)};
+}
+export function paymentForecast(expenses, today = eventToday()) {
+  const pending = expenses.flatMap(expense => (expense.installments || []).map(p=>({...p,expense,balance:installmentBalance(p)}))).filter(p=>p.balance>0).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||a.expense.description.localeCompare(b.expense.description,'pt-BR'));
+  const next7 = pending.filter(p=>matchesPeriod(p.due,'next7',today)), next30 = pending.filter(p=>matchesPeriod(p.due,'next30',today));
+  const sum = rows => rows.reduce((s,p)=>s+cents(p.balance),0)/100;
+  return {next7,next30,total7:sum(next7),total30:sum(next30),overdue:sum(pending.filter(p=>matchesPeriod(p.due,'overdue',today))),undated:(pending.filter(p=>daysUntil(p.due,today)===null).reduce((s,p)=>s+cents(p.balance),0)+expenses.reduce((s,e)=>s+cents(expenseTotals(e).unallocated),0))/100};
+}
+// Semicolon CSV is compatible with Brazilian spreadsheet settings; quote every field.
+export function planningCsv(data, section, today = eventToday()) {
+  const brMoney = value => Number(value||0).toFixed(2).replace('.',',');
+  let rows;
+  if (section === 'tasks') rows = [['Ação','Categoria','Situação','Prioridade','Responsável','Prazo','Realizada em','Serviço vinculado','Observação'],...data.tasks.map(t=>[t.title,t.category,t.status==='done'?'Realizada':'A realizar',({high:'Alta',medium:'Média',low:'Baixa'})[t.priority]||'',t.responsible,t.due,t.completedAt,data.expenses.find(e=>e.id===t.expenseId)?.description||'',t.notes])];
+  else if (section === 'expenses') rows = [['Serviço','Categoria','Fornecedor','Contratado','Pago','A quitar','Situação','Ações vinculadas','Observação'],...data.expenses.map(e=>{const totals=expenseTotals(e,today);return [e.description,e.category,e.supplier,brMoney(totals.planned),brMoney(totals.paid),brMoney(totals.balance),totals.state==='paid'?'Quitado':totals.planned>0?'A quitar':'Valor a definir',data.tasks.filter(t=>t.expenseId===e.id).map(t=>t.title).join(' | '),e.notes]})];
+  else if (section === 'payments') rows = [['Serviço','Parcela','Valor programado','Vencimento','Valor pago ativo','Saldo da parcela','Pagamento registrado','Data do pagamento','Meio de pagamento','Situação do registro','Motivo do estorno','Estornado em','Correções','Valores anteriores'],...data.expenses.flatMap(e=>(e.installments||[]).flatMap(p=>{const history=paymentHistory(p),base=[e.description,p.label,brMoney(p.amount),p.due,brMoney(p.paidAmount),brMoney(installmentBalance(p))];return history.length?history.map(h=>[...base,brMoney(h.amount),h.paidAt,h.payment,h.reversedAt?'Estornado':'Ativo',h.reversalReason,h.reversedAt,h.changes?.length||0,(h.changes||[]).map(c=>`${brMoney(c.amount)} | ${c.paidAt||'Sem data'} | ${c.payment||''} | ${c.changedAt||''} | ${c.reason||''}`).join(' / ')]):[[...base,'','','','Sem pagamento','','',0,'']]}))];
+  else if (section === 'budgets') rows = [['Categoria','Limite','Contratado','Disponível','Excedido'],...categoryBudgets(data.expenses,data.budgets||{}).map(r=>[r.category,r.budget===null?'':brMoney(r.budget),brMoney(r.contracted),r.remaining===null?'':brMoney(Math.max(0,r.remaining)),r.remaining===null?'':brMoney(Math.max(0,-r.remaining))])];
+  else throw new Error('Exportação inválida.');
+  const escape = value => {let text=String(value??'');if(/^[\s]*[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
+  return '\uFEFF'+rows.map(row=>row.map(escape).join(';')).join('\r\n')+'\r\n';
+}

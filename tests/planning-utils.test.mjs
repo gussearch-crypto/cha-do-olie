@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets} from '../planning-utils.mjs';
+import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -144,4 +144,26 @@ test('category budgets include settled and unscheduled contracts, distinguish ze
   assert.equal(rows.find(r=>r.category==='Local').remaining,200);
   assert.equal(rows.find(r=>r.category==='Decoração').budget,null);
   assert.equal(categoryBudgets(expenses,{'Alimentação':''})[0].budget,null);
+});
+
+test('saving service links applies selection, preserves unrelated tasks and leaves payment-only edits linked',()=>{
+  const data={budgets:{Local:500},tasks:[{id:'a',expenseId:'old',cost:true},{id:'b',expenseId:'service',cost:true},{id:'c'}],expenses:[{id:'old'},{id:'service'}]};
+  const next=saveExpenseWithActions(data,{id:'service',description:'Updated'},['a','c','c']);
+  assert.equal(next.tasks[0].expenseId,'service');assert.equal(next.tasks[1].expenseId,'');assert.equal(next.tasks[2].cost,true);assert.equal(next.expenses.length,2);assert.equal(next.budgets.Local,500);assert.equal(data.tasks[0].expenseId,'old');
+  const paid=saveExpenseWithActions(next,{id:'service',paid:100});assert.strictEqual(paid.tasks,next.tasks);
+  const none=saveExpenseWithActions(paid,{id:'service'},[]);assert.equal(none.tasks.filter(t=>t.expenseId==='service').length,0);
+  const added=saveExpenseWithActions(data,{id:'new'},['c']);assert.equal(added.expenses.length,3);assert.equal(added.tasks[1].expenseId,'service');
+});
+test('forecast includes today and period boundaries, excludes paid, overdue and unknown dates',()=>{
+  const expenses=[{id:'e',description:'Buffet',contracted:1000,installments:[{id:'today',amount:100,paidAmount:40,due:today},{id:'7',amount:100,due:'2026-10-12'},{id:'8',amount:100,due:'2026-10-13'},{id:'30',amount:100,due:'2026-11-04'},{id:'31',amount:100,due:'2026-11-05'},{id:'old',amount:100,due:'2026-10-04'},{id:'paid',amount:100,paidAmount:100,due:today},{id:'none',amount:100,due:''}]}];
+  const forecast=paymentForecast(expenses,today);
+  assert.equal(forecast.total7,160);assert.equal(forecast.total30,360);assert.equal(forecast.overdue,100);assert.equal(forecast.undated,300);assert.deepEqual(forecast.next7.map(p=>p.id),['today','7']);
+  assert.equal(paymentForecast([],today).total30,0);
+});
+test('CSV exports all sections, protects formula text, preserves quotes and distinguishes reversals',()=>{
+  const data={budgets:{Local:100},tasks:[{id:'t',title:'=HYPERLINK("evil")',category:'Local',expenseId:'e',notes:'Line 1\nLine 2',status:'done'}],expenses:[{id:'e',description:'Salão; "A"',category:'Local',contracted:150,installments:[{id:'p',label:'Sinal',amount:150,paidAmount:100,payments:[{id:'active',amount:100,paidAt:today,payment:'Pix'},{id:'reverse',amount:50,paidAt:today,payment:'Pix',reversedAt:'2026-10-05T12:00:00Z',reversalReason:'Duplicado'}]}]}]};
+  const actions=planningCsv(data,'tasks',today);assert.ok(actions.startsWith('\uFEFF'));assert.ok(actions.includes(`"'=HYPERLINK(""evil"")"`));assert.ok(actions.includes('"Line 1\nLine 2"'));
+  const expenses=planningCsv(data,'expenses',today);assert.ok(expenses.includes('"Salão; ""A"""'));assert.ok(expenses.includes('"150,00";"100,00";"50,00"'));
+  const payments=planningCsv(data,'payments',today);assert.ok(payments.includes('"Estornado";"Duplicado"'));assert.ok(payments.includes('"Ativo"'));assert.ok(planningCsv(data,'budgets',today).includes('"0,00";"50,00"'));
+  assert.throws(()=>planningCsv(data,'invalid',today));
 });
