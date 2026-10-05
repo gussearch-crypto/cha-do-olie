@@ -34,11 +34,39 @@ const cents = n => Math.max(0, Math.round((Number(n) || 0) * 100));
 export const installmentBalance = p => Math.max(0, cents(p.amount) - cents(p.paidAmount)) / 100;
 export function expenseTotals(expense, today = eventToday()) {
   const ps = expense.installments || [];
-  const planned = ps.reduce((s, p) => s + cents(p.amount), 0) / 100;
+  const scheduled = ps.reduce((s, p) => s + cents(p.amount), 0) / 100;
+  // Existing expenses keep their original total until explicitly edited.
+  const planned = expense.contracted != null ? cents(expense.contracted) / 100 : scheduled;
   const paid = ps.reduce((s, p) => s + cents(p.paidAmount), 0) / 100;
-  const balance = ps.reduce((s, p) => s + Math.round(installmentBalance(p) * 100), 0) / 100;
+  const scheduledBalance = ps.reduce((s, p) => s + Math.round(installmentBalance(p) * 100), 0) / 100;
+  const unallocated = Math.max(0, cents(planned) - cents(scheduled)) / 100;
+  const balance = Math.max(scheduledBalance, Math.max(0, cents(planned) - cents(paid)) / 100);
   const overdue = ps.some(p => installmentBalance(p) > 0 && matchesPeriod(p.due, 'overdue', today));
-  return {planned, paid, balance, overdue, state: balance === 0 && planned > 0 ? 'paid' : overdue ? 'overdue' : paid > 0 ? 'partial' : 'open'};
+  return {planned, scheduled, unallocated, paid, balance, overdue, state: balance === 0 && planned > 0 ? 'paid' : overdue ? 'overdue' : paid > 0 ? 'partial' : 'open'};
+}
+export function recordExpensePayment(expense, {installmentId, amount, paidAt, payment}, makeId = () => crypto.randomUUID()) {
+  const value = cents(amount);
+  if (!(Number(amount) > 0) || value === 0) throw new Error('Informe um valor maior que zero.');
+  if (civilDay(paidAt) === null) throw new Error('Informe a data do pagamento.');
+  const ps = (expense.installments || []).map(p => ({...p}));
+  let p;
+  if (installmentId === '__unallocated__') {
+    if (value > cents(expenseTotals(expense).unallocated)) throw new Error('O valor supera o saldo sem programação.');
+    p = {id: makeId(), label: 'Pagamento avulso', amount: value / 100, due: '', paidAmount: 0, payments: []};
+    ps.push(p);
+  } else {
+    p = ps.find(p => p.id === installmentId);
+    if (!p || value > cents(installmentBalance(p))) throw new Error('O valor supera o saldo da parcela.');
+  }
+  let history = Array.isArray(p.payments) ? [...p.payments] : [];
+  if (history.reduce((s, h) => s + cents(h.amount), 0) !== cents(p.paidAmount)) {
+    history = cents(p.paidAmount) > 0 ? [{id: makeId(), amount: cents(p.paidAmount) / 100, paidAt: p.paidAt || '', payment: p.payment || 'Outros', legacy: true}] : [];
+  }
+  history.push({id: makeId(), amount: value / 100, paidAt, payment});
+  Object.assign(p, {paidAmount: (cents(p.paidAmount) + value) / 100, paidAt, payment, payments: history});
+  const result = {...expense, contracted: expenseTotals(expense).planned, installments: ps};
+  const totals = expenseTotals(result);
+  return {...result, planned: totals.planned, paid: totals.paid};
 }
 export function planningSnapshot(data, today = eventToday()) {
   const tasks = data.tasks.filter(t => t.status !== 'done');

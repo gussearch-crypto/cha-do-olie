@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot} from '../planning-utils.mjs';
+import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -61,4 +61,36 @@ test('services become settled only after the full contracted value is paid',()=>
   assert.notEqual(expenseTotals(split,today).state,'paid');
   assert.equal(expenseTotals(split,today).balance,.01);
   assert.equal(expenseTotals({installments:[]},today).state,'open');
+});
+
+test('contracted total includes amounts not yet scheduled and keeps legacy totals',()=>{
+  const e={contracted:1800,installments:[{id:'sinal',amount:500,paidAmount:500}]};
+  const t=expenseTotals(e,today);
+  assert.equal(t.planned,1800);assert.equal(t.unallocated,1300);assert.equal(t.balance,1300);
+  assert.equal(t.state,'partial');
+  assert.equal(planningSnapshot({tasks:[],expenses:[e]},today).open,1300);
+  assert.equal(expenseTotals({installments:e.installments},today).planned,500);
+  assert.equal(expenseTotals({contracted:1800,installments:[]},today).balance,1800);
+});
+test('quick payments accumulate with their history and settle only the remaining balance',()=>{
+  const e={id:'a',contracted:1000,installments:[{id:'p',amount:1000,paidAmount:200,paidAt:'2026-10-01',payment:'Pix'}]};
+  let seq=0;const makeId=()=>String(++seq);
+  const next=recordExpensePayment(e,{installmentId:'p',amount:300,paidAt:today,payment:'Crédito'},makeId);
+  assert.equal(next.installments[0].paidAmount,500);assert.equal(next.installments[0].payments.length,2);
+  assert.equal(next.installments[0].payments[0].amount,200);
+  assert.equal(next.installments[0].payments[1].payment,'Crédito');
+  assert.equal(e.installments[0].paidAmount,200);
+  const end=recordExpensePayment(next,{installmentId:'p',amount:500,paidAt:today,payment:'Pix'},makeId);
+  assert.equal(expenseTotals(end,today).state,'paid');assert.equal(end.installments[0].payments.length,3);
+  assert.throws(()=>recordExpensePayment(next,{installmentId:'p',amount:500.01,paidAt:today,payment:'Pix'},makeId));
+  assert.throws(()=>recordExpensePayment(next,{installmentId:'p',amount:0,paidAt:today,payment:'Pix'},makeId));
+  assert.throws(()=>recordExpensePayment(next,{installmentId:'p',amount:1,paidAt:'',payment:'Pix'},makeId));
+});
+test('paying unscheduled balance creates only the amount paid, preserves the remaining contract',()=>{
+  const e={contracted:1800,installments:[{id:'s',amount:500,paidAmount:500}]};let seq=0;
+  const next=recordExpensePayment(e,{installmentId:'__unallocated__',amount:300,paidAt:today,payment:'Débito'},()=>String(++seq));
+  assert.equal(next.contracted,1800);assert.equal(expenseTotals(next,today).unallocated,1000);
+  assert.equal(expenseTotals(next,today).paid,800);assert.equal(expenseTotals(next,today).balance,1000);
+  const end=recordExpensePayment(next,{installmentId:'__unallocated__',amount:1000,paidAt:today,payment:'Pix'},()=>String(++seq));
+  assert.equal(expenseTotals(end,today).state,'paid');assert.equal(expenseTotals(end,today).unallocated,0);
 });
