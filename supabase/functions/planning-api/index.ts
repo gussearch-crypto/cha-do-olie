@@ -26,6 +26,15 @@ function fileKind(bytes:Uint8Array) {
   if (bytes.length>=12 && [82,73,70,70].every((b,i)=>bytes[i]===b) && [87,69,66,80].every((b,i)=>bytes[i+8]===b)) return {mime:'image/webp',ext:'webp'};
   return null;
 }
+const expectedRevision = (body:any) => body.expectedRevision !== undefined && /^\d+$/.test(String(body.expectedRevision)) && Number.isSafeInteger(Number(body.expectedRevision)) ? Number(body.expectedRevision) : null;
+async function commitState(client:any,state:any,revision:number,exists:boolean) {
+  const row={id:'main',data:state,revision:revision+1,updated_at:new Date().toISOString()};
+  const result=exists
+    ? await client.from('event_planning_state').update(row).eq('id','main').eq('revision',revision).select('revision').maybeSingle()
+    : await client.from('event_planning_state').insert(row).select('revision').maybeSingle();
+  if(result.error) return result.error.code==='23505' ? json({error:'conflict'},409) : json({error:'planning_save_failed'},500);
+  return result.data ? null : json({error:'conflict'},409);
+}
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", {headers:cors});
   if (req.method !== "POST") return json({error:"method_not_allowed"},405);
@@ -35,12 +44,12 @@ Deno.serve(async req => {
   if (!(await isAdmin(body.adminCode))) return json({error:"unauthorized"},401);
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   if (body.action === 'get') {
-    const {data,error} = await supabase.from('event_planning_state').select('data,updated_at').eq('id','main').maybeSingle();
+    const {data,error} = await supabase.from('event_planning_state').select('data,updated_at,revision').eq('id','main').maybeSingle();
     if (error) return json({error:'planning_load_failed'},500);
-    return json({data:data?.data || null, updatedAt:data?.updated_at || null});
+    return json({data:data?.data || null, updatedAt:data?.updated_at || null, revision:data?.revision || 0});
   }
   if (['upload','file_url','remove_file'].includes(body.action)) {
-    const {data:record,error:loadError} = await supabase.from('event_planning_state').select('data').eq('id','main').maybeSingle();
+    const {data:record,error:loadError} = await supabase.from('event_planning_state').select('data,revision').eq('id','main').maybeSingle();
     if (loadError) return json({error:'planning_load_failed'},500);
     const state = record?.data;
     if (!validData(state)) return json({error:'target_not_found'},404);
@@ -52,6 +61,9 @@ Deno.serve(async req => {
       const {data,error} = await bucket.createSignedUrl(body.path,60);
       return error ? json({error:'storage_failed'},500) : json({url:data.signedUrl});
     }
+    const revision=expectedRevision(body);
+    if(revision===null) return json({error:'upgrade_required'},409);
+    if(revision!==(record?.revision || 0)) return json({error:'conflict'},409);
     const expense = state.expenses.find((e:any)=>e.id===body.expenseId);
     if (!expense || !/^[a-zA-Z0-9_-]{1,100}$/.test(expense.id)) return json({error:'target_not_found'},404);
     let target = expense;
@@ -74,22 +86,25 @@ Deno.serve(async req => {
       if (uploadError) return json({error:'upload_failed'},500);
       const document = {id:crypto.randomUUID(),path,name:file.name.slice(0,180),size:file.size,type:kind.mime,uploadedAt:new Date().toISOString()};
       target.attachments = [...documents,document];
-      const {error:saveError} = await supabase.from('event_planning_state').upsert({id:'main',data:state,updated_at:new Date().toISOString()},{onConflict:'id'});
-      if (saveError) {await bucket.remove([path]);return json({error:'planning_save_failed'},500)}
-      return json({expense});
+      const failure=await commitState(supabase,state,revision,true);
+      if(failure){await bucket.remove([path]);return failure}
+      return json({expense,revision:revision+1});
     }
     if (!validPath(body.path) || !documents.some((d:any)=>d.path===body.path)) return json({error:'file_not_found'},404);
     // Persist the removal first so a failed database write never loses the file.
     target.attachments = documents.filter((d:any)=>d.path!==body.path);
-    const {error:saveError} = await supabase.from('event_planning_state').upsert({id:'main',data:state,updated_at:new Date().toISOString()},{onConflict:'id'});
-    if (saveError) return json({error:'planning_save_failed'},500);
+    const failure=await commitState(supabase,state,revision,true);
+    if(failure)return failure;
     await bucket.remove([body.path]);
-    return json({expense});
+    return json({expense,revision:revision+1});
   }
   if (body.action === 'save') {
     if (!validData(body.data)) return json({error:'invalid_data'},400);
-    const {data:previousRecord,error:previousError} = await supabase.from('event_planning_state').select('data').eq('id','main').maybeSingle();
+    const {data:previousRecord,error:previousError} = await supabase.from('event_planning_state').select('data,revision').eq('id','main').maybeSingle();
     if (previousError) return json({error:'planning_load_failed'},500);
+    const revision=expectedRevision(body);
+    if(revision===null)return json({error:'upgrade_required'},409);
+    if(revision!==(previousRecord?.revision || 0))return json({error:'conflict'},409);
     const previous = previousRecord?.data || {};
     let budgets = {};
     if (body.data.budgets !== undefined) {
@@ -104,9 +119,9 @@ Deno.serve(async req => {
     const trash = body.data.trash===undefined ? previous.trash || [] : body.data.trash;
     if (!Array.isArray(trash) || trash.length>500 || trash.some((entry:any)=>!entry || !['task','expense'].includes(entry.type) || !entry.item?.id || typeof entry.id!=='string' || typeof entry.deletedAt!=='string')) return json({error:'invalid_trash'},400);
     const clean = {trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
-    const {error} = await supabase.from('event_planning_state').upsert({id:'main',data:clean,updated_at:new Date().toISOString()},{onConflict:'id'});
-    if (error) return json({error:'planning_save_failed'},500);
-    return json({ok:true});
+    const failure=await commitState(supabase,clean,revision,!!previousRecord);
+    if(failure)return failure;
+    return json({ok:true,revision:revision+1});
   }
   return json({error:'unknown_action'},400);
 });

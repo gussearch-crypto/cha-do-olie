@@ -7,12 +7,12 @@ import {transformWithOxc} from 'vite';
 const source=await readFile(new URL('../supabase/functions/planning-api/index.ts',import.meta.url),'utf8');
 const code=(await transformWithOxc(source.replace(/^import .*;\n/gm,'').replace(/const ADMIN_HASH="[^"]+";/,'const ADMIN_HASH="'+createHash('sha256').update('test-admin').digest('hex')+'";'),'index.ts')).code;
 function endpoint(previous={budgets:{Local:500}}){
- let handler,saved,loadError=null,saveError=null,uploadError=null;let state=structuredClone(previous);const uploads=[],removals=[],signed=[];
- const table={select:()=>table,eq:()=>table,maybeSingle:async()=>({data:{data:structuredClone(state)},error:loadError}),upsert:async row=>{if(saveError)return {error:saveError};saved=structuredClone(row.data);state=saved;return {error:null}}};
+ let handler,saved,loadError=null,saveError=null,uploadError=null;let state=structuredClone(previous),revision=0,write=null,filters={},race=false;const uploads=[],removals=[],signed=[];
+ const table={select:()=>table,eq:(key,value)=>{filters[key]=value;return table},update:row=>{write=row;filters={};return table},insert:row=>{write=row;filters={};return table},maybeSingle:async()=>{if(!write){filters={};return {data:state?{data:structuredClone(state),revision}:null,error:loadError}}const row=write;write=null;if(race){revision++;race=false}if(saveError)return {error:saveError};if(filters.revision!==undefined&&filters.revision!==revision)return {data:null,error:null};if(filters.revision===undefined&&state)return {error:{code:'23505'}};saved=structuredClone(row.data);state=saved;revision=row.revision;return {data:{revision},error:null}}};
  const bucket={upload:async(path,bytes,options)=>{uploads.push({path,size:bytes.length,options});return {error:uploadError}},remove:async paths=>{removals.push(...paths);return {error:null}},createSignedUrl:async(path,seconds)=>{signed.push({path,seconds});return {data:{signedUrl:'https://example.test/signed'},error:null}}};
  vm.runInNewContext(code,{crypto:webcrypto,TextEncoder,Response,Request,File,createClient:()=>({from:()=>table,storage:{from:name=>{assert.equal(name,'planning-documents');return bucket}}}),Deno:{env:{get:()=>''},serve:fn=>{handler=fn}}});
  const invoke=async request=>{const response=await handler(request);return {status:response.status,json:await response.json()}};
- return {call:body=>invoke(new Request('https://example.test',{method:'POST',body:JSON.stringify({adminCode:'test-admin',...body})})),upload:(file,target={},adminCode='test-admin')=>{const form=new FormData();form.set('action','upload');form.set('adminCode',adminCode);form.set('file',file);Object.entries(target).forEach(([k,v])=>form.set(k,v));return invoke(new Request('https://example.test',{method:'POST',body:form}))},saved:()=>saved,uploads,removals,signed,failLoad:()=>{loadError={message:'offline'}},failSave:()=>{saveError={message:'offline'}},failUpload:()=>{uploadError={message:'offline'}}};
+ return {call:body=>invoke(new Request('https://example.test',{method:'POST',body:JSON.stringify({adminCode:'test-admin',expectedRevision:revision,...body})})),upload:(file,target={},adminCode='test-admin')=>{const form=new FormData();form.set('action','upload');form.set('adminCode',adminCode);form.set('expectedRevision',String(revision));form.set('file',file);Object.entries(target).forEach(([k,v])=>form.set(k,v));return invoke(new Request('https://example.test',{method:'POST',body:form}))},revision:()=>revision,race:()=>{race=true},saved:()=>saved,uploads,removals,signed,failLoad:()=>{loadError={message:'offline'}},failSave:()=>{saveError={message:'offline'}},failUpload:()=>{uploadError={message:'offline'}}};
 }
 test('API persists and returns budgets with the planning payload',async()=>{
  const api=endpoint();const data={tasks:[],expenses:[],budgets:{Local:500.123,'Alimentação':0}};
@@ -51,4 +51,17 @@ test('trash survives older clients and archived documents remain available to au
  assert.equal((await api.call({action:'file_url',path})).status,200);
  assert.equal((await api.call({adminCode:'invalid',action:'file_url',path})).status,401);
  assert.equal((await api.call({action:'save',data:{tasks:[],expenses:[],trash:'bad'}})).status,400);
+});
+
+test('revision compare-and-swap rejects stale, missing and racing writes without losing saved data',async()=>{
+ const api=endpoint(fixture()),data=fixture();
+ assert.equal((await api.call({action:'save',data,expectedRevision:undefined})).json.error,'upgrade_required');
+ assert.equal((await api.call({action:'save',data,expectedRevision:7})).status,409);
+ assert.equal(api.saved(),undefined);
+ assert.equal((await api.call({action:'save',data,expectedRevision:0})).json.revision,1);
+ assert.equal((await api.call({action:'save',data,expectedRevision:0})).status,409);
+ api.race();assert.equal((await api.call({action:'save',data})).status,409);
+ assert.equal((await api.call({action:'get'})).json.revision,2);
+ const upload=endpoint(fixture());upload.race();assert.equal((await upload.upload(pdf(),{expenseId:'service'})).status,409);assert.equal(upload.saved(),undefined);assert.equal(upload.removals[0],upload.uploads[0].path);
+ const initial=endpoint(null);assert.equal((await initial.call({action:'save',data,expectedRevision:0})).json.revision,1);
 });

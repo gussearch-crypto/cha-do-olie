@@ -183,3 +183,25 @@ test('restoring task and service in either order preserves their association',()
   const taskFirst=restorePlanningItem(restorePlanningItem(both,'1'),'2');assert.equal(taskFirst.tasks[0].expenseId,'e');assert.equal(taskFirst.tasks[0].status,'done');
   const serviceFirst=restorePlanningItem(restorePlanningItem(both,'2'),'1');assert.equal(serviceFirst.tasks[0].expenseId,'e');
 });
+
+
+test('task steps prevent early completion and reopen a completed task when a step is unchecked',async()=>{
+ const {taskProgress,togglePlanningTask,togglePlanningSubtask}=await import('../planning-utils.mjs');
+ let data={tasks:[{id:'t',title:'Montagem',status:'todo',subtasks:[{id:'s',title:'Conferir mesas',done:false}]}],expenses:[]};
+ assert.deepEqual(taskProgress(data.tasks[0]),{total:1,done:0,pending:true});assert.throws(()=>togglePlanningTask(data,'t'),/etapas/);
+ data=togglePlanningSubtask(data,'t','s');data=togglePlanningTask(data,'t','2026-12-04');assert.equal(data.tasks[0].completedAt,'2026-12-04');
+ data=togglePlanningSubtask(data,'t','s');assert.equal(data.tasks[0].status,'todo');assert.equal(data.tasks[0].completedAt,'');
+});
+test('schedule filters date, sorts times, excludes malformed times and exports all dates',async()=>{
+ const {eventSchedule,planningCsv}=await import('../planning-utils.mjs');
+ const tasks=[{id:'b',title:'Recepção',eventDate:'2026-12-04',eventTime:'15:00'},{id:'a',title:'Montagem',eventDate:'2026-12-04',eventTime:'09:00'},{id:'x',title:'Outro dia',eventDate:'2026-12-05',eventTime:'09:00'},{id:'z',title:'Inválido',eventDate:'2026-12-04',eventTime:'25:99'}];
+ assert.deepEqual(eventSchedule(tasks,'2026-12-04').map(t=>t.id),['a','b']);assert.ok(planningCsv({tasks,expenses:[]},'schedule').includes('Outro dia'));
+});
+test('three-way merge combines independent records and requires a choice for same-record changes or deletion',async()=>{
+ const {mergePlanningStates}=await import('../planning-utils.mjs');
+ const base={tasks:[{id:'a',title:'A'},{id:'b',title:'B'}],expenses:[],trash:[],budgets:{Local:100}};
+ const local=structuredClone(base),remote=structuredClone(base);local.tasks[0].title='A local';remote.tasks[1].title='B remoto';remote.budgets.Local=200;
+ let result=mergePlanningStates(base,local,remote);assert.equal(result.conflicts.length,0);assert.deepEqual(result.data.tasks.map(t=>t.title),['A local','B remoto']);assert.equal(result.data.budgets.Local,200);
+ remote.tasks[0].title='A remoto';result=mergePlanningStates(base,local,remote);assert.equal(result.conflicts[0].key,'tasks:a');assert.equal(mergePlanningStates(base,local,remote,{'tasks:a':'remote'}).data.tasks[0].title,'A remoto');
+ remote.tasks=[];assert.equal(mergePlanningStates(base,local,remote).conflicts.length,1);
+});

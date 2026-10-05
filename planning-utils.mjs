@@ -146,7 +146,8 @@ export function paymentForecast(expenses, today = eventToday()) {
 export function planningCsv(data, section, today = eventToday()) {
   const brMoney = value => Number(value||0).toFixed(2).replace('.',',');
   let rows;
-  if (section === 'tasks') rows = [['Ação','Categoria','Situação','Prioridade','Responsável','Prazo','Realizada em','Serviço vinculado','Observação'],...data.tasks.map(t=>[t.title,t.category,t.status==='done'?'Realizada':'A realizar',({high:'Alta',medium:'Média',low:'Baixa'})[t.priority]||'',t.responsible,t.due,t.completedAt,data.expenses.find(e=>e.id===t.expenseId)?.description||'',t.notes])];
+  if (section === 'schedule') rows = [['Ação','Data','Início','Fim','Responsável','Contato','Local','Situação','Etapas'],...data.tasks.filter(t=>t.eventDate&&t.eventTime).sort((a,b)=>(a.eventDate+a.eventTime).localeCompare(b.eventDate+b.eventTime)).map(t=>[t.title,t.eventDate,t.eventTime,t.eventEnd,t.responsible,t.contact,t.place,t.status==='done'?'Realizada':'A realizar',(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
+  else if (section === 'tasks') rows = [['Ação','Categoria','Situação','Prioridade','Responsável','Prazo','Realizada em','Serviço vinculado','Observação','Etapas'],...data.tasks.map(t=>[t.title,t.category,t.status==='done'?'Realizada':'A realizar',({high:'Alta',medium:'Média',low:'Baixa'})[t.priority]||'',t.responsible,t.due,t.completedAt,data.expenses.find(e=>e.id===t.expenseId)?.description||'',t.notes,(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
   else if (section === 'expenses') rows = [['Serviço','Categoria','Fornecedor','Contratado','Pago','A quitar','Situação','Ações vinculadas','Observação'],...data.expenses.map(e=>{const totals=expenseTotals(e,today);return [e.description,e.category,e.supplier,brMoney(totals.planned),brMoney(totals.paid),brMoney(totals.balance),totals.state==='paid'?'Quitado':totals.planned>0?'A quitar':'Valor a definir',data.tasks.filter(t=>t.expenseId===e.id).map(t=>t.title).join(' | '),e.notes]})];
   else if (section === 'payments') rows = [['Serviço','Parcela','Valor programado','Vencimento','Valor pago ativo','Saldo da parcela','Pagamento registrado','Data do pagamento','Meio de pagamento','Situação do registro','Motivo do estorno','Estornado em','Correções','Valores anteriores'],...data.expenses.flatMap(e=>(e.installments||[]).flatMap(p=>{const history=paymentHistory(p),base=[e.description,p.label,brMoney(p.amount),p.due,brMoney(p.paidAmount),brMoney(installmentBalance(p))];return history.length?history.map(h=>[...base,brMoney(h.amount),h.paidAt,h.payment,h.reversedAt?'Estornado':'Ativo',h.reversalReason,h.reversedAt,h.changes?.length||0,(h.changes||[]).map(c=>`${brMoney(c.amount)} | ${c.paidAt||'Sem data'} | ${c.payment||''} | ${c.changedAt||''} | ${c.reason||''}`).join(' / ')]):[[...base,'','','','Sem pagamento','','',0,'']]}))];
   else if (section === 'budgets') rows = [['Categoria','Limite','Contratado','Disponível','Excedido'],...categoryBudgets(data.expenses,data.budgets||{}).map(r=>[r.category,r.budget===null?'':brMoney(r.budget),brMoney(r.contracted),r.remaining===null?'':brMoney(Math.max(0,r.remaining)),r.remaining===null?'':brMoney(Math.max(0,-r.remaining))])];
@@ -173,4 +174,46 @@ export function restorePlanningItem(data, entryId) {
   const item=structuredClone(entry.item);
   const tasks=entry.type==='task'?[item,...data.tasks]:data.tasks.map(t=>(entry.linkedTaskIds||[]).includes(t.id)&&!t.expenseId?{...t,expenseId:item.id,cost:true}:t);
   return {...data,[collection]:[item,...data[collection]],tasks,trash:data.trash.filter(x=>x.id!==entryId)};
+}
+
+export function taskProgress(task) {
+  const steps=task.subtasks||[];
+  return {total:steps.length,done:steps.filter(s=>s.done).length,pending:steps.some(s=>!s.done)};
+}
+export function togglePlanningTask(data, taskId, today=eventToday()) {
+  return {...data,tasks:data.tasks.map(t=>{
+    if(t.id!==taskId)return t;
+    if(t.status!=='done'&&taskProgress(t).pending)throw new Error('Conclua as etapas antes de finalizar a ação.');
+    return {...t,status:t.status==='done'?'todo':'done',completedAt:t.status==='done'?'':today};
+  })};
+}
+export function togglePlanningSubtask(data, taskId, stepId) {
+  return {...data,tasks:data.tasks.map(t=>{
+    if(t.id!==taskId)return t;
+    const subtasks=(t.subtasks||[]).map(s=>s.id===stepId?{...s,done:!s.done}:s);
+    return {...t,subtasks,...(t.status==='done'&&subtasks.some(s=>!s.done)?{status:'todo',completedAt:''}:{})};
+  })};
+}
+export function eventSchedule(tasks,date) {
+  return tasks.filter(t=>t.eventDate===date&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t.eventTime||'')).sort((a,b)=>a.eventTime.localeCompare(b.eventTime)||a.title.localeCompare(b.title,'pt-BR'));
+}
+const ordered=value=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,ordered(value[key])])):value;
+export const planningStatesEqual=(a,b)=>JSON.stringify(ordered(a))===JSON.stringify(ordered(b));
+const sameRecord=planningStatesEqual;
+export function mergePlanningStates(base,local,remote,choices={}) {
+  const conflicts=[],data={};
+  const pick=(key,label,b,l,r)=>{
+    if(sameRecord(l,b))return r;
+    if(sameRecord(r,b)||sameRecord(l,r))return l;
+    conflicts.push({key,label,local:l,remote:r});
+    return choices[key]==='remote'?r:l;
+  };
+  for(const collection of ['tasks','expenses','trash']) {
+    const maps=[base,local,remote].map(d=>new Map((d?.[collection]||[]).map(x=>[x.id,x])));
+    const keys=[...new Set([...maps[1].keys(),...maps[2].keys(),...maps[0].keys()])];
+    data[collection]=keys.map(key=>{const [b,l,r]=maps.map(m=>m.get(key));const item=l||r||b;return pick(collection+':'+key,item.title||item.description||item.item?.title||item.item?.description||'Registro',b,l,r)}).filter(Boolean);
+  }
+  const keys=[...new Set([...Object.keys(base?.budgets||{}),...Object.keys(local?.budgets||{}),...Object.keys(remote?.budgets||{})])];
+  data.budgets={};keys.forEach(key=>{const v=pick('budgets:'+key,'Orçamento: '+key,base?.budgets?.[key],local?.budgets?.[key],remote?.budgets?.[key]);if(v!==undefined)data.budgets[key]=v});
+  return {data,conflicts};
 }
