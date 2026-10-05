@@ -103,3 +103,19 @@
   .planningExpenseNumbers>div:last-child {grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #eee7d6;padding-top:8px;margin-top:3px;}
   .planningExpenseNumbers>div:last-child strong {margin:0;font-size:.9rem;}
 }
+.planningTaskExpense {display:block;text-align:left;border:0;border-radius:6px;background:#f0f3e7;color:#5b6d3e;padding:7px 8px;margin-top:6px;max-width:100%;font:700 .68rem 'DM Sans',sans-serif;cursor:pointer;overflow-wrap:anywhere;}
+.planningRelatedTasks {display:grid;gap:7px;padding:12px;background:#f0f3e7;border-radius:10px;margin-bottom:14px;}
+.planningRelatedTasks>b {font-size:.76rem;}
+.planningRelatedTasks button {text-align:left;border:0;background:none;color:#5c713a;font:700 .76rem 'DM Sans',sans-serif;cursor:pointer;min-height:36px;padding:4px 0;}
+.planningPaymentHistory {list-style:none;padding:0;display:grid;gap:8px;}
+.planningPaymentHistory li {border:1px solid #e9e3d2;border-radius:8px;background:#faf9f3;padding:8px;min-width:0;}
+.planningPaymentHistory li>span {font-size:.68rem;overflow-wrap:anywhere;}
+.planningPaymentHistory li>small {display:block;margin-top:5px;font-size:.65rem;color:#9a5a44;overflow-wrap:anywhere;}
+.planningPaymentHistory .reversed>span {text-decoration:line-through;color:#818372;}
+.planningHistoryActions {display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+.planningHistoryActions button {border:0;background:none;color:#5f713e;font:700 .67rem 'DM Sans',sans-serif;cursor:pointer;min-height:36px;padding:4px 0;}
+.planningHistoryActions button:last-child {color:#974f3d;}
+.planningPaymentChanges>summary {font-size:.65rem;min-height:30px;padding:5px 0;}
+.planningPaymentChanges small {display:block;font-size:.64rem;line-height:1.5;overflow-wrap:anywhere;}
+.planningDialog input:disabled,.planningDialog select:disabled {background:#f0eee5;color:#7d806e;}
+@media(max-width:560px) {.planningHistoryActions button,.planningTaskExpense {min-height:44px;}}

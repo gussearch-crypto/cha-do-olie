@@ -58,13 +58,37 @@ export function recordExpensePayment(expense, {installmentId, amount, paidAt, pa
     p = ps.find(p => p.id === installmentId);
     if (!p || value > cents(installmentBalance(p))) throw new Error('O valor supera o saldo da parcela.');
   }
-  let history = Array.isArray(p.payments) ? [...p.payments] : [];
-  if (history.reduce((s, h) => s + cents(h.amount), 0) !== cents(p.paidAmount)) {
-    history = cents(p.paidAmount) > 0 ? [{id: makeId(), amount: cents(p.paidAmount) / 100, paidAt: p.paidAt || '', payment: p.payment || 'Outros', legacy: true}] : [];
-  }
+  const history = paymentHistory(p);
   history.push({id: makeId(), amount: value / 100, paidAt, payment});
   Object.assign(p, {paidAmount: (cents(p.paidAmount) + value) / 100, paidAt, payment, payments: history});
   const result = {...expense, contracted: expenseTotals(expense).planned, installments: ps};
+  const totals = expenseTotals(result);
+  return {...result, planned: totals.planned, paid: totals.paid};
+}
+export function paymentHistory(installment) {
+  const history = Array.isArray(installment.payments) ? installment.payments.map(h => ({...h})) : [];
+  if (history.reduce((s, h) => s + (h.reversedAt ? 0 : cents(h.amount)), 0) === cents(installment.paidAmount)) return history;
+  return cents(installment.paidAmount) > 0 ? [{id: 'legacy-' + installment.id, amount: cents(installment.paidAmount) / 100, paidAt: installment.paidAt || '', payment: installment.payment || 'Outros', legacy: true}] : [];
+}
+export function reviseExpensePayment(expense, {installmentId, paymentId, action, amount, paidAt, payment, reason = ''}, now = new Date()) {
+  const installments = (expense.installments || []).map(p => ({...p}));
+  const p = installments.find(p => p.id === installmentId);
+  if (!p) throw new Error('Parcela não encontrada.');
+  const history = paymentHistory(p), entry = history.find(h => h.id === paymentId);
+  if (!entry || entry.reversedAt) throw new Error('Pagamento indisponível para alteração.');
+  if (action === 'reverse') {
+    if (!reason.trim()) throw new Error('Informe o motivo do estorno.');
+    Object.assign(entry, {reversedAt: now.toISOString(), reversalReason: reason.trim()});
+  } else if (action === 'edit') {
+    const value = cents(amount), other = history.reduce((s,h) => s + (h.id === paymentId || h.reversedAt ? 0 : cents(h.amount)), 0);
+    if (!(Number(amount) > 0) || value === 0 || value + other > cents(p.amount)) throw new Error('O valor deve ser positivo e não superar o valor da parcela.');
+    if (civilDay(paidAt) === null) throw new Error('Informe a data do pagamento.');
+    const changes = [...(entry.changes || []), {amount: entry.amount, paidAt: entry.paidAt, payment: entry.payment, changedAt: now.toISOString(), reason: reason.trim()}];
+    Object.assign(entry, {amount: value / 100, paidAt, payment, changes});
+  } else throw new Error('Ação inválida.');
+  const active = history.filter(h => !h.reversedAt), last = [...active].sort((a,b) => (b.paidAt || '').localeCompare(a.paidAt || ''))[0];
+  Object.assign(p, {payments: history, paidAmount: active.reduce((s,h) => s + cents(h.amount), 0) / 100, paidAt: last?.paidAt || '', payment: last?.payment || 'Pix'});
+  const result = {...expense, contracted: expenseTotals(expense).planned, installments};
   const totals = expenseTotals(result);
   return {...result, planned: totals.planned, paid: totals.paid};
 }

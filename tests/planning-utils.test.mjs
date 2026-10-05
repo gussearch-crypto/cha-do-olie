@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment} from '../planning-utils.mjs';
+import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -93,4 +93,34 @@ test('paying unscheduled balance creates only the amount paid, preserves the rem
   assert.equal(expenseTotals(next,today).paid,800);assert.equal(expenseTotals(next,today).balance,1000);
   const end=recordExpensePayment(next,{installmentId:'__unallocated__',amount:1000,paidAt:today,payment:'Pix'},()=>String(++seq));
   assert.equal(expenseTotals(end,today).state,'paid');assert.equal(expenseTotals(end,today).unallocated,0);
+});
+
+test('corrections recalculate the paid amount and preserve previous values',()=>{
+  const e={contracted:1000,installments:[{id:'p',amount:1000,paidAmount:1000,paidAt:today,payment:'Pix'}]};
+  const fixed=reviseExpensePayment(e,{installmentId:'p',paymentId:'legacy-p',action:'edit',amount:900,paidAt:today,payment:'Débito',reason:'Valor digitado incorretamente'});
+  assert.equal(expenseTotals(fixed,today).balance,100);
+  assert.equal(fixed.installments[0].payments[0].changes[0].amount,1000);
+  assert.equal(fixed.installments[0].payments[0].payment,'Débito');
+  assert.equal(e.installments[0].paidAmount,1000);
+});
+test('reversals preserve the entry, reopen debt, and are excluded from later payment sums',()=>{
+  let seq=0;const makeId=()=>String(++seq);
+  const base={contracted:1000,installments:[{id:'p',amount:1000,paidAmount:200,paidAt:today,payment:'Pix',due:'2026-10-01'}]};
+  const paid=recordExpensePayment(base,{installmentId:'p',amount:800,paidAt:today,payment:'Pix'},makeId);
+  const history=paymentHistory(paid.installments[0]);
+  const reversed=reviseExpensePayment(paid,{installmentId:'p',paymentId:history[1].id,action:'reverse',reason:'Duplicado'});
+  assert.equal(expenseTotals(reversed,today).paid,200);assert.equal(expenseTotals(reversed,today).balance,800);
+  assert.equal(expenseTotals(reversed,today).state,'overdue');
+  assert.ok(paymentHistory(reversed.installments[0])[1].reversedAt);
+  const again=recordExpensePayment(reversed,{installmentId:'p',amount:800,paidAt:today,payment:'Crédito'},makeId);
+  assert.equal(paymentHistory(again.installments[0]).length,3);
+  assert.equal(expenseTotals(again,today).state,'paid');
+  assert.throws(()=>reviseExpensePayment(reversed,{installmentId:'p',paymentId:history[1].id,action:'edit',amount:1,paidAt:today,payment:'Pix'}));
+});
+test('history corrections cannot exceed a parcel after other active payments',()=>{
+  const e={contracted:1000,installments:[{id:'p',amount:1000,paidAmount:1000,payments:[{id:'a',amount:400,paidAt:today,payment:'Pix'},{id:'b',amount:600,paidAt:today,payment:'Pix'}]}]};
+  assert.throws(()=>reviseExpensePayment(e,{installmentId:'p',paymentId:'a',action:'edit',amount:401,paidAt:today,payment:'Pix'}));
+  assert.throws(()=>reviseExpensePayment(e,{installmentId:'p',paymentId:'a',action:'reverse',reason:''}));
+  assert.throws(()=>reviseExpensePayment(e,{installmentId:'missing',paymentId:'a',action:'reverse',reason:'Erro'}));
+  assert.equal(paymentHistory({id:'old',paidAmount:500,paidAt:''})[0].id,'legacy-old');
 });
