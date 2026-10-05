@@ -154,3 +154,23 @@ export function planningCsv(data, section, today = eventToday()) {
   const escape = value => {let text=String(value??'');if(/^[\s]*[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
   return '\uFEFF'+rows.map(row=>row.map(escape).join(';')).join('\r\n')+'\r\n';
 }
+
+export function trashPlanningItem(data, type, itemId, makeId = () => crypto.randomUUID(), now = new Date()) {
+  const collection = type === 'task' ? 'tasks' : type === 'expense' ? 'expenses' : null;
+  if (!collection) throw new Error('Tipo inválido.');
+  const item = data[collection].find(x=>x.id===itemId);
+  if (!item) throw new Error('Registro não encontrado.');
+  const linkedTaskIds = type === 'expense' ? data.tasks.filter(t=>t.expenseId===itemId).map(t=>t.id) : [];
+  if ((data.trash||[]).length>=500) throw new Error('A lixeira atingiu 500 registros. Restaure um registro antes de excluir outro.');
+  const entry = {id:makeId(),type,item:structuredClone(item),linkedTaskIds,deletedAt:now.toISOString()};
+  return {...data,[collection]:data[collection].filter(x=>x.id!==itemId),tasks:type==='expense'?data.tasks.map(t=>t.expenseId===itemId?{...t,expenseId:''}:t):data.tasks.filter(t=>t.id!==itemId),trash:[entry,...(data.trash||[])]};
+}
+export function restorePlanningItem(data, entryId) {
+  const entry = (data.trash||[]).find(x=>x.id===entryId);
+  if (!entry || !['task','expense'].includes(entry.type)) throw new Error('Registro não encontrado na lixeira.');
+  const collection = entry.type==='task'?'tasks':'expenses';
+  if (data[collection].some(x=>x.id===entry.item.id)) throw new Error('Já existe um registro com este identificador.');
+  const item=structuredClone(entry.item);
+  const tasks=entry.type==='task'?[item,...data.tasks]:data.tasks.map(t=>(entry.linkedTaskIds||[]).includes(t.id)&&!t.expenseId?{...t,expenseId:item.id,cost:true}:t);
+  return {...data,[collection]:[item,...data[collection]],tasks,trash:data.trash.filter(x=>x.id!==entryId)};
+}

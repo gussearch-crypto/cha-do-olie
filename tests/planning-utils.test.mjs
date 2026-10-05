@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv} from '../planning-utils.mjs';
+import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -166,4 +166,20 @@ test('CSV exports all sections, protects formula text, preserves quotes and dist
   const expenses=planningCsv(data,'expenses',today);assert.ok(expenses.includes('"Salão; ""A"""'));assert.ok(expenses.includes('"150,00";"100,00";"50,00"'));
   const payments=planningCsv(data,'payments',today);assert.ok(payments.includes('"Estornado";"Duplicado"'));assert.ok(payments.includes('"Ativo"'));assert.ok(planningCsv(data,'budgets',today).includes('"0,00";"50,00"'));
   assert.throws(()=>planningCsv(data,'invalid',today));
+});
+
+test('trash excludes balances and restoration recovers histories, documents and available links',()=>{
+  const expense={id:'e',description:'Buffet',contracted:1000,attachments:[{path:'contract'}],installments:[{id:'p',amount:1000,paidAmount:400,payments:[{id:'h',amount:400,attachments:[{path:'receipt'}]}]}]};
+  const data={budgets:{Local:100},tasks:[{id:'t',title:'Contratar',expenseId:'e',cost:true}],expenses:[expense]};
+  const deleted=trashPlanningItem(data,'expense','e',()=> 'deleted',new Date('2026-10-05T15:00:00Z'));
+  assert.equal(planningSnapshot(deleted,today).open,0);assert.equal(deleted.tasks[0].expenseId,'');assert.equal(data.tasks[0].expenseId,'e');
+  const restored=restorePlanningItem(deleted,'deleted');assert.deepEqual(restored.expenses[0],expense);assert.equal(restored.tasks[0].expenseId,'e');assert.equal(planningSnapshot(restored,today).open,600);assert.equal(restored.trash.length,0);
+  const reassigned={...deleted,tasks:[{...deleted.tasks[0],expenseId:'another'}]};assert.equal(restorePlanningItem(reassigned,'deleted').tasks[0].expenseId,'another');
+  assert.throws(()=>restorePlanningItem({...deleted,expenses:[expense]},'deleted'));assert.throws(()=>trashPlanningItem(data,'expense','missing'));
+});
+test('restoring task and service in either order preserves their association',()=>{
+  const data={tasks:[{id:'t',title:'Ação',expenseId:'e',status:'done'}],expenses:[{id:'e',description:'Serviço',contracted:10,installments:[]}]};let n=0;
+  const both=trashPlanningItem(trashPlanningItem(data,'task','t',()=>String(++n)),'expense','e',()=>String(++n));
+  const taskFirst=restorePlanningItem(restorePlanningItem(both,'1'),'2');assert.equal(taskFirst.tasks[0].expenseId,'e');assert.equal(taskFirst.tasks[0].status,'done');
+  const serviceFirst=restorePlanningItem(restorePlanningItem(both,'2'),'1');assert.equal(serviceFirst.tasks[0].expenseId,'e');
 });
