@@ -106,3 +106,27 @@ export function planningSnapshot(data, today = eventToday()) {
     overdueValue: sum(overduePayments), soonValue: sum(soonPayments),
     overduePayments: overduePayments.length, soonPayments: soonPayments.length};
 }
+
+// Split in integer cents; keep the original day when a shorter month is clamped.
+export function generateInstallments({amount, count, firstDue, startIndex = 1}, makeId = () => crypto.randomUUID()) {
+  const value = cents(amount), n = Number(count);
+  if (!Number.isFinite(Number(amount)) || value < 1 || !Number.isInteger(n) || n < 1 || n > 60 || value < n) throw new Error('Informe um valor positivo e de 1 a 60 parcelas de pelo menos R$ 0,01.');
+  if (civilDay(firstDue) === null) throw new Error('Informe o primeiro vencimento.');
+  const [year, month, day] = firstDue.split('-').map(Number);
+  if (year + Math.floor((month - 1 + n - 1) / 12) > 9999) throw new Error('O último vencimento ultrapassa o ano permitido.');
+  return Array.from({length:n}, (_, i) => {
+    const absolute = month - 1 + i, y = year + Math.floor(absolute / 12), m = absolute % 12;
+    const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    const due = `${String(y).padStart(4,'0')}-${String(m + 1).padStart(2,'0')}-${String(Math.min(day,last)).padStart(2,'0')}`;
+    return {id:makeId(), label:`Parcela ${startIndex + i}`, amount:(Math.floor(value / n) + (i < value % n ? 1 : 0)) / 100, due, paidAmount:0, paidAt:'', payment:'Pix'};
+  });
+}
+export function categoryBudgets(expenses, budgets = {}, categories = []) {
+  const names = [...new Set([...categories, ...Object.keys(budgets), ...expenses.map(e => e.category || 'Outros')])];
+  return names.map(category => {
+    const contracted = expenses.filter(e => (e.category || 'Outros') === category).reduce((s,e) => s + cents(expenseTotals(e).planned),0) / 100;
+    const raw = budgets[category], defined = raw !== '' && raw != null && Number.isFinite(Number(raw)) && Number(raw) >= 0;
+    const budget = defined ? cents(raw) / 100 : null;
+    return {category, budget, contracted, remaining:defined ? (cents(budget) - cents(contracted)) / 100 : null};
+  });
+}

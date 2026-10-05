@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment} from '../planning-utils.mjs';
+import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -123,4 +123,25 @@ test('history corrections cannot exceed a parcel after other active payments',()
   assert.throws(()=>reviseExpensePayment(e,{installmentId:'p',paymentId:'a',action:'reverse',reason:''}));
   assert.throws(()=>reviseExpensePayment(e,{installmentId:'missing',paymentId:'a',action:'reverse',reason:'Erro'}));
   assert.equal(paymentHistory({id:'old',paidAmount:500,paidAt:''})[0].id,'legacy-old');
+});
+
+test('monthly schedules preserve cents and restore the original day after shorter months',()=>{
+  let seq=0;
+  const ps=generateInstallments({amount:100,count:3,firstDue:'2027-01-31',startIndex:2},()=>String(++seq));
+  assert.deepEqual(ps.map(p=>p.amount),[33.34,33.33,33.33]);
+  assert.deepEqual(ps.map(p=>p.due),['2027-01-31','2027-02-28','2027-03-31']);
+  assert.equal(ps[0].label,'Parcela 2');assert.equal(new Set(ps.map(p=>p.id)).size,3);
+  assert.equal(ps.reduce((s,p)=>s+Math.round(p.amount*100),0),10000);
+  assert.equal(generateInstallments({amount:2,count:2,firstDue:'2023-12-31'})[1].due,'2024-01-31');
+  assert.equal(generateInstallments({amount:3,count:3,firstDue:'2024-01-31'})[1].due,'2024-02-29');
+  for(const args of [{amount:0,count:3,firstDue:today},{amount:.02,count:3,firstDue:today},{amount:10,count:1.5,firstDue:today},{amount:10,count:61,firstDue:today},{amount:10,count:3,firstDue:'2026-02-30'}])assert.throws(()=>generateInstallments(args));
+});
+test('category budgets include settled and unscheduled contracts, distinguish zero and missing limits',()=>{
+  const expenses=[{category:'Alimentação',contracted:100,installments:[{amount:100,paidAmount:100}]},{category:'Alimentação',contracted:50,installments:[]},{category:'Bebidas',contracted:25,installments:[]}];
+  const rows=categoryBudgets(expenses,{'Alimentação':140,'Bebidas':0,'Local':200},['Decoração']);
+  assert.deepEqual(rows.find(r=>r.category==='Alimentação'),{category:'Alimentação',budget:140,contracted:150,remaining:-10});
+  assert.equal(rows.find(r=>r.category==='Bebidas').remaining,-25);
+  assert.equal(rows.find(r=>r.category==='Local').remaining,200);
+  assert.equal(rows.find(r=>r.category==='Decoração').budget,null);
+  assert.equal(categoryBudgets(expenses,{'Alimentação':''})[0].budget,null);
 });
