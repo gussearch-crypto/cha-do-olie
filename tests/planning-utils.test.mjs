@@ -40,9 +40,6 @@ test('alerts count only pending actions and remaining installment balances',()=>
   assert.equal(s.overduePayments,1);assert.equal(s.overdueValue,450);
   assert.equal(s.soonPayments,1);assert.equal(s.soonValue,650);
   assert.equal(s.planned,2200);assert.equal(s.paid,700);assert.equal(s.open,1500);
-  assert.equal(s.agenda.length,5);
-  assert.ok(s.agenda.every(a=>a.item.id!=='done'&&a.key!=='payment-dec-paid'));
-  assert.deepEqual(s.agenda.map(a=>a.due),[...s.agenda.map(a=>a.due)].sort());
   assert.equal(expenseTotals(expense,today).state,'overdue');
 });
 test('overpayment on one installment cannot erase another installment debt',()=>{
@@ -50,4 +47,18 @@ test('overpayment on one installment cannot erase another installment debt',()=>
   const e={installments:[{amount:100,paidAmount:200},{amount:100,paidAmount:0}]};
   assert.equal(expenseTotals(e,today).balance,100);
   assert.equal(planningSnapshot({tasks:[],expenses:[e]},today).open,100);
+});
+
+test('services become settled only after the full contracted value is paid',()=>{
+  const full={installments:[{amount:1000,paidAmount:1000,due:'2026-10-01'}]};
+  assert.equal(expenseTotals(full,today).state,'paid');
+  const split={installments:[{amount:500,paidAmount:500},{amount:500,paidAmount:100}]};
+  assert.equal(expenseTotals(split,today).state,'partial');
+  assert.equal(expenseTotals(split,today).balance,400);
+  split.installments[1].paidAmount=500;
+  assert.equal(expenseTotals(split,today).state,'paid');
+  split.installments[1].paidAmount=499.99;
+  assert.notEqual(expenseTotals(split,today).state,'paid');
+  assert.equal(expenseTotals(split,today).balance,.01);
+  assert.equal(expenseTotals({installments:[]},today).state,'open');
 });

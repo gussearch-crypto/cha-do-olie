@@ -48,13 +48,9 @@ export function planningSnapshot(data, today = eventToday()) {
   const sum = ps => ps.reduce((s, p) => s + Math.round(p.balance * 100), 0) / 100;
   const totals = data.expenses.map(e => expenseTotals(e, today));
   const total = key => totals.reduce((s, e) => s + Math.round(e[key] * 100), 0) / 100;
-  const agenda = [
-    ...tasks.filter(t => daysUntil(t.due, today) !== null).map(t => ({key: `task-${t.id}`, type: 'task', title: t.title, due: t.due, item: t})),
-    ...payments.filter(p => daysUntil(p.due, today) !== null).map(p => ({key: `payment-${p.key}`, type: 'expense', title: `${p.expense.description} · ${p.label || 'Pagamento'}`, due: p.due, balance: p.balance, item: p.expense}))
-  ].sort((a, b) => a.due.localeCompare(b.due) || a.title.localeCompare(b.title, 'pt-BR'));
   return {planned: total('planned'), paid: total('paid'), open: total('balance'),
     overdueTasks: tasks.filter(t => matchesPeriod(t.due, 'overdue', today)).length,
     soonTasks: tasks.filter(t => matchesPeriod(t.due, 'next7', today)).length,
     overdueValue: sum(overduePayments), soonValue: sum(soonPayments),
-    overduePayments: overduePayments.length, soonPayments: soonPayments.length, agenda};
+    overduePayments: overduePayments.length, soonPayments: soonPayments.length};
 }

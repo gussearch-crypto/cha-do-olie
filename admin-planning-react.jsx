@@ -25,7 +25,7 @@ function Planning(){
   const[data,setData]=useState(readLocal),[modal,setModal]=useState(null),[sync,setSync]=useState('loading');
   const[taskSearch,setTaskSearch]=useState(''),[taskCat,setTaskCat]=useState('all'),[taskView,setTaskView]=useState('open'),[taskOwner,setTaskOwner]=useState('all'),[taskPeriod,setTaskPeriod]=useState('all'),[taskStatus,setTaskStatus]=useState('all');
   const[expenseSearch,setExpenseSearch]=useState(''),[expenseCat,setExpenseCat]=useState('all'),[expenseView,setExpenseView]=useState('open'),[expensePeriod,setExpensePeriod]=useState('all'),[expenseStatus,setExpenseStatus]=useState('all');
-  const[currentDay,setCurrentDay]=useState(today),[showAllAgenda,setShowAllAgenda]=useState(false);
+  const[currentDay,setCurrentDay]=useState(today);
   const ready=useRef(false),timer=useRef(null),taskPanel=useRef(null),expensePanel=useRef(null);
   useEffect(()=>{const refresh=()=>setCurrentDay(today()),clock=setInterval(refresh,60000);window.addEventListener('focus',refresh);return()=>{clearInterval(clock);window.removeEventListener('focus',refresh)}},[]);
   useEffect(()=>{let live=true;(async()=>{try{const remote=await planningApi('get');if(!live)return;if(remote.data&&Array.isArray(remote.data.tasks)&&Array.isArray(remote.data.expenses)){const n=normalize(remote.data);setData(n);localStorage.setItem(KEY,JSON.stringify(n));setSync('synced')}else{const local=readLocal();setData(local);await planningApi('save',local);if(live)setSync('synced')}}catch{if(live)setSync('offline')}finally{ready.current=true}})();return()=>{live=false;if(timer.current)clearTimeout(timer.current)}},[]);
@@ -41,23 +41,24 @@ function Planning(){
     matchesPeriod(t.due,taskPeriod,currentDay)&&
     (taskStatus==='all'||(taskStatus==='overdue'&&matchesPeriod(t.due,'overdue',currentDay))||(taskStatus==='undated'&&!t.due))
   ).sort((a,b)=>taskView==='done'?(b.completedAt||'').localeCompare(a.completedAt||''):(a.due||'9999').localeCompare(b.due||'9999'));
-  // Filter individual installments: an expense can contain both paid and pending payments.
-  const expenses=data.expenses.map(e=>{
-    const totals=expenseTotals(e,currentDay);
-    const visible=(e.installments||[]).filter(p=>{
-      const balance=installmentBalance(p);
-      if(expenseView==='paid' ? !(Number(p.paidAmount)>0) : !(balance>0))return false;
-      if(!matchesPeriod(expenseView==='paid'?p.paidAt:p.due,expensePeriod,currentDay))return false;
-      if(expenseStatus==='overdue')return balance>0&&matchesPeriod(p.due,'overdue',currentDay);
-      if(expenseStatus==='partial')return Number(p.paidAmount)>0&&balance>0;
-      if(expenseStatus==='unpaid')return !(Number(p.paidAmount)>0);
-      if(expenseStatus==='settled')return balance===0;
-      return true;
-    });
-    return {...e,totals,visible};
-  }).filter(e=>(e.visible.length||(expenseView==='open'&&e.totals.planned===0&&e.totals.paid===0&&expensePeriod==='all'&&expenseStatus==='all'))&&(expenseCat==='all'||e.category===expenseCat)&&searchText(`${e.description} ${e.supplier||''} ${e.notes||''} ${e.visible.map(p=>p.label).join(' ')}`).includes(searchText(expenseSearch))).sort((a,b)=>{
-    const date=e=>e.visible.map(p=>(expenseView==='paid'?p.paidAt:p.due)||'9999').sort()[0];
-    return (date(a)||'9999').localeCompare(date(b)||'9999');
+  // A service is settled only when every installment has no remaining balance.
+  const allExpenses=data.expenses.map(e=>({...e,totals:expenseTotals(e,currentDay)}));
+  const expenseCounts={open:allExpenses.filter(e=>e.totals.state!=='paid').length,paid:allExpenses.filter(e=>e.totals.state==='paid').length};
+  const settledValue=allExpenses.filter(e=>e.totals.state==='paid').reduce((sum,e)=>sum+e.totals.paid,0);
+  const expenses=allExpenses.filter(e=>{
+    const settled=e.totals.state==='paid';
+    if(expenseView==='paid'?!settled:settled)return false;
+    if(expenseCat!=='all'&&e.category!==expenseCat)return false;
+    if(!searchText(`${e.description} ${e.supplier||''} ${e.notes||''} ${(e.installments||[]).map(p=>p.label).join(' ')}`).includes(searchText(expenseSearch)))return false;
+    if(expenseStatus==='overdue'&&!e.totals.overdue)return false;
+    if(expenseStatus==='partial'&&!(e.totals.paid>0&&e.totals.balance>0))return false;
+    if(expenseStatus==='unpaid'&&e.totals.paid>0)return false;
+    if(expensePeriod==='all')return true;
+    const payments=(e.installments||[]).filter(p=>settled?Number(p.paidAmount)>0:installmentBalance(p)>0);
+    return payments.some(p=>matchesPeriod(settled?p.paidAt:p.due,expensePeriod,currentDay))||(!payments.length&&expensePeriod==='undated');
+  }).sort((a,b)=>{
+    const date=e=>(e.installments||[]).filter(p=>expenseView==='paid'?Number(p.paidAmount)>0:installmentBalance(p)>0).map(p=>(expenseView==='paid'?p.paidAt:p.due)||'9999').sort()[0]||'9999';
+    return date(a).localeCompare(date(b));
   });
   const clearTasks=()=>{setTaskSearch('');setTaskCat('all');setTaskOwner('all');setTaskPeriod('all');setTaskStatus('all')};
   const clearExpenses=()=>{setExpenseSearch('');setExpenseCat('all');setExpensePeriod('all');setExpenseStatus('all')};
@@ -80,8 +81,7 @@ function Planning(){
   return <>
     <div className="planningIntro"><span className="eyebrow">PLANEJAMENTO DO EVENTO</span><h2>Organização do Chá do Oliver</h2><p>Ações, pagamentos e prazos para acompanhar até o dia do chá.</p><small className={'planningSync '+sync}>{sync==='loading'?'Carregando planejamento…':sync==='saving'?'Salvando…':sync==='synced'?'✓ Sincronizado entre dispositivos':'⚠ Offline — alterações salvas neste dispositivo'}</small></div>
     <section className="planningAttention" aria-label="Alertas do planejamento"><h3>Precisa da sua atenção</h3><p>Selecione um alerta para consultar as pendências. Os valores mostram o saldo das parcelas.</p><div className="planningAlertGrid">{alerts.map(a=><button key={a.type+a.period} type="button" disabled={!a.count} className={'planningAlertButton '+(a.count?a.tone:'clear')} onClick={()=>filterAlert(a.type,a.period)}><strong>{a.value}</strong><span>{a.label}</span>{a.count>0&&<small>Ver pendências →</small>}</button>)}</div>{!alerts.some(a=>a.count>0)&&<p className="planningAllClear">Tudo em dia: nenhuma pendência vencida ou nos próximos 7 dias.</p>}</section>
-    <div className="planningSummary"><div><span>AÇÕES REALIZADAS</span><strong>{taskCounts.done}/{data.tasks.length}</strong><small>{taskCounts.open} a realizar</small></div><div><span>CONTRATADO</span><strong>{money(summary.planned)}</strong><small>total dos gastos</small></div><div><span>PAGO</span><strong>{money(summary.paid)}</strong><small>pagamentos realizados</small></div><div><span>A PAGAR</span><strong>{money(summary.open)}</strong><small>saldo das parcelas</small></div></div>
-    <section className="planningAgenda" aria-label="Próximas ações e pagamentos"><div className="planningPanelHead"><div><span className="eyebrow">AÇÕES + FINANCEIRO</span><h3>Próximos prazos</h3><p>Pendências em ordem de prazo, começando pelas atrasadas.</p></div></div><div className="planningAgendaList">{(showAllAgenda?summary.agenda:summary.agenda.slice(0,6)).map(a=><button key={a.key} type="button" className="planningAgendaItem" onClick={()=>setModal({type:a.type,item:a.item})}><time dateTime={a.due}>{fmt(a.due)}</time><span><small>{a.type==='task'?'AÇÃO':'PAGAMENTO'}</small><b>{a.title}</b><DueBadge date={a.due} currentDay={currentDay}/></span>{a.type==='expense'&&<strong>{money(a.balance)}</strong>}<span className="agendaEdit">Abrir →</span></button>)}{!summary.agenda.length&&<div className="planningEmpty">Nenhuma pendência com prazo. Itens sem data continuam disponíveis nas listas abaixo.</div>}</div>{summary.agenda.length>6&&<button type="button" className="planningClear" onClick={()=>setShowAllAgenda(x=>!x)}>{showAllAgenda?'Mostrar menos':`Ver todos os ${summary.agenda.length} prazos`}</button>}</section>
+    <div className="planningSummary"><div><span>AÇÕES REALIZADAS</span><strong>{taskCounts.done}/{data.tasks.length}</strong><small>{taskCounts.open} a realizar</small></div><div><span>CONTRATADO</span><strong>{money(summary.planned)}</strong><small>total dos gastos</small></div><div><span>PAGO</span><strong>{money(summary.paid)}</strong><small>pagamentos realizados</small></div><div><span>A QUITAR</span><strong>{money(summary.open)}</strong><small>saldo das parcelas</small></div></div>
     <div className="planningColumns">
       <section className="planningPanel" ref={taskPanel} tabIndex={-1} aria-label="Ações do planejamento">
         <div className="planningPanelHead"><div><span className="eyebrow">AÇÕES</span><h3>Checklist</h3></div><button type="button" onClick={()=>setModal({type:'task'})}>+ Nova tarefa</button></div>
@@ -98,15 +98,25 @@ function Planning(){
       </section>
       <section className="planningPanel" ref={expensePanel} tabIndex={-1} aria-label="Financeiro do planejamento">
         <div className="planningPanelHead"><div><span className="eyebrow">FINANCEIRO</span><h3>Controle de gastos</h3></div><button type="button" onClick={()=>setModal({type:'expense'})}>+ Novo gasto</button></div>
-        <div className="filterPills planningViewSwitch" aria-label="Situação dos pagamentos">{[['open','A pagar',summary.open],['paid','Pagos',summary.paid]].map(([view,label,value])=><button key={view} type="button" aria-pressed={expenseView===view} className={expenseView===view?'active':''} onClick={()=>{setExpenseView(view);setExpenseStatus('all');setExpensePeriod('all')}}>{label} · {money(value)}</button>)}</div>
+        <div className="filterPills planningViewSwitch" aria-label="Situação dos serviços">{[['open','A quitar',summary.open],['paid','Quitados',settledValue]].map(([view,label,value])=><button key={view} type="button" aria-pressed={expenseView===view} className={expenseView===view?'active':''} onClick={()=>{setExpenseView(view);setExpenseStatus('all');setExpensePeriod('all')}}>{label} · {expenseCounts[view]} · {money(value)}</button>)}</div>
         <div className="planningFilters planningFiltersV2">
           <label className="planningSearch">Buscar<input aria-label="Buscar" placeholder="Gasto, fornecedor ou parcela" value={expenseSearch} onChange={e=>setExpenseSearch(e.target.value)}/></label>
           <label>Categoria<select aria-label="Categoria" value={expenseCat} onChange={e=>setExpenseCat(e.target.value)}><option value="all">Todas as categorias</option>{CATS.map(x=><option key={x}>{x}</option>)}</select></label>
           <PeriodFilter value={expensePeriod} onChange={setExpensePeriod} paid={expenseView==='paid'} label={expenseView==='paid'?'Data do pagamento':'Período do vencimento'}/>
-          <label>Status da parcela<select aria-label="Status da parcela" value={expenseStatus} onChange={e=>setExpenseStatus(e.target.value)}><option value="all">Todos os status</option>{expenseView==='open'?<><option value="unpaid">A pagar (sem pagamento)</option><option value="partial">Parcial</option><option value="overdue">Vencido</option></>:<><option value="partial">Parcial</option><option value="settled">Quitado</option></>}</select></label>
+          {expenseView==='open'&&<label>Status do serviço<select aria-label="Status do serviço" value={expenseStatus} onChange={e=>setExpenseStatus(e.target.value)}><option value="all">Todos os status</option><option value="unpaid">Sem pagamento</option><option value="partial">Parcialmente pago</option><option value="overdue">Com parcela vencida</option></select></label>}
         </div>
-        <div className="planningFilterMeta"><span aria-live="polite">{expenses.reduce((s,e)=>s+e.visible.length,0)} pagamento(s) · {money(expenses.reduce((s,e)=>s+e.visible.reduce((v,p)=>v+(expenseView==='paid'?(Number(p.paidAmount)||0):installmentBalance(p)),0),0))} nesta consulta</span>{expenseFiltersActive&&<button type="button" className="planningClear" onClick={clearExpenses}>Limpar filtros</button>}</div>
-        <div className="expenseList">{expenses.map(e=><article className="planningExpenseCard" key={e.id}><div className="planningExpenseHead"><div><b>{e.description}</b><span>{e.category}{e.supplier?' · '+e.supplier:''}</span></div><button type="button" className="iconAction" aria-label={`Editar gasto ${e.description}`} onClick={()=>setModal({type:'expense',item:e})}>Editar</button></div><p className="planningExpenseTotals">Contratado {money(e.totals.planned)} · Pago {money(e.totals.paid)} · Saldo {money(e.totals.balance)}</p><div className="planningPayments">{!e.visible.length&&<p className="planningEmpty">Gasto sem valor definido. Edite para adicionar um pagamento.</p>}{e.visible.map((p,i)=><div className="planningPayment" key={p.id||i}><div><b>{p.label||'Pagamento'}</b><span>{expenseView==='paid'?(p.paidAt?'Pago em '+fmt(p.paidAt):'Data de pagamento não informada'):(p.due?'Vencimento '+fmt(p.due):'Sem vencimento')}{expenseView==='paid'?' · '+(p.payment||'Não informado'):''}</span>{expenseView==='open'?<DueBadge date={p.due} currentDay={currentDay}/>:<span className={'expenseStatus '+(installmentBalance(p)>0?'partial':'paid')}>{installmentBalance(p)>0?'Pagamento parcial':'Quitado'}</span>}</div><div className="planningPaymentValue"><strong>{money(expenseView==='paid'?p.paidAmount:installmentBalance(p))}</strong><small>{expenseView==='paid'?'valor pago':'saldo a pagar'}{expenseView==='open'&&Number(p.paidAmount)>0?' · '+money(p.paidAmount)+' já pagos':''}</small></div></div>)}</div></article>)}{!expenses.length&&<div className="planningEmpty">Nenhum pagamento neste filtro.{expenseFiltersActive?' Limpe os filtros para ampliar a consulta.':''}</div>}</div>
+        <div className="planningFilterMeta"><span aria-live="polite">{expenses.length} de {expenseCounts[expenseView]} serviço(s)</span>{expenseFiltersActive&&<button type="button" className="planningClear" onClick={clearExpenses}>Limpar filtros</button>}</div>
+        <div className="expenseList">{expenses.map(e=><article className="planningExpenseCard" key={e.id}>
+          <div className="planningExpenseHead"><div><b>{e.description}</b><span>{e.category}{e.supplier?' · '+e.supplier:''}</span><span className={'expenseStatus '+(e.totals.state==='paid'?'paid':'open')}>{e.totals.state==='paid'?'Quitado':e.totals.planned>0?'A quitar':'Valor a definir'}</span></div><button type="button" className="iconAction" aria-label={`Editar gasto ${e.description}`} onClick={()=>setModal({type:'expense',item:e})}>Editar</button></div>
+          <p className="planningExpenseTotals">Contratado {money(e.totals.planned)} · Pago {money(e.totals.paid)} · Saldo {money(e.totals.balance)}</p>
+          <div className="planningPayments">{!(e.installments||[]).length&&<p className="planningEmpty">Gasto sem valor definido. Edite para adicionar um pagamento.</p>}{(e.installments||[]).map((p,i)=>{
+            const balance=installmentBalance(p),settled=balance===0&&Number(p.amount)>0;
+            return <div className="planningPayment" key={p.id||i}><div><b>{p.label||'Pagamento'}</b>
+              <span>{settled?(p.paidAt?'Pago em '+fmt(p.paidAt):'Data de pagamento não informada'):(p.due?'Vencimento '+fmt(p.due):'Sem vencimento')}{settled?' · '+(p.payment||'Não informado'):''}</span>
+              {settled?<span className="expenseStatus paid">Quitado</span>:<><span className={'expenseStatus '+(Number(p.paidAmount)>0?'partial':'open')}>{Number(p.paidAmount)>0?'Pagamento parcial':'A quitar'}</span>{balance>0&&<DueBadge date={p.due} currentDay={currentDay}/>}</>}
+            </div><div className="planningPaymentValue"><strong>{money(settled?p.paidAmount:balance)}</strong><small>{settled?'valor pago':'saldo a quitar'}{!settled&&Number(p.paidAmount)>0?' · '+money(p.paidAmount)+' já pagos':''}</small></div></div>;
+          })}</div>
+        </article>)}{!expenses.length&&<div className="planningEmpty">Nenhum serviço neste filtro.{expenseFiltersActive?' Limpe os filtros para ampliar a consulta.':''}</div>}</div>
       </section>
     </div>
     {modal&&<Modal onClose={()=>setModal(null)}>{modal.type==='task'?<TaskForm item={modal.item} onClose={()=>setModal(null)} onSave={saveTask} onDelete={()=>{if(confirm('Excluir esta tarefa?')){setData(d=>({...d,tasks:d.tasks.filter(x=>x.id!==modal.item.id)}));setModal(null)}}}/>:<ExpenseForm item={modal.item} onClose={()=>setModal(null)} onSave={saveExpense} onDelete={()=>{if(confirm('Excluir este gasto?')){setData(d=>({...d,expenses:d.expenses.filter(x=>x.id!==modal.item.id)}));setModal(null)}}}/>}</Modal>}

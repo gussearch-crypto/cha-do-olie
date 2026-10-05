@@ -1,7 +1,7 @@
 .planningOverview {min-width:0;}
-.planningAttention,.planningAgenda {margin:20px 0;padding:18px;border:1px solid #e1d8bf;border-radius:16px;background:#fffdf8;}
+.planningAttention {margin:20px 0;padding:18px;border:1px solid #e1d8bf;border-radius:16px;background:#fffdf8;}
 .planningAttention h3 {margin:0 0 6px;font-size:1rem;}
-.planningAttention p,.planningAgenda p {margin:0 0 14px;color:#70735f;font-size:.78rem;line-height:1.5;}
+.planningAttention p {margin:0 0 14px;color:#70735f;font-size:.78rem;line-height:1.5;}
 .planningAlertGrid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
 .planningAlertButton {text-align:left;padding:14px;border:1px solid #ddd3b8;border-radius:12px;font:inherit;cursor:pointer;min-width:0;}
 .planningAlertButton strong,.planningAlertButton span,.planningAlertButton small {display:block;}
@@ -12,13 +12,6 @@
 .planningAlertButton.soon {color:#76551a;background:#fff4dc;border-color:#e8d4a4;}
 .planningAlertButton.clear {color:#767b68;background:#f5f5ed;cursor:default;}
 .planningAttention .planningAllClear {margin:14px 0 0;color:#54663b;}
-.planningAgendaList {display:grid;gap:8px;}
-.planningAgendaItem {display:grid;grid-template-columns:90px minmax(0,1fr) auto auto;gap:14px;align-items:center;width:100%;padding:12px;border:1px solid #e4dcc5;border-radius:11px;background:#fff;color:#455236;text-align:left;font:inherit;cursor:pointer;}
-.planningAgendaItem time {font-size:.76rem;font-weight:700;}
-.planningAgendaItem b {display:block;font-size:.82rem;overflow-wrap:anywhere;}
-.planningAgendaItem small {display:block;font-size:.58rem;letter-spacing:.08em;color:#777b66;margin-bottom:3px;}
-.planningAgendaItem>strong {font-size:.87rem;white-space:nowrap;}
-.planningAgendaItem .agendaEdit {font-size:.68rem;color:#647442;font-weight:700;}
 .planningOverview .planningDeadline {display:inline-block;width:fit-content;border-radius:6px;padding:4px 7px;margin-top:6px;font-size:.66rem;font-weight:700;line-height:1.3;}
 .planningOverview .planningDeadline.overdue {background:#fbe4dc;color:#873f30;}
 .planningOverview .planningDeadline.soon {background:#fff0d4;color:#785519;}
@@ -33,7 +26,6 @@
 .planningFiltersV2 input,.planningFiltersV2 select {width:100%;min-width:0;height:42px;font-size:.76rem;}
 .planningFilterMeta {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:0 0 12px;color:#72765f;font-size:.69rem;}
 .planningClear {border:0;background:transparent;padding:8px 0;color:#5e703e;cursor:pointer;font:700 .73rem 'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;min-height:40px;}
-.planningAgenda>.planningClear {margin-top:8px;}
 .planningExpenseCard {border:1px solid #e5ddc8;border-radius:12px;padding:13px;background:#fff;min-width:0;}
 .planningExpenseHead {display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .planningExpenseHead>div {min-width:0;}
@@ -52,15 +44,11 @@
 .planningOverview .iconAction {min-height:40px;padding:7px;}
 .planningOverview .taskCheck {width:36px;height:36px;}
 .planningOverview button:focus-visible,.planningOverview input:focus-visible,.planningOverview select:focus-visible {outline:2px solid #61753d;outline-offset:3px;}
-.planningAgendaItem:hover,.planningAlertButton:not(:disabled):hover {box-shadow:0 2px 8px #46522b15;}
 @media(max-width:1050px) {.planningAlertGrid {grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:560px) {
-  .planningAttention,.planningAgenda {padding:13px;}
+  .planningAttention {padding:13px;}
   .planningAlertButton {padding:12px;}
   .planningAlertButton strong {font-size:1rem;}
-  .planningAgendaItem {grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:11px;}
-  .planningAgendaItem time {grid-column:1/-1;font-size:.68rem;}
-  .planningAgendaItem .agendaEdit {grid-column:1/-1;text-align:right;}
   .planningFiltersV2 {grid-template-columns:minmax(0,1fr);}
   .planningFiltersV2 input,.planningFiltersV2 select {font-size:16px;min-height:44px;}
   .planningViewSwitch button {font-size:.72rem;min-height:44px;}
@@ -69,3 +57,5 @@
   .planningOverview .planningSummary strong {font-size:1.05rem;overflow-wrap:anywhere;}
   .planningOverview .planningPanelHead {flex-wrap:wrap;}
 }
+
+.planningExpenseHead .expenseStatus {display:inline-block;width:fit-content;}
