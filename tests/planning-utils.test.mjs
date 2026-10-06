@@ -205,3 +205,32 @@ test('three-way merge combines independent records and requires a choice for sam
  remote.tasks[0].title='A remoto';result=mergePlanningStates(base,local,remote);assert.equal(result.conflicts[0].key,'tasks:a');assert.equal(mergePlanningStates(base,local,remote,{'tasks:a':'remote'}).data.tasks[0].title,'A remoto');
  remote.tasks=[];assert.equal(mergePlanningStates(base,local,remote).conflicts.length,1);
 });
+
+test('quotes compare cents, preserve validity and enter costs only after one atomic contract',async()=>{
+ const {quoteComparison,contractPlanningQuote,planningSnapshot,mergePlanningStates,trashPlanningItem,restorePlanningItem}=await import('../planning-utils.mjs');
+ const quote={id:'q',title:'Decoração',category:'Decoração',proposals:[{id:'p1',supplier:'Fornecedor A',amount:1000,validUntil:'2026-10-05'},{id:'p2',supplier:'Fornecedor B',amount:800,validUntil:'2026-10-06'}]};
+ const base={tasks:[],expenses:[],quotes:[quote],trash:[],budgets:{},guestSettings:{}};
+ const rows=quoteComparison(quote,'2026-10-06');assert.equal(rows[0].id,'p2');assert.equal(rows[0].lowest,true);assert.equal(rows[0].expired,false);assert.equal(rows[1].expired,true);assert.equal(planningSnapshot(base).planned,0);
+ const expense={id:'ignored',description:'Decoração',contracted:800,installments:[]};
+ const contracted=contractPlanningQuote(base,'q','p2',expense);assert.equal(contracted.expenses[0].id,'quote-q');assert.equal(contracted.quotes[0].expenseId,'quote-q');assert.equal(planningSnapshot(contracted).planned,800);assert.throws(()=>contractPlanningQuote(contracted,'q','p2',expense),/já foi/);
+ const remote=contractPlanningQuote(base,'q','p1',{...expense,contracted:1000});
+ const merged=mergePlanningStates(base,contracted,remote,{'expenses:quote-q':'remote','quotes:q':'local'});assert.equal(merged.data.expenses.length,1);assert.equal(merged.data.quotes[0].selectedProposalId,'p1');assert.equal(merged.conflicts.length,2);
+ const deleted=trashPlanningItem(base,'quote','q',()=> 'deleted');assert.equal(deleted.quotes.length,0);assert.deepEqual(restorePlanningItem(deleted,'deleted').quotes,[quote]);assert.equal(deleted.expenses.length,0);
+});
+test('guest costs use confirmed non-test people, optionally exclude under-5s, and never divide by zero',async()=>{
+ const {confirmedGuestCounts,guestCostAnalysis}=await import('../planning-utils.mjs');
+ const families=[{guests:[{attendance:'yes',person_type:'adult'},{attendance:'yes',person_type:'child',child_age_group:'under_5'},{attendance:'yes',person_type:'child',child_age_group:'five_plus'},{attendance:'pending'},{attendance:'no'}]},{is_test:true,guests:[{attendance:'yes'}]},{group_name:' TESTE ',guests:[{attendance:'yes'}]}];
+ const counts=confirmedGuestCounts(families);assert.deepEqual(counts,{total:3,adults:1,children:2,under5:1});const expenses=[{contracted:1000,installments:[]}];
+ assert.equal(guestCostAnalysis(expenses,counts,{basis:'confirmed',excludeUnder5:true}).perGuest,500);assert.equal(guestCostAnalysis(expenses,counts,{basis:'confirmed',excludeUnder5:false}).perGuest,333.33);
+ assert.equal(guestCostAnalysis(expenses,null,{basis:'confirmed'}).perGuest,null);assert.equal(guestCostAnalysis(expenses,{total:0,under5:0},{basis:'confirmed'}).perGuest,null);
+ assert.equal(guestCostAnalysis(expenses,null,{basis:'estimate',estimatedGuests:100}).perGuest,10);assert.equal(guestCostAnalysis(expenses,null,{basis:'estimate',estimatedGuests:0}).perGuest,null);
+});
+
+test('concurrent quote edits cannot remove a contracted proposal or create a second service',async()=>{
+ const {contractPlanningQuote,mergePlanningStates}=await import('../planning-utils.mjs');
+ const quote={id:'q',title:'Buffet',category:'Alimentação',proposals:[{id:'a',supplier:'A',amount:100},{id:'b',supplier:'B',amount:200}]},base={tasks:[],expenses:[],quotes:[quote],trash:[],budgets:{},guestSettings:{}};
+ const local=structuredClone(base);local.quotes[0].proposals=local.quotes[0].proposals.filter(p=>p.id!=='a');
+ const remote=contractPlanningQuote(base,'q','a',{description:'Buffet',contracted:100,installments:[]});
+ const merged=mergePlanningStates(base,local,remote,{'quotes:q':'local'}).data;
+ assert.equal(merged.quotes[0].expenseId,'quote-q');assert.equal(merged.quotes[0].proposals.find(p=>p.id==='a').amount,100);assert.throws(()=>contractPlanningQuote(merged,'q','b',{description:'Novo',installments:[]}),/já foi/);
+});

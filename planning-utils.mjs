@@ -148,6 +148,7 @@ export function planningCsv(data, section, today = eventToday()) {
   let rows;
   if (section === 'schedule') rows = [['Ação','Data','Início','Fim','Responsável','Contato','Local','Situação','Etapas'],...data.tasks.filter(t=>t.eventDate&&t.eventTime).sort((a,b)=>(a.eventDate+a.eventTime).localeCompare(b.eventDate+b.eventTime)).map(t=>[t.title,t.eventDate,t.eventTime,t.eventEnd,t.responsible,t.contact,t.place,t.status==='done'?'Realizada':'A realizar',(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
   else if (section === 'tasks') rows = [['Ação','Categoria','Situação','Prioridade','Responsável','Prazo','Realizada em','Serviço vinculado','Observação','Etapas'],...data.tasks.map(t=>[t.title,t.category,t.status==='done'?'Realizada':'A realizar',({high:'Alta',medium:'Média',low:'Baixa'})[t.priority]||'',t.responsible,t.due,t.completedAt,data.expenses.find(e=>e.id===t.expenseId)?.description||'',t.notes,(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
+  else if (section === 'quotes') rows = [['Serviço','Categoria','Fornecedor','Valor','Condições','Validade','Contato','Observação','Contratada'],...(data.quotes||[]).flatMap(q=>q.proposals.map(p=>[q.title,q.category,p.supplier,brMoney(p.amount),p.terms,p.validUntil,p.contact,p.notes,q.selectedProposalId===p.id?'Sim':'Não']))];
   else if (section === 'expenses') rows = [['Serviço','Categoria','Fornecedor','Contratado','Pago','A quitar','Situação','Ações vinculadas','Observação'],...data.expenses.map(e=>{const totals=expenseTotals(e,today);return [e.description,e.category,e.supplier,brMoney(totals.planned),brMoney(totals.paid),brMoney(totals.balance),totals.state==='paid'?'Quitado':totals.planned>0?'A quitar':'Valor a definir',data.tasks.filter(t=>t.expenseId===e.id).map(t=>t.title).join(' | '),e.notes]})];
   else if (section === 'payments') rows = [['Serviço','Parcela','Valor programado','Vencimento','Valor pago ativo','Saldo da parcela','Pagamento registrado','Data do pagamento','Meio de pagamento','Situação do registro','Motivo do estorno','Estornado em','Correções','Valores anteriores'],...data.expenses.flatMap(e=>(e.installments||[]).flatMap(p=>{const history=paymentHistory(p),base=[e.description,p.label,brMoney(p.amount),p.due,brMoney(p.paidAmount),brMoney(installmentBalance(p))];return history.length?history.map(h=>[...base,brMoney(h.amount),h.paidAt,h.payment,h.reversedAt?'Estornado':'Ativo',h.reversalReason,h.reversedAt,h.changes?.length||0,(h.changes||[]).map(c=>`${brMoney(c.amount)} | ${c.paidAt||'Sem data'} | ${c.payment||''} | ${c.changedAt||''} | ${c.reason||''}`).join(' / ')]):[[...base,'','','','Sem pagamento','','',0,'']]}))];
   else if (section === 'budgets') rows = [['Categoria','Limite','Contratado','Disponível','Excedido'],...categoryBudgets(data.expenses,data.budgets||{}).map(r=>[r.category,r.budget===null?'':brMoney(r.budget),brMoney(r.contracted),r.remaining===null?'':brMoney(Math.max(0,r.remaining)),r.remaining===null?'':brMoney(Math.max(0,-r.remaining))])];
@@ -157,19 +158,19 @@ export function planningCsv(data, section, today = eventToday()) {
 }
 
 export function trashPlanningItem(data, type, itemId, makeId = () => crypto.randomUUID(), now = new Date()) {
-  const collection = type === 'task' ? 'tasks' : type === 'expense' ? 'expenses' : null;
+  const collection = type === 'task' ? 'tasks' : type === 'expense' ? 'expenses' : type === 'quote' ? 'quotes' : null;
   if (!collection) throw new Error('Tipo inválido.');
   const item = data[collection].find(x=>x.id===itemId);
   if (!item) throw new Error('Registro não encontrado.');
   const linkedTaskIds = type === 'expense' ? data.tasks.filter(t=>t.expenseId===itemId).map(t=>t.id) : [];
   if ((data.trash||[]).length>=500) throw new Error('A lixeira atingiu 500 registros. Restaure um registro antes de excluir outro.');
   const entry = {id:makeId(),type,item:structuredClone(item),linkedTaskIds,deletedAt:now.toISOString()};
-  return {...data,[collection]:data[collection].filter(x=>x.id!==itemId),tasks:type==='expense'?data.tasks.map(t=>t.expenseId===itemId?{...t,expenseId:''}:t):data.tasks.filter(t=>t.id!==itemId),trash:[entry,...(data.trash||[])]};
+  return {...data,[collection]:data[collection].filter(x=>x.id!==itemId),tasks:type==='expense'?data.tasks.map(t=>t.expenseId===itemId?{...t,expenseId:''}:t):type==='task'?data.tasks.filter(t=>t.id!==itemId):data.tasks,trash:[entry,...(data.trash||[])]};
 }
 export function restorePlanningItem(data, entryId) {
   const entry = (data.trash||[]).find(x=>x.id===entryId);
-  if (!entry || !['task','expense'].includes(entry.type)) throw new Error('Registro não encontrado na lixeira.');
-  const collection = entry.type==='task'?'tasks':'expenses';
+  if (!entry || !['task','expense','quote'].includes(entry.type)) throw new Error('Registro não encontrado na lixeira.');
+  const collection = entry.type==='task'?'tasks':entry.type==='quote'?'quotes':'expenses';
   if (data[collection].some(x=>x.id===entry.item.id)) throw new Error('Já existe um registro com este identificador.');
   const item=structuredClone(entry.item);
   const tasks=entry.type==='task'?[item,...data.tasks]:data.tasks.map(t=>(entry.linkedTaskIds||[]).includes(t.id)&&!t.expenseId?{...t,expenseId:item.id,cost:true}:t);
@@ -208,12 +209,46 @@ export function mergePlanningStates(base,local,remote,choices={}) {
     conflicts.push({key,label,local:l,remote:r});
     return choices[key]==='remote'?r:l;
   };
-  for(const collection of ['tasks','expenses','trash']) {
+  for(const collection of ['tasks','expenses','trash','quotes']) {
     const maps=[base,local,remote].map(d=>new Map((d?.[collection]||[]).map(x=>[x.id,x])));
     const keys=[...new Set([...maps[1].keys(),...maps[2].keys(),...maps[0].keys()])];
     data[collection]=keys.map(key=>{const [b,l,r]=maps.map(m=>m.get(key));const item=l||r||b;return pick(collection+':'+key,item.title||item.description||item.item?.title||item.item?.description||'Registro',b,l,r)}).filter(Boolean);
   }
-  const keys=[...new Set([...Object.keys(base?.budgets||{}),...Object.keys(local?.budgets||{}),...Object.keys(remote?.budgets||{})])];
-  data.budgets={};keys.forEach(key=>{const v=pick('budgets:'+key,'Orçamento: '+key,base?.budgets?.[key],local?.budgets?.[key],remote?.budgets?.[key]);if(v!==undefined)data.budgets[key]=v});
+  for(const group of ['budgets','guestSettings']) {
+    const keys=[...new Set([...Object.keys(base?.[group]||{}),...Object.keys(local?.[group]||{}),...Object.keys(remote?.[group]||{})])];
+    data[group]={};keys.forEach(key=>{const label=group==='budgets'?'Orçamento: '+key:({basis:'Base do custo por convidado',excludeUnder5:'Excluir crianças menores de 5 anos',estimatedGuests:'Estimativa de convidados'})[key]||key;const v=pick(group+':'+key,label,base?.[group]?.[key],local?.[group]?.[key],remote?.[group]?.[key]);if(v!==undefined)data[group][key]=v});
+  }
+  // Both devices use one service ID for a quote. Keep its selected proposal consistent with the service version.
+  data.quotes=data.quotes.map(q=>{
+    const expense=data.expenses.find(e=>e.quoteId===q.id);if(!expense?.proposalId)return q;
+    let proposals=q.proposals;
+    if(!proposals.some(p=>p.id===expense.proposalId)){
+      const source=[remote,local,base].flatMap(d=>(d?.quotes||[]).filter(x=>x.id===q.id).flatMap(x=>x.proposals)).find(p=>p.id===expense.proposalId);
+      if(source)proposals=[...proposals,source];
+    }
+    return {...q,proposals,expenseId:expense.id,selectedProposalId:expense.proposalId};
+  });
   return {data,conflicts};
+}
+
+export function quoteComparison(quote,today=eventToday()) {
+  const proposals=quote.proposals||[],lowest=Math.min(...proposals.map(p=>Number(p.amount)));
+  return proposals.map(p=>({...p,lowest:Number(p.amount)===lowest,expired:!!p.validUntil&&p.validUntil<today})).sort((a,b)=>Number(a.amount)-Number(b.amount)||a.supplier.localeCompare(b.supplier,'pt-BR'));
+}
+export function contractPlanningQuote(data,quoteId,proposalId,expense,linkedActionIds) {
+  const quote=(data.quotes||[]).find(q=>q.id===quoteId),proposal=quote?.proposals.find(p=>p.id===proposalId);
+  if(!quote||!proposal)throw new Error('A proposta não está mais disponível.');
+  if(quote.expenseId||data.expenses.some(e=>e.quoteId===quoteId||e.id==='quote-'+quoteId)||(data.trash||[]).some(t=>t.type==='expense'&&t.item.quoteId===quoteId))throw new Error('Esta cotação já foi contratada. Abra o serviço existente.');
+  const contractedExpense={...expense,id:'quote-'+quote.id,quoteId,proposalId};
+  const saved=saveExpenseWithActions(data,contractedExpense,linkedActionIds);
+  return {...saved,quotes:data.quotes.map(q=>q.id===quoteId?{...q,expenseId:contractedExpense.id,selectedProposalId:proposalId}:q)};
+}
+export function confirmedGuestCounts(families) {
+  const people=families.filter(f=>f.is_test!==true&&String(f.group_name||'').trim().toLowerCase()!=='teste').flatMap(f=>f.guests||[]).filter(g=>g.attendance==='yes');
+  return {total:people.length,adults:people.filter(g=>g.person_type!=='child').length,children:people.filter(g=>g.person_type==='child').length,under5:people.filter(g=>g.person_type==='child'&&g.child_age_group==='under_5').length};
+}
+export function guestCostAnalysis(expenses,counts,settings) {
+  const contracted=expenses.reduce((s,e)=>s+Math.round(expenseTotals(e).planned*100),0)/100;
+  const people=settings.basis==='estimate'?(Number.isInteger(settings.estimatedGuests)&&settings.estimatedGuests>0?settings.estimatedGuests:null):counts?Math.max(0,counts.total-(settings.excludeUnder5?counts.under5:0)):null;
+  return {contracted,people,perGuest:people>0?Math.round(contracted*100/people)/100:null};
 }

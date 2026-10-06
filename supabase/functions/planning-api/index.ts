@@ -10,6 +10,24 @@ async function isAdmin(value:any) {
 }
 const validData = (value:any) => value && typeof value === 'object' && Array.isArray(value.tasks) && Array.isArray(value.expenses);
 
+const boundedText=(value:any,max:number)=>typeof value==='string'&&value.length<=max;
+function validQuote(quote:any) {
+  if(!quote||!boundedText(quote.id,94)||!quote.id||!boundedText(quote.title,180)||!quote.title.trim()||!boundedText(quote.category,100))return false;
+  if(!Array.isArray(quote.proposals)||!quote.proposals.length||quote.proposals.length>21||new Set(quote.proposals.map((p:any)=>p?.id)).size!==quote.proposals.length)return false;
+  if(quote.expenseId!==undefined&&!boundedText(quote.expenseId,100))return false;
+  if(quote.selectedProposalId!==undefined&&!quote.proposals.some((p:any)=>p.id===quote.selectedProposalId))return false;
+  return quote.proposals.every((p:any)=>{
+    if(!p||!boundedText(p.id,100)||!p.id||!boundedText(p.supplier,180)||!p.supplier.trim())return false;
+    if(typeof p.amount!=='number'||!Number.isFinite(p.amount)||p.amount<0||!Number.isSafeInteger(Math.round(p.amount*100)))return false;
+    if(['terms','notes'].some(k=>p[k]!==undefined&&!boundedText(p[k],4000))||p.contact!==undefined&&!boundedText(p.contact,180))return false;
+    if(p.validUntil!==undefined&&p.validUntil!=='') {
+      if(!boundedText(p.validUntil,10)||!/^\d{4}-\d{2}-\d{2}$/.test(p.validUntil))return false;
+      const stamp=Date.parse(p.validUntil+'T12:00:00Z');if(!Number.isFinite(stamp)||new Date(stamp).toISOString().slice(0,10)!==p.validUntil)return false;
+    }
+    return true;
+  });
+}
+
 const validPath = (path:any) => typeof path==='string' && /^expenses\/[a-zA-Z0-9_-]{1,100}\/[a-f0-9-]{36}\.(pdf|jpg|png|webp)$/.test(path);
 function allDocuments(expense:any) {
   return [...(expense.attachments||[]),...(expense.installments||[]).flatMap((p:any)=>(p.payments||[]).flatMap((h:any)=>h.attachments||[]))];
@@ -117,8 +135,12 @@ Deno.serve(async req => {
       budgets = previous.budgets || {};
     }
     const trash = body.data.trash===undefined ? previous.trash || [] : body.data.trash;
-    if (!Array.isArray(trash) || trash.length>500 || trash.some((entry:any)=>!entry || !['task','expense'].includes(entry.type) || !entry.item?.id || typeof entry.id!=='string' || typeof entry.deletedAt!=='string')) return json({error:'invalid_trash'},400);
-    const clean = {trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
+    if (!Array.isArray(trash) || trash.length>500 || trash.some((entry:any)=>!entry || !['task','expense','quote'].includes(entry.type) || !entry.item?.id || typeof entry.id!=='string' || typeof entry.deletedAt!=='string')) return json({error:'invalid_trash'},400);
+    const quotes=body.data.quotes===undefined ? previous.quotes || [] : body.data.quotes;
+    if(!Array.isArray(quotes)||quotes.length>500||new Set(quotes.map((q:any)=>q?.id)).size!==quotes.length||quotes.some((q:any)=>!validQuote(q)))return json({error:'invalid_quotes'},400);
+    const guestSettings=body.data.guestSettings===undefined ? previous.guestSettings || {basis:'confirmed',excludeUnder5:true,estimatedGuests:100} : body.data.guestSettings;
+    if(!guestSettings||!['confirmed','estimate'].includes(guestSettings.basis)||typeof guestSettings.excludeUnder5!=='boolean'||guestSettings.estimatedGuests!==null&&(!Number.isInteger(guestSettings.estimatedGuests)||guestSettings.estimatedGuests<0||guestSettings.estimatedGuests>10000))return json({error:'invalid_guest_settings'},400);
+    const clean = {quotes,guestSettings,trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
     const failure=await commitState(supabase,clean,revision,!!previousRecord);
     if(failure)return failure;
     return json({ok:true,revision:revision+1});

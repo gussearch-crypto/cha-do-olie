@@ -65,3 +65,13 @@ test('revision compare-and-swap rejects stale, missing and racing writes without
  const upload=endpoint(fixture());upload.race();assert.equal((await upload.upload(pdf(),{expenseId:'service'})).status,409);assert.equal(upload.saved(),undefined);assert.equal(upload.removals[0],upload.uploads[0].path);
  const initial=endpoint(null);assert.equal((await initial.call({action:'save',data,expectedRevision:0})).json.revision,1);
 });
+
+test('API stores quote comparisons and guest settings, preserves them for compatible older clients and rejects invalid payloads',async()=>{
+ const quote={id:'q',title:'Buffet',category:'Alimentação',proposals:[{id:'p',supplier:'Fornecedor',amount:1000,terms:'Pix',validUntil:'2026-12-04'}]};
+ const data={tasks:[],expenses:[],quotes:[quote],guestSettings:{basis:'confirmed',excludeUnder5:true,estimatedGuests:100}},api=endpoint();
+ assert.equal((await api.call({action:'save',data})).status,200);assert.equal((await api.call({action:'get'})).json.data.quotes[0].proposals[0].amount,1000);
+ await api.call({action:'save',data:{tasks:[],expenses:[]}});assert.equal(api.saved().quotes[0].title,'Buffet');assert.equal(api.saved().guestSettings.excludeUnder5,true);
+ for(const quotes of [null,[{...quote,proposals:[]}],[{...quote,proposals:[{...quote.proposals[0],amount:-1}]}],[quote,quote]])assert.equal((await api.call({action:'save',data:{...data,quotes}})).status,400);
+ assert.equal((await api.call({action:'save',data:{...data,guestSettings:{...data.guestSettings,estimatedGuests:10001}}})).status,400);
+ assert.equal((await api.call({action:'save',data:{...data,quotes:[],trash:[{id:'deleted',type:'quote',item:quote,deletedAt:'2026-10-06'}]}})).status,200);
+});
