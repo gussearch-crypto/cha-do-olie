@@ -95,3 +95,12 @@ test('history records remaining payment changes and failed concurrent writes add
  const result=await api.call({action:'save',data:changed});assert.equal(result.status,200);assert(result.json.history[0].changes.some(c=>c.label==='Parcelas e pagamentos'));
  const entries=api.saved().history;api.race();assert.equal((await api.call({action:'save',data:{...changed,tasks:[{id:'t2',title:'Novo'}]}})).status,409);assert.deepEqual(api.saved().history,entries);
 });
+
+test('API rejects self dependencies, cycles and malformed links, and preserves removed prerequisites',async()=>{
+ for(const tasks of [[{id:'a',title:'A',dependsOn:['a']}],[{id:'a',title:'A',dependsOn:['b']},{id:'b',title:'B',dependsOn:['a']}],[{id:'a',title:'A',dependsOn:'b'}]]){
+  const api=endpoint();const result=await api.call({action:'save',data:{tasks,expenses:[]}});assert.equal(result.status,400);assert.equal(result.json.error,'invalid_dependencies');assert.equal(api.saved(),undefined);
+ }
+ const api=endpoint({tasks:[{id:'a',title:'Fornecedor'},{id:'b',title:'Sinal',dependsOn:[]}],expenses:[]});const saved=await api.call({action:'save',data:{tasks:[{id:'a',title:'Fornecedor'},{id:'b',title:'Sinal',dependsOn:['a']}],expenses:[]}});
+ assert.equal(saved.status,200);assert.equal(saved.json.history.find(e=>e.recordId==='b').changes.find(c=>c.label==='Dependências').after,'Fornecedor');
+ await api.call({action:'save',data:{tasks:[{id:'b',title:'Sinal',dependsOn:['a']}],expenses:[]}});assert.deepEqual(Array.from(api.saved().tasks[0].dependsOn),['a']);
+});

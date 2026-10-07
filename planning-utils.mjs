@@ -177,6 +177,28 @@ export function restorePlanningItem(data, entryId) {
   return {...data,[collection]:[item,...data[collection]],tasks,trash:data.trash.filter(x=>x.id!==entryId)};
 }
 
+export function taskDependencies(task,tasks) {
+  return (task.dependsOn||[]).map(id=>tasks.find(t=>t.id===id)||{id,title:'Ação removida',missing:true}).filter(t=>t.status!=='done');
+}
+export function validateTaskDependencies(tasks) {
+  const map=new Map(tasks.map(t=>[t.id,t])),visiting=new Set(),visited=new Set();
+  const visit=id=>{
+    if(visiting.has(id))throw new Error('Uma ação não pode depender de si mesma ou formar um ciclo de dependências.');
+    if(visited.has(id))return;
+    const task=map.get(id);if(!task)return;
+    const links=task.dependsOn||[];
+    if(!Array.isArray(links)||links.length>50||links.some(x=>typeof x!=='string'||!x)||new Set(links).size!==links.length)throw new Error('Confira as ações vinculadas nas dependências.');
+    visiting.add(id);links.forEach(visit);visiting.delete(id);visited.add(id);
+  };
+  tasks.forEach(t=>visit(t.id));return true;
+}
+export function duplicatePlanningTask(task,makeId=()=>crypto.randomUUID()) {
+  const fields=['category','due','priority','responsible','notes','cost','eventDate','eventTime','eventEnd','contact','place'];
+  return {...Object.fromEntries(fields.filter(key=>task[key]!==undefined).map(key=>[key,task[key]])),title:task.title+' (cópia)',status:'todo',completedAt:'',expenseId:'',dependsOn:[],subtasks:(task.subtasks||[]).map(step=>({id:makeId(),title:step.title,done:false}))};
+}
+export function duplicatePlanningExpense(expense) {
+  return {description:expense.description+' (cópia)',category:expense.category||'Outros',supplier:expense.supplier||'',notes:expense.notes||'',contracted:expenseTotals(expense).planned,planned:expenseTotals(expense).planned,paid:0,installments:[]};
+}
 export function taskProgress(task) {
   const steps=task.subtasks||[];
   return {total:steps.length,done:steps.filter(s=>s.done).length,pending:steps.some(s=>!s.done)};
@@ -184,6 +206,7 @@ export function taskProgress(task) {
 export function togglePlanningTask(data, taskId, today=eventToday()) {
   return {...data,tasks:data.tasks.map(t=>{
     if(t.id!==taskId)return t;
+    if(t.status!=='done'&&taskDependencies(t,data.tasks).length)throw new Error('Conclua as ações das quais esta tarefa depende.');
     if(t.status!=='done'&&taskProgress(t).pending)throw new Error('Conclua as etapas antes de finalizar a ação.');
     return {...t,status:t.status==='done'?'todo':'done',completedAt:t.status==='done'?'':today};
   })};

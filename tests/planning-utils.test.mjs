@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
+import {taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -233,4 +233,21 @@ test('concurrent quote edits cannot remove a contracted proposal or create a sec
  const remote=contractPlanningQuote(base,'q','a',{description:'Buffet',contracted:100,installments:[]});
  const merged=mergePlanningStates(base,local,remote,{'quotes:q':'local'}).data;
  assert.equal(merged.quotes[0].expenseId,'quote-q');assert.equal(merged.quotes[0].proposals.find(p=>p.id==='a').amount,100);assert.throws(()=>contractPlanningQuote(merged,'q','b',{description:'Novo',installments:[]}),/já foi/);
+});
+
+test('dependencies block pending and deleted prerequisites, release completed prerequisites, and reject cycles',()=>{
+ const a={id:'a',title:'Fornecedor',status:'todo'},b={id:'b',title:'Sinal',status:'todo',dependsOn:['a']},data={tasks:[a,b],expenses:[]};
+ assert.equal(taskDependencies(b,data.tasks).length,1);assert.throws(()=>togglePlanningTask(data,'b'),/depend/);
+ const done=togglePlanningTask(data,'a',today);assert.equal(taskDependencies(b,done.tasks).length,0);assert.equal(togglePlanningTask(done,'b',today).tasks[1].status,'done');
+ const removed=trashPlanningItem(data,'task','a',()=> 'trash-a');assert.equal(taskDependencies(b,removed.tasks)[0].missing,true);
+ assert.equal(taskDependencies(b,restorePlanningItem(removed,'trash-a').tasks).length,1);
+ assert.throws(()=>validateTaskDependencies([{...a,dependsOn:['b']},b]),/ciclo/);assert.throws(()=>validateTaskDependencies([{...a,dependsOn:['a']}]),/ciclo/);
+ assert.equal(validateTaskDependencies([{...b,dependsOn:['removed']}]),true);
+});
+
+test('duplicates create clean drafts without old identities, financial links or completion state',()=>{
+ const task={id:'t1',title:'Fornecedor',status:'done',completedAt:today,expenseId:'e1',dependsOn:['t0'],category:'Local',subtasks:[{id:'s1',title:'Assinar',done:true}],attachments:[{path:'private.pdf'}]};
+ const draft=duplicatePlanningTask(task,()=> 'new-step');assert.equal(draft.id,undefined);assert.equal(draft.title,'Fornecedor (cópia)');assert.equal(draft.status,'todo');assert.equal(draft.completedAt,'');assert.equal(draft.expenseId,'');assert.deepEqual(draft.dependsOn,[]);assert.deepEqual(draft.subtasks,[{id:'new-step',title:'Assinar',done:false}]);assert.equal(task.subtasks[0].done,true);
+ const expense={id:'e1',description:'Local',supplier:'Salão',category:'Local',contracted:1000,paid:1000,quoteId:'q1',proposalId:'p1',attachments:[{path:'private.pdf'}],installments:[{id:'p1',amount:1000,paidAmount:1000,payments:[{id:'h1',amount:1000}]}]};
+ const copy=duplicatePlanningExpense(expense);assert.equal(copy.id,undefined);assert.equal(copy.quoteId,undefined);assert.equal(copy.attachments,undefined);assert.equal(copy.paid,0);assert.deepEqual(copy.installments,[]);assert.equal(expenseTotals(copy).balance,1000);assert.equal(copy.supplier,'Salão');assert.equal(expenseTotals(expense).state,'paid');
 });

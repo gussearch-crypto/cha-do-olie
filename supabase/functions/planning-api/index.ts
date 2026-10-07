@@ -10,14 +10,28 @@ async function isAdmin(value:any) {
 }
 const validData = (value:any) => value && typeof value === 'object' && Array.isArray(value.tasks) && Array.isArray(value.expenses);
 
+function validTaskDependencies(tasks:any[]) {
+  if(tasks.some(t=>!t||typeof t.id!=='string'||!t.id)||new Set(tasks.map(t=>t.id)).size!==tasks.length)return false;
+  const map=new Map(tasks.map(t=>[t.id,t])),visiting=new Set(),visited=new Set();
+  const visit=(id:any):boolean=>{
+    if(visiting.has(id))return false;if(visited.has(id))return true;
+    const task=map.get(id);if(!task)return true;
+    const links=task.dependsOn||[];
+    if(!Array.isArray(links)||links.length>50||links.some((x:any)=>typeof x!=='string'||!x)||new Set(links).size!==links.length)return false;
+    visiting.add(id);if(!links.every(visit))return false;visiting.delete(id);visited.add(id);return true;
+  };
+  return tasks.every(t=>visit(t.id));
+}
+
 // History is generated from committed state, never accepted from client payloads.
 function planningHistory(previous:any,next:any) {
   const events:any[]=[],at=new Date().toISOString();
   const text=(value:any)=>value===undefined||value===null?'':typeof value==='object'?JSON.stringify(value).slice(0,500):String(value).slice(0,500);
-  const fields:any={title:'Título',description:'Serviço',category:'Categoria',supplier:'Fornecedor',contracted:'Valor contratado',planned:'Valor previsto',due:'Prazo',status:'Situação',priority:'Prioridade',responsible:'Responsável',expenseId:'Serviço vinculado',notes:'Observação',eventDate:'Data do cronograma',eventTime:'Horário',eventEnd:'Horário final',contact:'Contato',place:'Local',subtasks:'Etapas',installments:'Parcelas e pagamentos',proposals:'Propostas',selectedProposalId:'Proposta contratada'};
+  const fields:any={title:'Título',description:'Serviço',category:'Categoria',supplier:'Fornecedor',contracted:'Valor contratado',planned:'Valor previsto',due:'Prazo',status:'Situação',priority:'Prioridade',responsible:'Responsável',expenseId:'Serviço vinculado',notes:'Observação',eventDate:'Data do cronograma',eventTime:'Horário',eventEnd:'Horário final',contact:'Contato',place:'Local',dependsOn:'Dependências',subtasks:'Etapas',installments:'Parcelas e pagamentos',proposals:'Propostas',selectedProposalId:'Proposta contratada'};
   const money=(value:any)=>(Number(value)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const display=(key:string,value:any)=>{
     if(key==='installments')return (value||[]).map((p:any)=>`${p.label||'Parcela'}: ${money(p.amount)} · Vencimento: ${p.due||'Sem data'} · Pago: ${money(p.paidAmount)}${p.paidAt?' em '+p.paidAt:''}${p.payment?' · '+p.payment:''} · Estornos: ${(p.payments||[]).filter((h:any)=>h.reversedAt).length}`).join('; ');
+    if(key==='dependsOn')return (value||[]).map((id:any)=>[...(next.tasks||[]),...(previous.tasks||[])].find((t:any)=>t.id===id)?.title||'Ação removida').join('; ');
     if(key==='subtasks')return (value||[]).map((p:any)=>`${p.title}: ${p.done?'Concluída':'Pendente'}`).join('; ');
     if(key==='proposals')return (value||[]).map((p:any)=>`${p.supplier}: ${money(p.amount)}${p.terms?' · '+p.terms:''}${p.validUntil?' · Validade: '+p.validUntil:''}`).join('; ');
     if(key==='expenseId')return [...(next.expenses||[]),...(previous.expenses||[])].find((e:any)=>e.id===value)?.description||(value?'Serviço indisponível':'Sem vínculo');
@@ -151,6 +165,7 @@ Deno.serve(async req => {
   }
   if (body.action === 'save') {
     if (!validData(body.data)) return json({error:'invalid_data'},400);
+    if (!validTaskDependencies(body.data.tasks)) return json({error:'invalid_dependencies'},400);
     const {data:previousRecord,error:previousError} = await supabase.from('event_planning_state').select('data,revision').eq('id','main').maybeSingle();
     if (previousError) return json({error:'planning_load_failed'},500);
     const revision=expectedRevision(body);

@@ -178,3 +178,11 @@
 .planningHistoryList summary {cursor:pointer;padding:8px 0;font-size:.78rem;color:#596d3a;}
 .planningHistoryList p {font-size:.75rem;line-height:1.6;white-space:pre-wrap;}
 .planningFooter>button {min-height:44px;border:1px solid #d4c9aa;border-radius:9px;background:#f4f0e5;color:#53603c;padding:8px 12px;font:700 .75rem 'DM Sans',sans-serif;cursor:pointer;}
+.planningDependencyEditor {padding:12px;border:1px solid #e5ddc8;border-radius:10px;margin:14px 0;background:#f8f5eb;}
+.planningDependencyRow {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:8px 0;align-items:center;}
+.planningDependencyEditor button {min-height:40px;border:1px solid #d4c9aa;border-radius:8px;background:#fffaf0;color:#53603c;padding:8px;cursor:pointer;}
+.planningDependencyNotice {padding:8px 10px;margin:8px 0;border-radius:8px;background:#fbf3dd;color:#79622f;font-size:.72rem;}
+.planningDependencyNotice b,.planningDependencyNotice span {display:block;}
+.planningDependencyNotice button {display:block;border:0;background:transparent;text-align:left;color:#6a713d;padding:6px 0;text-decoration:underline;cursor:pointer;overflow-wrap:anywhere;max-width:100%;}
+.planningRecordActions {display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+@media(max-width:560px) {.taskItem>.planningRecordActions {grid-column:2/-1;}.planningRecordActions button {min-height:44px;}.planningDependencyRow select {font-size:16px;min-width:0;}}
