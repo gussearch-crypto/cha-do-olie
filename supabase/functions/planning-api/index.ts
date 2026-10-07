@@ -10,6 +10,39 @@ async function isAdmin(value:any) {
 }
 const validData = (value:any) => value && typeof value === 'object' && Array.isArray(value.tasks) && Array.isArray(value.expenses);
 
+// History is generated from committed state, never accepted from client payloads.
+function planningHistory(previous:any,next:any) {
+  const events:any[]=[],at=new Date().toISOString();
+  const text=(value:any)=>value===undefined||value===null?'':typeof value==='object'?JSON.stringify(value).slice(0,500):String(value).slice(0,500);
+  const fields:any={title:'Título',description:'Serviço',category:'Categoria',supplier:'Fornecedor',contracted:'Valor contratado',planned:'Valor previsto',due:'Prazo',status:'Situação',priority:'Prioridade',responsible:'Responsável',expenseId:'Serviço vinculado',notes:'Observação',eventDate:'Data do cronograma',eventTime:'Horário',eventEnd:'Horário final',contact:'Contato',place:'Local',subtasks:'Etapas',installments:'Parcelas e pagamentos',proposals:'Propostas',selectedProposalId:'Proposta contratada'};
+  const money=(value:any)=>(Number(value)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const display=(key:string,value:any)=>{
+    if(key==='installments')return (value||[]).map((p:any)=>`${p.label||'Parcela'}: ${money(p.amount)} · Vencimento: ${p.due||'Sem data'} · Pago: ${money(p.paidAmount)}${p.paidAt?' em '+p.paidAt:''}${p.payment?' · '+p.payment:''} · Estornos: ${(p.payments||[]).filter((h:any)=>h.reversedAt).length}`).join('; ');
+    if(key==='subtasks')return (value||[]).map((p:any)=>`${p.title}: ${p.done?'Concluída':'Pendente'}`).join('; ');
+    if(key==='proposals')return (value||[]).map((p:any)=>`${p.supplier}: ${money(p.amount)}${p.terms?' · '+p.terms:''}${p.validUntil?' · Validade: '+p.validUntil:''}`).join('; ');
+    if(key==='expenseId')return [...(next.expenses||[]),...(previous.expenses||[])].find((e:any)=>e.id===value)?.description||(value?'Serviço indisponível':'Sem vínculo');
+    if(key==='selectedProposalId')return [...(next.quotes||[]),...(previous.quotes||[])].flatMap((q:any)=>q.proposals||[]).find((p:any)=>p.id===value)?.supplier||'Sem contratação';
+    if(key==='status')return ({todo:'A realizar',done:'Realizada'} as any)[value]||value||'';
+    if(key==='priority')return ({high:'Alta',medium:'Média',low:'Baixa'} as any)[value]||value||'';
+    if(key==='contracted'||key==='planned')return value===undefined?'Não definido':money(value);
+    return value??'';
+  };
+  for(const section of ['tasks','expenses','quotes']){
+    const before=new Map((previous[section]||[]).map((x:any)=>[x.id,x])),after=new Map((next[section]||[]).map((x:any)=>[x.id,x]));
+    for(const key of new Set([...before.keys(),...after.keys()])){
+      const old:any=before.get(key),item:any=after.get(key),changes=old&&item?Object.entries(fields).flatMap(([field,label])=>{const a=text(display(field,old[field])),b=text(display(field,item[field]));return JSON.stringify(display(field,old[field]))===JSON.stringify(display(field,item[field]))?[]:[{label,before:a,after:b}]}):[];
+      if(old&&item&&!changes.length)continue;
+      const restored=!old&&item&&(previous.trash||[]).some((e:any)=>e.item?.id===key);
+      events.push({id:crypto.randomUUID(),at,section,recordId:key,title:text(item?.title||item?.description||old?.title||old?.description||'Registro'),action:!item?'Movido para a lixeira':restored?'Restaurado':!old?'Criado':'Atualizado',changes});
+    }
+  }
+  for(const section of ['budgets','guestSettings']){
+    const changes=Object.keys({...previous[section],...next[section]}).flatMap(key=>{const a=text(previous[section]?.[key]),b=text(next[section]?.[key]);return a===b?[]:[{label:({basis:'Base do público',excludeUnder5:'Excluir menores de 5 anos',estimatedGuests:'Estimativa de convidados'} as any)[key]||key,before:a,after:b}]});
+    if(changes.length)events.push({id:crypto.randomUUID(),at,section,title:section==='budgets'?'Orçamento por categoria':'Base do custo por convidado',action:'Atualizado',changes});
+  }
+  return [...events,...(previous.history||[])].slice(0,500);
+}
+
 const boundedText=(value:any,max:number)=>typeof value==='string'&&value.length<=max;
 function validQuote(quote:any) {
   if(!quote||!boundedText(quote.id,94)||!quote.id||!boundedText(quote.title,180)||!quote.title.trim()||!boundedText(quote.category,100))return false;
@@ -140,10 +173,11 @@ Deno.serve(async req => {
     if(!Array.isArray(quotes)||quotes.length>500||new Set(quotes.map((q:any)=>q?.id)).size!==quotes.length||quotes.some((q:any)=>!validQuote(q)))return json({error:'invalid_quotes'},400);
     const guestSettings=body.data.guestSettings===undefined ? previous.guestSettings || {basis:'confirmed',excludeUnder5:true,estimatedGuests:100} : body.data.guestSettings;
     if(!guestSettings||!['confirmed','estimate'].includes(guestSettings.basis)||typeof guestSettings.excludeUnder5!=='boolean'||guestSettings.estimatedGuests!==null&&(!Number.isInteger(guestSettings.estimatedGuests)||guestSettings.estimatedGuests<0||guestSettings.estimatedGuests>10000))return json({error:'invalid_guest_settings'},400);
-    const clean = {quotes,guestSettings,trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
+    const clean:any = {quotes,guestSettings,trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
+    clean.history=planningHistory(previous,clean);
     const failure=await commitState(supabase,clean,revision,!!previousRecord);
     if(failure)return failure;
-    return json({ok:true,revision:revision+1});
+    return json({ok:true,revision:revision+1,history:clean.history});
   }
   return json({error:'unknown_action'},400);
 });

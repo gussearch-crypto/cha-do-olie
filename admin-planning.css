@@ -171,3 +171,10 @@
 .planningDrawer .installmentRow input,.planningDrawer .installmentRow select {min-width:0;}
 .planningDrawer .removeInstallment {grid-column:1/-1;}
 @media(max-width:560px) {.planningDrawer .installmentRow {grid-template-columns:repeat(2,minmax(0,1fr));}}
+.planningHistoryList {list-style:none;padding:0;display:grid;gap:12px;}
+.planningHistoryList li {padding:14px;border:1px solid #e5ddc8;border-radius:10px;background:#fffdf8;overflow-wrap:anywhere;}
+.planningHistoryList time,.planningHistoryList li>span {display:block;font-size:.72rem;color:#737b65;margin-bottom:5px;}
+.planningHistoryList li>b {display:block;margin-bottom:5px;}
+.planningHistoryList summary {cursor:pointer;padding:8px 0;font-size:.78rem;color:#596d3a;}
+.planningHistoryList p {font-size:.75rem;line-height:1.6;white-space:pre-wrap;}
+.planningFooter>button {min-height:44px;border:1px solid #d4c9aa;border-radius:9px;background:#f4f0e5;color:#53603c;padding:8px 12px;font:700 .75rem 'DM Sans',sans-serif;cursor:pointer;}

@@ -228,6 +228,7 @@ export function mergePlanningStates(base,local,remote,choices={}) {
     }
     return {...q,proposals,expenseId:expense.id,selectedProposalId:expense.proposalId};
   });
+  data.history=remote?.history||local?.history||[];
   return {data,conflicts};
 }
 

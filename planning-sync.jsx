@@ -21,7 +21,7 @@ export function usePlanningSync({data,setData,api,normalize,storageKey}) {
       if(!e.base)await reconcile();
       for(let attempt=0;attempt<3&&!e.conflict&&!equal(current.current,e.base);attempt++){
         const snapshot=structuredClone(current.current);setSync('saving');
-        try{const result=await api('save',snapshot,e.revision);if(!e.live)return;e.base=snapshot;e.revision=result.revision;cache()}
+        try{const result=await api('save',snapshot,e.revision);if(!e.live)return;if(Array.isArray(result.history)){snapshot.history=result.history;current.current={...current.current,history:result.history};setData(current.current)}e.base=snapshot;e.revision=result.revision;cache()}
         catch(error){if(error.code!=='conflict')throw error;await reconcile()}
       }
       if(!e.conflict)setSync(equal(current.current,e.base)?'synced':'offline');
@@ -42,7 +42,7 @@ export function usePlanningSync({data,setData,api,normalize,storageKey}) {
           else adopt(merged.data)
         }
         // A missing server row must be created even if it matches the local seed.
-        if(!remote.data&&!e.conflict){e.base=null;e.revision=0;const snapshot=structuredClone(current.current);const saved=await api('save',snapshot,0);e.base=snapshot;e.revision=saved.revision;cache()}
+        if(!remote.data&&!e.conflict){e.base=null;e.revision=0;const snapshot=structuredClone(current.current);const saved=await api('save',snapshot,0);if(Array.isArray(saved.history)){snapshot.history=saved.history;current.current={...current.current,history:saved.history};setData(current.current)}e.base=snapshot;e.revision=saved.revision;cache()}
         e.ready=true;if(!e.conflict)await flush();
       }catch{e.ready=true;if(e.live){if(!e.base)e.base=normalize({tasks:[],expenses:[]});cache();setSync('offline')}}
     })();
