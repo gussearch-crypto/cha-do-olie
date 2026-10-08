@@ -195,3 +195,11 @@
 @media(max-width:560px) {.planningScheduleToolbar input,.planningScheduleFilters input,.planningScheduleFilters select {font-size:16px;min-height:44px;}.planningScheduleFilters {grid-template-columns:minmax(0,1fr);}.planningScheduleToolbar label {font-size:.72rem;}}
 .planningScheduleHead input {box-sizing:border-box;max-width:100%;}
 .planningScheduleHead label {min-width:0;}
+.planningRecordHistory,.planningSupplierEditor {margin:14px 0;padding:12px;border:1px solid #e5ddc8;border-radius:10px;background:#faf8f1;}
+.planningRecordHistory>summary,.planningSupplierEditor>summary {cursor:pointer;font-size:.8rem;font-weight:700;color:#5c6d3e;min-height:32px;line-height:1.6;}
+.planningRecordHistory .planningHistoryList {max-height:320px;overflow:auto;overscroll-behavior:contain;}
+.planningSupplierEditor[open]>summary {margin-bottom:14px;}
+.planningSupplierContact {display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:.75rem;color:#667052;overflow-wrap:anywhere;}
+.planningSupplierContact span {max-width:100%;}
+.planningSupplierContact a {display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 10px;border:1px solid #d4c9aa;border-radius:8px;color:#53603c;text-decoration:none;background:#f4f0e5;font-weight:700;}
+@media(max-width:560px) {.planningSupplierContact a {min-height:44px;}.planningSupplierEditor input[type=date],.planningSupplierEditor input[type=time] {min-width:0;max-width:100%;}}

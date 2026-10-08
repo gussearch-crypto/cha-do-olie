@@ -104,3 +104,11 @@ test('API rejects self dependencies, cycles and malformed links, and preserves r
  assert.equal(saved.status,200);assert.equal(saved.json.history.find(e=>e.recordId==='b').changes.find(c=>c.label==='Dependências').after,'Fornecedor');
  await api.call({action:'save',data:{tasks:[{id:'b',title:'Sinal',dependsOn:['a']}],expenses:[]}});assert.deepEqual(Array.from(api.saved().tasks[0].dependsOn),['a']);
 });
+
+test('supplier contact and delivery persist and their changes appear only in the matching service history',async()=>{
+ const expense={id:'e1',description:'Salão',contracted:500,installments:[]},api=endpoint({tasks:[],expenses:[expense]});
+ const updated={...expense,supplierContact:'Ana',supplierPhone:'11999999999',deliveryDate:'2026-12-04',deliveryTime:'17:00',deliveryPlace:'Salão principal',deliveryNotes:'Entrada lateral'};
+ const result=await api.call({action:'save',data:{tasks:[],expenses:[updated]}});assert.equal(result.status,200);assert.equal(api.saved().expenses[0].supplierPhone,'11999999999');
+ const entry=result.json.history.find(e=>e.recordId==='e1');assert.equal(entry.section,'expenses');assert.equal(entry.changes.find(c=>c.label==='Telefone / WhatsApp').after,'11999999999');assert.equal(entry.changes.find(c=>c.label==='Horário de entrega').after,'17:00');
+ const loaded=await api.call({action:'get'});assert.equal(loaded.json.data.expenses[0].deliveryNotes,'Entrada lateral');assert.equal(loaded.json.data.history[0].recordId,'e1');
+});

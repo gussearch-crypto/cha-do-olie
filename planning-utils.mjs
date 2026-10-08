@@ -196,8 +196,16 @@ export function duplicatePlanningTask(task,makeId=()=>crypto.randomUUID()) {
   const fields=['category','due','priority','responsible','notes','cost','eventDate','eventTime','eventEnd','contact','place'];
   return {...Object.fromEntries(fields.filter(key=>task[key]!==undefined).map(key=>[key,task[key]])),title:task.title+' (cópia)',status:'todo',completedAt:'',expenseId:'',dependsOn:[],subtasks:(task.subtasks||[]).map(step=>({id:makeId(),title:step.title,done:false}))};
 }
+export function supplierContactLinks(value) {
+  const raw=String(value||'').trim();if(!raw||!/^[+\d\s().-]+$/.test(raw))return null;
+  let digits=raw.replace(/\D/g,'');
+  if(raw.startsWith('+')){if(digits.length<8||digits.length>15||digits.startsWith('0'))return null;}
+  else if(digits.length===10||digits.length===11)digits='55'+digits;
+  else if(!digits.startsWith('55')||![12,13].includes(digits.length))return null;
+  return {phone:'tel:+'+digits,whatsapp:'https://wa.me/'+digits};
+}
 export function duplicatePlanningExpense(expense) {
-  return {description:expense.description+' (cópia)',category:expense.category||'Outros',supplier:expense.supplier||'',notes:expense.notes||'',contracted:expenseTotals(expense).planned,planned:expenseTotals(expense).planned,paid:0,installments:[]};
+  return {description:expense.description+' (cópia)',category:expense.category||'Outros',supplier:expense.supplier||'',supplierContact:expense.supplierContact||'',supplierPhone:expense.supplierPhone||'',notes:expense.notes||'',contracted:expenseTotals(expense).planned,planned:expenseTotals(expense).planned,paid:0,installments:[]};
 }
 export function taskProgress(task) {
   const steps=task.subtasks||[];

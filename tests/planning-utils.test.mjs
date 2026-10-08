@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {filterEventSchedule,taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
+import {supplierContactLinks,filterEventSchedule,taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -265,4 +265,11 @@ test('schedule filters combine accent insensitive search, responsible, status an
  assert.deepEqual(ids({status:'open',from:'18:00',until:'19:00'}),['c']);assert.deepEqual(ids({from:'19:00',until:'17:00'}),[]);
  assert.deepEqual(ids({}),['a','b','c']);assert.equal(filterEventSchedule(tasks.map(t=>t.id==='prior'?{...t,status:'done'}:t),date,{status:'blocked'}).length,0);
  assert.equal(filterEventSchedule(tasks.filter(t=>t.id!=='prior'),date,{status:'blocked'}).length,1);
+});
+
+test('supplier links normalize Brazilian and international numbers and reject unsafe or incomplete input',()=>{
+ assert.deepEqual(supplierContactLinks('(11) 99999-9999'),{phone:'tel:+5511999999999',whatsapp:'https://wa.me/5511999999999'});
+ assert.equal(supplierContactLinks('11 3333-4444').phone,'tel:+551133334444');assert.equal(supplierContactLinks('+1 (212) 555-0100').whatsapp,'https://wa.me/12125550100');assert.equal(supplierContactLinks('5511999999999').phone,'tel:+5511999999999');
+ for(const value of ['',null,'9999','javascript:alert(1)','+0123456789','+1234567890123456','11 99999-9999 ramal 2'])assert.equal(supplierContactLinks(value),null);
+ const copy=duplicatePlanningExpense({description:'Salão',contracted:100,supplierContact:'Ana',supplierPhone:'11999999999',deliveryDate:'2026-12-04'});assert.equal(copy.supplierContact,'Ana');assert.equal(copy.supplierPhone,'11999999999');assert.equal(copy.deliveryDate,undefined);
 });
