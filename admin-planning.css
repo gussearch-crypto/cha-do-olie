@@ -186,3 +186,12 @@
 .planningDependencyNotice button {display:block;border:0;background:transparent;text-align:left;color:#6a713d;padding:6px 0;text-decoration:underline;cursor:pointer;overflow-wrap:anywhere;max-width:100%;}
 .planningRecordActions {display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 @media(max-width:560px) {.taskItem>.planningRecordActions {grid-column:2/-1;}.planningRecordActions button {min-height:44px;}.planningDependencyRow select {font-size:16px;min-width:0;}}
+.planningScheduleToolbar {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0;}
+.planningScheduleToolbar label,.planningScheduleFilters label {display:grid;gap:6px;min-width:0;font-size:.72rem;color:#5c634b;font-weight:700;}
+.planningScheduleToolbar input,.planningScheduleFilters input,.planningScheduleFilters select {box-sizing:border-box;width:100%;min-width:0;min-height:42px;padding:8px 10px;border:1px solid #d8cfb5;border-radius:9px;background:white;color:#414b34;font:inherit;}
+.planningScheduleFilters {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px;border:1px solid #e5ddc8;border-radius:10px;background:#f8f5eb;}
+.planningScheduleFilters small {grid-column:1/-1;color:#778068;font-size:.7rem;}
+.planningScheduleClear {margin:10px 0;border:0;background:transparent;color:#63743f;text-decoration:underline;cursor:pointer;padding:8px 0;min-height:40px;}
+@media(max-width:560px) {.planningScheduleToolbar input,.planningScheduleFilters input,.planningScheduleFilters select {font-size:16px;min-height:44px;}.planningScheduleFilters {grid-template-columns:minmax(0,1fr);}.planningScheduleToolbar label {font-size:.72rem;}}
+.planningScheduleHead input {box-sizing:border-box;max-width:100%;}
+.planningScheduleHead label {min-width:0;}

@@ -221,6 +221,16 @@ export function togglePlanningSubtask(data, taskId, stepId) {
 export function eventSchedule(tasks,date) {
   return tasks.filter(t=>t.eventDate===date&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t.eventTime||'')).sort((a,b)=>a.eventTime.localeCompare(b.eventTime)||a.title.localeCompare(b.title,'pt-BR'));
 }
+export function filterEventSchedule(tasks,date,{search='',owner='all',status='all',from='',until=''}={}) {
+  const clean=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  if(from&&until&&from>until)return [];
+  return eventSchedule(tasks,date).filter(task=>
+    clean([task.title,task.responsible,task.place,task.contact,task.notes,task.category].filter(Boolean).join(' ')).includes(clean(search))&&
+    (owner==='all'||(owner==='unassigned'?!task.responsible?.trim():task.responsible?.trim()===owner))&&
+    (status==='all'||status==='done'&&task.status==='done'||status==='open'&&task.status!=='done'||status==='blocked'&&task.status!=='done'&&taskDependencies(task,tasks).length>0)&&
+    (!from||task.eventTime>=from)&&(!until||task.eventTime<=until)
+  );
+}
 const ordered=value=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,ordered(value[key])])):value;
 export const planningStatesEqual=(a,b)=>JSON.stringify(ordered(a))===JSON.stringify(ordered(b));
 const sameRecord=planningStatesEqual;

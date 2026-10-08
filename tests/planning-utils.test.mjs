@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
+import {filterEventSchedule,taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -250,4 +250,19 @@ test('duplicates create clean drafts without old identities, financial links or 
  const draft=duplicatePlanningTask(task,()=> 'new-step');assert.equal(draft.id,undefined);assert.equal(draft.title,'Fornecedor (cópia)');assert.equal(draft.status,'todo');assert.equal(draft.completedAt,'');assert.equal(draft.expenseId,'');assert.deepEqual(draft.dependsOn,[]);assert.deepEqual(draft.subtasks,[{id:'new-step',title:'Assinar',done:false}]);assert.equal(task.subtasks[0].done,true);
  const expense={id:'e1',description:'Local',supplier:'Salão',category:'Local',contracted:1000,paid:1000,quoteId:'q1',proposalId:'p1',attachments:[{path:'private.pdf'}],installments:[{id:'p1',amount:1000,paidAmount:1000,payments:[{id:'h1',amount:1000}]}]};
  const copy=duplicatePlanningExpense(expense);assert.equal(copy.id,undefined);assert.equal(copy.quoteId,undefined);assert.equal(copy.attachments,undefined);assert.equal(copy.paid,0);assert.deepEqual(copy.installments,[]);assert.equal(expenseTotals(copy).balance,1000);assert.equal(copy.supplier,'Salão');assert.equal(expenseTotals(expense).state,'paid');
+});
+
+test('schedule filters combine accent insensitive search, responsible, status and inclusive start time bounds',()=>{
+ const date='2026-12-04',tasks=[{id:'prior',title:'Fornecedor',status:'todo'},
+ {id:'a',title:'Decoração',responsible:'Vanessa',place:'Salão',category:'Local',eventDate:date,eventTime:'17:00',status:'todo',dependsOn:['prior']},
+ {id:'b',title:'Recepção',responsible:'Gustavo',contact:'1199999',eventDate:date,eventTime:'18:00',status:'done'},
+ {id:'c',title:'Bolo',eventDate:date,eventTime:'19:00',status:'todo'},
+ {id:'d',title:'Outro dia',eventDate:'2026-12-05',eventTime:'18:00',status:'todo'}];
+ const ids=filters=>filterEventSchedule(tasks,date,filters).map(t=>t.id);
+ assert.deepEqual(ids({search:'decoracao',owner:'Vanessa',status:'blocked',from:'17:00',until:'17:00'}),['a']);
+ assert.deepEqual(ids({search:'salao'}),['a']);assert.deepEqual(ids({search:'1199999'}),['b']);
+ assert.deepEqual(ids({owner:'unassigned'}),['c']);assert.deepEqual(ids({status:'done'}),['b']);
+ assert.deepEqual(ids({status:'open',from:'18:00',until:'19:00'}),['c']);assert.deepEqual(ids({from:'19:00',until:'17:00'}),[]);
+ assert.deepEqual(ids({}),['a','b','c']);assert.equal(filterEventSchedule(tasks.map(t=>t.id==='prior'?{...t,status:'done'}:t),date,{status:'blocked'}).length,0);
+ assert.equal(filterEventSchedule(tasks.filter(t=>t.id!=='prior'),date,{status:'blocked'}).length,1);
 });
