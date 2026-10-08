@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {personalPending,planningResponsibles} from '../planning-pending.mjs';
+const data={tasks:[{id:'a',title:'Atrasada',responsible:' Gustavo ',due:'2026-10-01',status:'todo',dependsOn:['missing']},{id:'b',title:'Montagem',responsible:'gustavo',due:'2026-10-09',eventDate:'2026-12-04',eventTime:'16:00',status:'todo'},{id:'c',title:'Concluída',responsible:'Vanessa',status:'done'},{id:'d',title:'Sem responsável',status:'todo'},{id:'e',title:'Data inválida',responsible:'Vanessa',due:'2026-02-30',status:'todo'}],shopping:[{id:'s1',title:'Copos',responsible:'Gustavo',taskId:'a',status:'pending'},{id:'s2',title:'Gelo',responsible:'Vanessa',taskId:'b',status:'ordered'},{id:'s3',title:'Feita',responsible:'Gustavo',status:'bought'},{id:'s4',title:'Órfã',taskId:'deleted',status:'pending'}]};
+test('personal pending deduplicates scheduled tasks, omits completed items and sorts earliest valid dates first',()=>{
+ const rows=personalPending(data,'2026-10-08');assert.equal(rows.length,7);assert.equal(rows.filter(r=>r.item.id==='b').length,1);assert.equal(rows.find(r=>r.item.id==='b').type,'schedule');assert.equal(rows.find(r=>r.item.id==='b').date,'2026-10-09');assert.equal(rows[0].date,'2026-10-01');assert.equal(rows.find(r=>r.item.id==='a').blocked,true);assert.equal(rows.find(r=>r.item.id==='e').date,'');assert.equal(rows.find(r=>r.item.id==='s4').date,'');
+});
+test('responsible filtering trims names and combines case/accent variants without inheriting purchase ownership',()=>{
+ assert.deepEqual(planningResponsibles(data),[['gustavo','Gustavo'],['vanessa','Vanessa']]);assert.equal(personalPending(data,'2026-10-08',{owner:'gustavo'}).length,3);assert.equal(personalPending(data,'2026-10-08',{owner:'vanessa'}).length,2);assert.equal(personalPending(data,'2026-10-08',{owner:'__unassigned__'}).length,2);
+});
+test('pending filters combine type, period and owner including linked task deadlines and no dates',()=>{
+ assert.equal(personalPending(data,'2026-10-08',{owner:'gustavo',period:'overdue'}).length,2);assert.equal(personalPending(data,'2026-10-08',{type:'shopping',period:'next7'}).length,1);assert.equal(personalPending(data,'2026-10-08',{type:'tasks',period:'undated'}).length,2);assert.equal(personalPending(data,'2026-10-08',{period:'today'}).length,0);assert.equal(personalPending(data,'2026-10-08',{owner:'nobody'}).length,0);
+});
