@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-const labels={tasks:'Ações',expenses:'Financeiro',quotes:'Cotações',budgets:'Orçamento',guestSettings:'Público'};
+const labels={shopping:'Compras',tasks:'Ações',expenses:'Financeiro',quotes:'Cotações',budgets:'Orçamento',guestSettings:'Público'};
 function HistoryEntries({rows}) {
   return rows.length?<ol className="planningHistoryList">{rows.map(entry=><li key={entry.id}><time>{new Date(entry.at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}</time><b>{entry.title}</b><span>{labels[entry.section]} · {entry.action}</span>{entry.changes?.length>0&&<details><summary>Ver alterações</summary>{entry.changes.map((change,i)=><p key={i}><strong>{change.label}:</strong> {change.before||'Não informado'} → {change.after||'Não informado'}</p>)}</details>}</li>)}</ol>:<p className="planningEmpty">Nenhuma alteração salva neste filtro.</p>;
 }

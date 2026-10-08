@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {supplierContactLinks,filterEventSchedule,taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
+import {mergePlanningStates,supplierContactLinks,filterEventSchedule,taskDependencies,validateTaskDependencies,duplicatePlanningTask,duplicatePlanningExpense,togglePlanningTask,eventToday,daysUntil,matchesPeriod,deadline,installmentBalance,expenseTotals,planningSnapshot,recordExpensePayment,paymentHistory,reviseExpensePayment,generateInstallments,categoryBudgets,saveExpenseWithActions,paymentForecast,planningCsv,trashPlanningItem,restorePlanningItem} from '../planning-utils.mjs';
 const today='2026-10-05';
 test('event day changes at midnight in São Paulo, including when UTC is already tomorrow',()=>{
   assert.equal(eventToday(new Date('2026-10-06T02:59:59Z')),today);
@@ -272,4 +272,14 @@ test('supplier links normalize Brazilian and international numbers and reject un
  assert.equal(supplierContactLinks('11 3333-4444').phone,'tel:+551133334444');assert.equal(supplierContactLinks('+1 (212) 555-0100').whatsapp,'https://wa.me/12125550100');assert.equal(supplierContactLinks('5511999999999').phone,'tel:+5511999999999');
  for(const value of ['',null,'9999','javascript:alert(1)','+0123456789','+1234567890123456','11 99999-9999 ramal 2'])assert.equal(supplierContactLinks(value),null);
  const copy=duplicatePlanningExpense({description:'Salão',contracted:100,supplierContact:'Ana',supplierPhone:'11999999999',deliveryDate:'2026-12-04'});assert.equal(copy.supplierContact,'Ana');assert.equal(copy.supplierPhone,'11999999999');assert.equal(copy.deliveryDate,undefined);
+});
+
+test('shopping supports trash restoration, conflict review and CSV without changing financial totals',()=>{
+ const item={id:'s1',title:'Copos',quantity:100,unit:'unidades',status:'pending',taskId:'t1',expenseId:'e1'};
+ const data={tasks:[{id:'t1',title:'Mesa'}],expenses:[{id:'e1',description:'Utensílios',contracted:80,installments:[]}],shopping:[item],trash:[]};
+ const removed=trashPlanningItem(data,'shopping','s1',()=> 'trash1');assert.equal(removed.shopping.length,0);assert.deepEqual(removed.expenses,data.expenses);
+ assert.deepEqual(restorePlanningItem(removed,'trash1').shopping,[item]);
+ const merged=mergePlanningStates(data,{...data,shopping:[{...item,quantity:120}]},{...data,shopping:[{...item,status:'bought'}]});assert.equal(merged.conflicts[0].key,'shopping:s1');
+ assert.equal(mergePlanningStates(data,{...data,shopping:[{...item,quantity:120}]},{...data,shopping:[{...item,status:'bought'}]},{'shopping:s1':'remote'}).data.shopping[0].status,'bought');
+ assert.match(planningCsv(data,'shopping'),/Copos.*100.*Mesa.*Utensílios/);
 });

@@ -27,21 +27,22 @@ function validTaskDependencies(tasks:any[]) {
 function planningHistory(previous:any,next:any) {
   const events:any[]=[],at=new Date().toISOString();
   const text=(value:any)=>value===undefined||value===null?'':typeof value==='object'?JSON.stringify(value).slice(0,500):String(value).slice(0,500);
-  const fields:any={title:'Título',description:'Serviço',category:'Categoria',supplier:'Fornecedor',supplierContact:'Pessoa de contato',supplierPhone:'Telefone / WhatsApp',deliveryDate:'Data de entrega',deliveryTime:'Horário de entrega',deliveryPlace:'Local de entrega',deliveryNotes:'Orientações de entrega',contracted:'Valor contratado',planned:'Valor previsto',due:'Prazo',status:'Situação',priority:'Prioridade',responsible:'Responsável',expenseId:'Serviço vinculado',notes:'Observação',eventDate:'Data do cronograma',eventTime:'Horário',eventEnd:'Horário final',contact:'Contato',place:'Local',dependsOn:'Dependências',subtasks:'Etapas',installments:'Parcelas e pagamentos',proposals:'Propostas',selectedProposalId:'Proposta contratada'};
+  const fields:any={title:'Título',quantity:'Quantidade',unit:'Unidade',taskId:'Ação vinculada',description:'Serviço',category:'Categoria',supplier:'Fornecedor',supplierContact:'Pessoa de contato',supplierPhone:'Telefone / WhatsApp',deliveryDate:'Data de entrega',deliveryTime:'Horário de entrega',deliveryPlace:'Local de entrega',deliveryNotes:'Orientações de entrega',contracted:'Valor contratado',planned:'Valor previsto',due:'Prazo',status:'Situação',priority:'Prioridade',responsible:'Responsável',expenseId:'Serviço vinculado',notes:'Observação',eventDate:'Data do cronograma',eventTime:'Horário',eventEnd:'Horário final',contact:'Contato',place:'Local',dependsOn:'Dependências',subtasks:'Etapas',installments:'Parcelas e pagamentos',proposals:'Propostas',selectedProposalId:'Proposta contratada'};
   const money=(value:any)=>(Number(value)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const display=(key:string,value:any)=>{
     if(key==='installments')return (value||[]).map((p:any)=>`${p.label||'Parcela'}: ${money(p.amount)} · Vencimento: ${p.due||'Sem data'} · Pago: ${money(p.paidAmount)}${p.paidAt?' em '+p.paidAt:''}${p.payment?' · '+p.payment:''} · Estornos: ${(p.payments||[]).filter((h:any)=>h.reversedAt).length}`).join('; ');
     if(key==='dependsOn')return (value||[]).map((id:any)=>[...(next.tasks||[]),...(previous.tasks||[])].find((t:any)=>t.id===id)?.title||'Ação removida').join('; ');
     if(key==='subtasks')return (value||[]).map((p:any)=>`${p.title}: ${p.done?'Concluída':'Pendente'}`).join('; ');
     if(key==='proposals')return (value||[]).map((p:any)=>`${p.supplier}: ${money(p.amount)}${p.terms?' · '+p.terms:''}${p.validUntil?' · Validade: '+p.validUntil:''}`).join('; ');
+    if(key==='taskId')return [...(next.tasks||[]),...(previous.tasks||[])].find((t:any)=>t.id===value)?.title||(value?'Ação indisponível':'Sem vínculo');
     if(key==='expenseId')return [...(next.expenses||[]),...(previous.expenses||[])].find((e:any)=>e.id===value)?.description||(value?'Serviço indisponível':'Sem vínculo');
     if(key==='selectedProposalId')return [...(next.quotes||[]),...(previous.quotes||[])].flatMap((q:any)=>q.proposals||[]).find((p:any)=>p.id===value)?.supplier||'Sem contratação';
-    if(key==='status')return ({todo:'A realizar',done:'Realizada'} as any)[value]||value||'';
+    if(key==='status')return ({todo:'A realizar',done:'Realizada',pending:'A comprar',ordered:'Encomendado',bought:'Comprado'} as any)[value]||value||'';
     if(key==='priority')return ({high:'Alta',medium:'Média',low:'Baixa'} as any)[value]||value||'';
     if(key==='contracted'||key==='planned')return value===undefined?'Não definido':money(value);
     return value??'';
   };
-  for(const section of ['tasks','expenses','quotes']){
+  for(const section of ['tasks','expenses','quotes','shopping']){
     const before=new Map((previous[section]||[]).map((x:any)=>[x.id,x])),after=new Map((next[section]||[]).map((x:any)=>[x.id,x]));
     for(const key of new Set([...before.keys(),...after.keys()])){
       const old:any=before.get(key),item:any=after.get(key),changes=old&&item?Object.entries(fields).flatMap(([field,label])=>{const a=text(display(field,old[field])),b=text(display(field,item[field]));return JSON.stringify(display(field,old[field]))===JSON.stringify(display(field,item[field]))?[]:[{label,before:a,after:b}]}):[];
@@ -183,12 +184,14 @@ Deno.serve(async req => {
       budgets = previous.budgets || {};
     }
     const trash = body.data.trash===undefined ? previous.trash || [] : body.data.trash;
-    if (!Array.isArray(trash) || trash.length>500 || trash.some((entry:any)=>!entry || !['task','expense','quote'].includes(entry.type) || !entry.item?.id || typeof entry.id!=='string' || typeof entry.deletedAt!=='string')) return json({error:'invalid_trash'},400);
+    if (!Array.isArray(trash) || trash.length>500 || trash.some((entry:any)=>!entry || !['shopping','task','expense','quote'].includes(entry.type) || !entry.item?.id || typeof entry.id!=='string' || typeof entry.deletedAt!=='string')) return json({error:'invalid_trash'},400);
     const quotes=body.data.quotes===undefined ? previous.quotes || [] : body.data.quotes;
     if(!Array.isArray(quotes)||quotes.length>500||new Set(quotes.map((q:any)=>q?.id)).size!==quotes.length||quotes.some((q:any)=>!validQuote(q)))return json({error:'invalid_quotes'},400);
     const guestSettings=body.data.guestSettings===undefined ? previous.guestSettings || {basis:'confirmed',excludeUnder5:true,estimatedGuests:100} : body.data.guestSettings;
     if(!guestSettings||!['confirmed','estimate'].includes(guestSettings.basis)||typeof guestSettings.excludeUnder5!=='boolean'||guestSettings.estimatedGuests!==null&&(!Number.isInteger(guestSettings.estimatedGuests)||guestSettings.estimatedGuests<0||guestSettings.estimatedGuests>10000))return json({error:'invalid_guest_settings'},400);
-    const clean:any = {quotes,guestSettings,trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
+    const shopping=body.data.shopping===undefined ? previous.shopping || [] : body.data.shopping;
+    if(!Array.isArray(shopping)||shopping.length>500||new Set(shopping.map((i:any)=>i?.id)).size!==shopping.length||shopping.some((i:any)=>!i||typeof i.id!=='string'||!i.id||i.id.length>100||typeof i.title!=='string'||!i.title.trim()||i.title.length>200||typeof i.quantity!=='number'||!Number.isFinite(i.quantity)||i.quantity<=0||i.quantity>1000000||typeof i.unit!=='string'||!i.unit.trim()||i.unit.length>40||!['pending','ordered','bought'].includes(i.status)||[['responsible',120],['notes',1500],['taskId',100],['expenseId',100]].some(([key,limit]:any)=>i[key]!==undefined&&(typeof i[key]!=='string'||i[key].length>limit))))return json({error:'invalid_shopping'},400);
+    const clean:any = {shopping,quotes,guestSettings,trash,tasks:body.data.tasks.slice(0,500), expenses:body.data.expenses.slice(0,500), budgets};
     clean.history=planningHistory(previous,clean);
     const failure=await commitState(supabase,clean,revision,!!previousRecord);
     if(failure)return failure;

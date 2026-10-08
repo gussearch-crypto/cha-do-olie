@@ -112,3 +112,15 @@ test('supplier contact and delivery persist and their changes appear only in the
  const entry=result.json.history.find(e=>e.recordId==='e1');assert.equal(entry.section,'expenses');assert.equal(entry.changes.find(c=>c.label==='Telefone / WhatsApp').after,'11999999999');assert.equal(entry.changes.find(c=>c.label==='Horário de entrega').after,'17:00');
  const loaded=await api.call({action:'get'});assert.equal(loaded.json.data.expenses[0].deliveryNotes,'Entrada lateral');assert.equal(loaded.json.data.history[0].recordId,'e1');
 });
+
+test('shopping persists independently of payments, survives older clients and records changes',async()=>{
+ const item={id:'s1',title:'Copos',quantity:100,unit:'unidades',responsible:'Gustavo',status:'pending',taskId:'t1',expenseId:'e1',notes:''};
+ const api=endpoint({tasks:[],expenses:[],shopping:[item]});
+ await api.call({action:'save',data:{tasks:[],expenses:[]}});assert.equal(api.saved().shopping[0].title,'Copos');
+ await api.call({action:'save',data:{tasks:[],expenses:[],shopping:[{...item,status:'bought'}]}});
+ assert.equal(api.saved().shopping[0].status,'bought');assert.deepEqual(api.saved().expenses,[]);
+ assert.equal(api.saved().history[0].section,'shopping');assert.equal(api.saved().history[0].changes[0].after,'Comprado');
+ assert.equal((await api.call({action:'get'})).json.data.shopping[0].quantity,100);
+ for(const shopping of [null,[{...item,quantity:0}],[{...item,quantity:'2'}],[{...item,status:'paid'}],[item,item],[{...item,title:''}]])assert.equal((await api.call({action:'save',data:{tasks:[],expenses:[],shopping}})).status,400);
+ await api.call({action:'save',data:{tasks:[],expenses:[],shopping:[]}});assert.equal(api.saved().shopping.length,0);
+});

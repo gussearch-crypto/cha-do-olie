@@ -147,6 +147,7 @@ export function planningCsv(data, section, today = eventToday()) {
   const brMoney = value => Number(value||0).toFixed(2).replace('.',',');
   let rows;
   if (section === 'schedule') rows = [['Ação','Data','Início','Fim','Responsável','Contato','Local','Situação','Etapas'],...data.tasks.filter(t=>t.eventDate&&t.eventTime).sort((a,b)=>(a.eventDate+a.eventTime).localeCompare(b.eventDate+b.eventTime)).map(t=>[t.title,t.eventDate,t.eventTime,t.eventEnd,t.responsible,t.contact,t.place,t.status==='done'?'Realizada':'A realizar',(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
+  else if (section === 'shopping') rows = [['Item','Quantidade','Unidade','Responsável','Status','Ação vinculada','Serviço vinculado','Observação'],...(data.shopping||[]).map(i=>[i.title,i.quantity,i.unit,i.responsible,({pending:'A comprar',ordered:'Encomendado',bought:'Comprado'})[i.status],data.tasks.find(t=>t.id===i.taskId)?.title||(i.taskId?'Ação indisponível':''),data.expenses.find(e=>e.id===i.expenseId)?.description||(i.expenseId?'Serviço indisponível':''),i.notes])];
   else if (section === 'tasks') rows = [['Ação','Categoria','Situação','Prioridade','Responsável','Prazo','Realizada em','Serviço vinculado','Observação','Etapas'],...data.tasks.map(t=>[t.title,t.category,t.status==='done'?'Realizada':'A realizar',({high:'Alta',medium:'Média',low:'Baixa'})[t.priority]||'',t.responsible,t.due,t.completedAt,data.expenses.find(e=>e.id===t.expenseId)?.description||'',t.notes,(t.subtasks||[]).map(s=>(s.done?'✓ ':'Pendente: ')+s.title).join(' | ')])];
   else if (section === 'quotes') rows = [['Serviço','Categoria','Fornecedor','Valor','Condições','Validade','Contato','Observação','Contratada'],...(data.quotes||[]).flatMap(q=>q.proposals.map(p=>[q.title,q.category,p.supplier,brMoney(p.amount),p.terms,p.validUntil,p.contact,p.notes,q.selectedProposalId===p.id?'Sim':'Não']))];
   else if (section === 'expenses') rows = [['Serviço','Categoria','Fornecedor','Contratado','Pago','A quitar','Situação','Ações vinculadas','Observação'],...data.expenses.map(e=>{const totals=expenseTotals(e,today);return [e.description,e.category,e.supplier,brMoney(totals.planned),brMoney(totals.paid),brMoney(totals.balance),totals.state==='paid'?'Quitado':totals.planned>0?'A quitar':'Valor a definir',data.tasks.filter(t=>t.expenseId===e.id).map(t=>t.title).join(' | '),e.notes]})];
@@ -158,7 +159,7 @@ export function planningCsv(data, section, today = eventToday()) {
 }
 
 export function trashPlanningItem(data, type, itemId, makeId = () => crypto.randomUUID(), now = new Date()) {
-  const collection = type === 'task' ? 'tasks' : type === 'expense' ? 'expenses' : type === 'quote' ? 'quotes' : null;
+  const collection = type === 'shopping' ? 'shopping' : type === 'task' ? 'tasks' : type === 'expense' ? 'expenses' : type === 'quote' ? 'quotes' : null;
   if (!collection) throw new Error('Tipo inválido.');
   const item = data[collection].find(x=>x.id===itemId);
   if (!item) throw new Error('Registro não encontrado.');
@@ -169,8 +170,8 @@ export function trashPlanningItem(data, type, itemId, makeId = () => crypto.rand
 }
 export function restorePlanningItem(data, entryId) {
   const entry = (data.trash||[]).find(x=>x.id===entryId);
-  if (!entry || !['task','expense','quote'].includes(entry.type)) throw new Error('Registro não encontrado na lixeira.');
-  const collection = entry.type==='task'?'tasks':entry.type==='quote'?'quotes':'expenses';
+  if (!entry || !['shopping','task','expense','quote'].includes(entry.type)) throw new Error('Registro não encontrado na lixeira.');
+  const collection = entry.type==='shopping'?'shopping':entry.type==='task'?'tasks':entry.type==='quote'?'quotes':'expenses';
   if (data[collection].some(x=>x.id===entry.item.id)) throw new Error('Já existe um registro com este identificador.');
   const item=structuredClone(entry.item);
   const tasks=entry.type==='task'?[item,...data.tasks]:data.tasks.map(t=>(entry.linkedTaskIds||[]).includes(t.id)&&!t.expenseId?{...t,expenseId:item.id,cost:true}:t);
@@ -250,7 +251,7 @@ export function mergePlanningStates(base,local,remote,choices={}) {
     conflicts.push({key,label,local:l,remote:r});
     return choices[key]==='remote'?r:l;
   };
-  for(const collection of ['tasks','expenses','trash','quotes']) {
+  for(const collection of ['tasks','expenses','trash','quotes','shopping']) {
     const maps=[base,local,remote].map(d=>new Map((d?.[collection]||[]).map(x=>[x.id,x])));
     const keys=[...new Set([...maps[1].keys(),...maps[2].keys(),...maps[0].keys()])];
     data[collection]=keys.map(key=>{const [b,l,r]=maps.map(m=>m.get(key));const item=l||r||b;return pick(collection+':'+key,item.title||item.description||item.item?.title||item.item?.description||'Registro',b,l,r)}).filter(Boolean);
