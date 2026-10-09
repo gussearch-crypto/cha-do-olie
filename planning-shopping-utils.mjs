@@ -15,3 +15,12 @@ export function linkExistingPurchase(data,task,purchaseId,previousTaskId='') {
   if(!exists&&data.tasks.length>=500)throw new Error('O planejamento atingiu 500 ações.');
   return {...data,tasks:exists?data.tasks.map(item=>item.id===task.id?task:item):[task,...data.tasks],shopping:data.shopping.map(item=>item.id===purchaseId?{...item,taskId:task.id}:item)};
 }
+
+export function updatePurchaseStatus(data,purchaseId,status,expectedStatus) {
+  if(!Object.hasOwn(shoppingStatuses,status))throw new Error('Selecione um status válido para a compra.');
+  const item=data.shopping.find(item=>item.id===purchaseId);
+  if(!item)throw new Error('Esta compra não está mais disponível.');
+  if(expectedStatus!==undefined&&item.status!==expectedStatus)throw new Error('O status desta compra foi alterado. Confira o status atual antes de continuar.');
+  if(item.status===status)return data;
+  return {...data,shopping:data.shopping.map(item=>item.id===purchaseId?{...item,status}:item)};
+}
