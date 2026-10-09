@@ -3,7 +3,7 @@ import {RecordHistory} from './planning-history.jsx';
 import {filterShopping,shoppingStatuses} from './planning-shopping-utils.mjs';
 import {ShoppingPrint} from './planning-shopping-print.jsx';
 export const purchaseStatuses=shoppingStatuses;
-export function ShoppingForm({item,tasks,expenses,history,onSave,onDelete,onClose}) {
+export function ShoppingForm({item,tasks,expenses,history,onSave,onDelete,onClose,closeLabel='Cancelar'}) {
   const [f,setF]=useState({title:'',quantity:1,unit:'unidades',responsible:'',status:'pending',taskId:'',expenseId:'',notes:'',...item});
   const change=(key,value)=>setF(x=>({...x,[key]:value}));
   return <form onSubmit={e=>{e.preventDefault();if(f.title.trim())onSave({...f,title:f.title.trim(),quantity:Number(f.quantity)})}}><h3>{item?.id?'Editar compra':'Nova compra'}</h3>
@@ -16,7 +16,7 @@ export function ShoppingForm({item,tasks,expenses,history,onSave,onDelete,onClos
     <p className="planningFormHint">O vínculo permite consultar o financeiro. O status da compra não registra pagamento nem altera a conclusão da ação.</p>
     <label>Observação<textarea maxLength={1500} value={f.notes} onChange={e=>change('notes',e.target.value)}/></label>
     <RecordHistory entries={history} section="shopping" recordId={item?.id}/>
-    <div className="modalActions">{item?.id&&<button type="button" className="danger" onClick={onDelete}>Excluir</button>}<button type="button" onClick={onClose}>Cancelar</button><button type="submit" className="primary">Salvar</button></div>
+    <div className="modalActions">{item?.id&&<button type="button" className="danger" onClick={onDelete}>Excluir</button>}<button type="button" onClick={onClose}>{closeLabel}</button><button type="submit" className="primary">Salvar</button></div>
   </form>;
 }
 export function ShoppingList({items,tasks,expenses,onEdit,onTask,onExpense}) {
