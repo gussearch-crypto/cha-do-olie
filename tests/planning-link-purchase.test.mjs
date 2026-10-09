@@ -7,3 +7,8 @@ test('new actions can link available purchases and stale or missing links are re
  const data=fixture();data.shopping[0].taskId='';const task={id:'new',title:'Nova ação'};assert.equal(linkExistingPurchase(data,task,'s1','').tasks[0].id,'new');assert.throws(()=>linkExistingPurchase(data,task,'s1','t2'),/alterado/);assert.throws(()=>linkExistingPurchase(data,task,'missing',''),/disponível/);assert.throws(()=>linkExistingPurchase(data,{title:'Sem ID'},'s1',''),/Preencha/);assert.equal(data.tasks.length,2);
  const linked=linkExistingPurchase(data,task,'s1','');assert.throws(()=>linkExistingPurchase(linked,task,'s1','new'),/já está/);
 });
+
+test('unlinking an action purchase preserves item, status, payments and other links and rejects stale linkage',async()=>{
+ const {unlinkPurchaseFromAction}=await import('../planning-shopping-utils.mjs');const data=fixture(),task={...data.tasks[1],title:'Bebidas ajustadas'};
+ const result=unlinkPurchaseFromAction(data,task,'s1');assert.deepEqual(result.shopping[0],{...data.shopping[0],taskId:''});assert.deepEqual(result.expenses,data.expenses);assert.equal(result.tasks[1].title,'Bebidas ajustadas');assert.equal(data.shopping[0].taskId,'t2');assert.equal(result.trash.length,0);assert.throws(()=>unlinkPurchaseFromAction(data,data.tasks[0],'s1'),/alterado/);assert.throws(()=>unlinkPurchaseFromAction(data,task,'missing'),/alterado/);
+});

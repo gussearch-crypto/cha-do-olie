@@ -24,3 +24,10 @@ export function updatePurchaseStatus(data,purchaseId,status,expectedStatus) {
   if(item.status===status)return data;
   return {...data,shopping:data.shopping.map(item=>item.id===purchaseId?{...item,status}:item)};
 }
+
+export function unlinkPurchaseFromAction(data,task,purchaseId) {
+  const purchase=data.shopping.find(item=>item.id===purchaseId);
+  if(!purchase||purchase.taskId!==task.id)throw new Error('O vínculo desta compra foi alterado. Confira os itens da ação antes de desvincular.');
+  if(!data.tasks.some(item=>item.id===task.id))throw new Error('Esta ação não está mais disponível.');
+  return {...data,tasks:data.tasks.map(item=>item.id===task.id?task:item),shopping:data.shopping.map(item=>item.id===purchaseId?{...item,taskId:''}:item)};
+}
