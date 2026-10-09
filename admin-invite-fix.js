@@ -1,3 +1,4 @@
+import{RSVP_DEADLINE_LABEL}from'./guest-review-utils.mjs';
 const APP_URL='https://cha-oliver-mvp.vercel.app/';
 const MAPS_URL='https://www.google.com/maps/search/?api=1&query=Av.%20das%20Na%C3%A7%C3%B5es%2C%20151%20-%20Parque%20Novo%20Orat%C3%B3rio%2C%20Santo%20Andr%C3%A9%20-%20SP%2C%2009260-000';
 const ADDRESS='Av. das Nações, 151 - sobreloja\nParque Novo Oratório · Santo André - SP\n09260-000';
@@ -9,7 +10,7 @@ function getFamilyData(row){
   return {name,token};
 }
 function inviteText(name,token){
-  return `Olá, ${name}! 💛\n\nEstamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.\n\nAcesse o convite:\n${APP_URL}\n\nPara confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:\n${token}\n\n📅 04 de dezembro (sexta-feira)\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n${ADDRESS}\n\n🗺️ Google Maps:\n${MAPS_URL}\n\nTraga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛`;
+  return `Olá, ${name}! 💛\n\nEstamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.\n\nAcesse o convite:\n${APP_URL}\n\nPara confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:\n${token}\n\n📅 04 de dezembro (sexta-feira)\n🕕 Das 18h às 22h\n📍 Salão Terra Mágica\n${ADDRESS}\n\n🗺️ Google Maps:\n${MAPS_URL}\n\nConfirme a presença até ${RSVP_DEADLINE_LABEL}.\n\nTraga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛`;
 }
 function enhanceInviteButtons(){
   document.querySelectorAll('.guestRow').forEach(row=>{

@@ -20,11 +20,13 @@
       const matches=selected==='all'||rowGroup(row)===selected;
       row.style.display=matches?'':'none';
     });
-    const counter=document.querySelector('.adminTools > span');
-    if(counter&&selected!=='all'){
-      const n=rows.filter(r=>r.style.display!=='none').length;
-      counter.textContent=`${n} núcleo${n===1?'':'s'} · ${selected}`;
-    }
+    const tools=document.querySelector('.adminTools');
+    const counter=tools?.querySelector(':scope > span:not(.adminGroupCount)');
+    let groupCounter=tools?.querySelector('.adminGroupCount');
+    if(tools&&!groupCounter){groupCounter=document.createElement('span');groupCounter.className='adminGroupCount';tools.append(groupCounter)}
+    if(counter)counter.style.display=selected==='all'?'':'none';
+    if(groupCounter){groupCounter.style.display=selected==='all'?'none':'';const n=rows.filter(r=>r.style.display!=='none').length;const label=`${n} núcleo${n===1?'':'s'} · ${selected}`;if(groupCounter.textContent!==label)groupCounter.textContent=label;}
+
   }
 
   function render(){
@@ -54,5 +56,6 @@
   const observer=new MutationObserver(()=>requestAnimationFrame(render));
   observer.observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('input',e=>{if(e.target.matches('.adminTools input'))requestAnimationFrame(()=>{render();apply()})});
+  window.addEventListener('oliver-reset-group-filter',()=>{selected='all';const select=document.querySelector('.adminGroupFilter select');if(select)select.value='all';requestAnimationFrame(render)});
   render();
 })();
