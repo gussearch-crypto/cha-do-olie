@@ -4,7 +4,7 @@ export function deadlineState(now=new Date()){
   const values=Object.fromEntries(new Intl.DateTimeFormat('en',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(p=>[p.type,p.value]));
   const date=`${values.year}-${values.month}-${values.day}`;
   const days=Math.round((Date.parse(RSVP_DEADLINE)-Date.parse(date))/86400000);
-  return {days,expired:days<0,label:days<0?'Prazo de confirmação encerrado':days===0?'Último dia para confirmar':`Confirmações até ${RSVP_DEADLINE_LABEL} · faltam ${days} dia(s)`};
+  return {days,expired:days<0,label:days<0?'Prazo de confirmação encerrado para convites antigos':days===0?'Último dia para confirmar':`Confirmações até ${RSVP_DEADLINE_LABEL} · faltam ${days} dia(s)`};
 }
 const normalized=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,' ').toLowerCase();
 export function reviewFamilies(families){
