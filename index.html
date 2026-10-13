@@ -13,7 +13,7 @@
 <body>
   <div id="root"></div>
   <script type="module">
-    const games = ['/games','/a-espera-do-oliver'].includes(location.pathname.replace(/\\/$/,''));\n    const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
+    const games = ['/games','/a-espera-do-oliver'].includes(location.pathname.replace(/\/$/,''));\n    const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
     if (admin) {
       await import('/admin-login-fast.js').catch(console.error);
       await import('/admin-central.js').catch(console.error);
