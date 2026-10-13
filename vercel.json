@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/games",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/a-espera-do-oliver",
+      "destination": "/index.html"
+    }
+  ]
+}
