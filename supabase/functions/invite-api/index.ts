@@ -23,7 +23,7 @@ if(guestId&&!before.some(g=>g.id===guestId))return json({error:"guest_not_found"
 const selected=guestId?before.filter(g=>g.id===guestId):before;
 if(selected.some(g=>g.attendance==="yes"))return json({error:"confirmed_attendance_protected"},409);
 const targets=guestId?[guestId]:before.map(g=>g.id);
-const {error:updateError}=await supabase.from("guests").update({attendance:"no",updated_at:new Date().toISOString()}).eq("family_id",familyId).in("id",targets);
+const {error:updateError}=await supabase.rpc("update_guest_attendance_with_source",{p_family_id:familyId,p_guest_ids:targets,p_attendance:"no",p_source:"administrador"});
 if(updateError)return json({error:"attendance_update_failed"},500);
 const {data:current,error:currentError}=await supabase.from("guests").select("attendance,person_type").eq("family_id",familyId);
 if(currentError||!current?.length)return json({error:"status_read_failed"},500);
