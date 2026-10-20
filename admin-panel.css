@@ -40,3 +40,16 @@
 .reminderDialogActions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.reminderDialogActions button{padding:10px 14px;min-height:42px;border-radius:10px}
 .reminderDialog small{color:#69735f}
 @media(max-width:620px){.reminderOverlay{padding:10px}.reminderDialog{padding:17px;max-height:94vh}.reminderDialogActions{display:grid;grid-template-columns:1fr 1fr}.reminderDialogActions button{font-size:12px;padding:9px 6px}}
+
+/* Edição de núcleos: integrantes alinhados em linhas consistentes */
+.adminForm .editGuests{gap:12px;min-width:0}
+.adminForm .editGuest.guestTypeEditor{display:grid;grid-template-columns:minmax(0,1fr) 146px 182px 112px;align-items:center;gap:10px;padding:12px;background:#fffcf5;border:1px solid #e4dcc6;border-radius:16px;min-width:0}
+.adminForm .guestTypeEditor>input{grid-column:1;min-width:0;margin:0}
+.adminForm .guestTypeEditor>.childToggle{grid-column:2;margin:0;width:100%;min-width:0;justify-content:center}
+.adminForm .guestTypeEditor>select{grid-column:3;width:100%;min-width:0;min-height:50px;height:50px;padding:0 10px;border:1px solid #d8cfb5;border-radius:13px;background:#fffdf8;color:#435035;font:600 13px 'DM Sans',sans-serif}
+.adminForm .guestTypeEditor>.guestAgeSpacer{grid-column:3;display:block}
+.adminForm .guestTypeEditor>.guestRemoveButton{grid-column:4;width:100%;height:50px;min-height:50px;margin:0;background:#fff8f5;border:1px solid #ebc8bc;color:#934a38;border-radius:13px}
+.adminForm .guestTypeEditor>.guestRemoveButton:hover{background:#f9e8e1;border-color:#d7a89a}
+.adminForm .guestTypeEditor>select:focus-visible,.adminForm .guestTypeEditor>.guestRemoveButton:focus-visible{outline:3px solid #a9b891;outline-offset:2px}
+@media(max-width:900px){.adminForm .editGuest.guestTypeEditor{grid-template-columns:minmax(0,1fr) 128px 155px 95px;gap:8px;padding:10px}.adminForm .guestTypeEditor>.guestRemoveButton{font-size:12px}}
+@media(max-width:690px){.adminForm .editGuest.guestTypeEditor{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.adminForm .guestTypeEditor>input{grid-column:1/-1}.adminForm .guestTypeEditor>.childToggle{grid-column:1}.adminForm .guestTypeEditor>select{grid-column:2}.adminForm .guestTypeEditor>.guestAgeSpacer{grid-column:2}.adminForm .guestTypeEditor>.guestRemoveButton{grid-column:1/-1;min-height:42px;height:42px}.adminForm .guestTypeEditor .childToggle{height:50px;justify-self:stretch}}
