@@ -28,3 +28,15 @@
 .guestValidation .guestValidationButtonMuted:hover{background:#efecdf;border-color:#bfc6ae;color:#405333}
 .guestValidation .guestValidationIgnoredItem{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e4ddc9;font-size:13px}
 @media(max-width:620px){.guestValidation .guestValidationSummary{width:100%;justify-content:center}.guestValidation .guestValidationIssue{align-items:stretch;flex-direction:column;gap:9px}.guestValidation .guestValidationIssue>span{min-width:0}.guestValidation .guestValidationButton{width:100%}.guestValidation .guestValidationIgnoredItem{display:block}.guestValidation .guestValidationIgnoredItem .guestValidationButton{margin-top:10px}}
+
+/* Lembretes de confirmação por núcleo */
+.guestActions .reminderButton{background:#eaf0df;border-color:#b8c9a0;color:#3f5831;font-weight:700}
+.guestActions .reminderButton:hover{background:#dce8cd;border-color:#8da77a}
+.guestActions .reminderMeta{grid-column:1/-1;color:#717962;font-size:12px}
+.reminderOverlay{position:fixed;inset:0;z-index:9999;background:rgba(26,37,22,.65);display:flex;align-items:center;justify-content:center;padding:20px}
+.reminderDialog{width:min(650px,100%);max-height:90vh;overflow:auto;background:#fffdf6;border:1px solid #d9d4bd;border-radius:20px;padding:24px;box-shadow:0 16px 56px #1b2b1738;color:#35462c}
+.reminderDialog h3{margin:0 0 7px;font-size:22px}.reminderDialog p{font-size:14px;color:#6b735e;margin:0 0 14px}
+.reminderDialog textarea{display:block;width:100%;box-sizing:border-box;min-height:265px;padding:14px;border:1px solid #c9cfb7;border-radius:12px;background:#fff;color:#283721;font:14px/1.5 'DM Sans',sans-serif;resize:vertical}
+.reminderDialogActions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.reminderDialogActions button{padding:10px 14px;min-height:42px;border-radius:10px}
+.reminderDialog small{color:#69735f}
+@media(max-width:620px){.reminderOverlay{padding:10px}.reminderDialog{padding:17px;max-height:94vh}.reminderDialogActions{display:grid;grid-template-columns:1fr 1fr}.reminderDialogActions button{font-size:12px;padding:9px 6px}}
