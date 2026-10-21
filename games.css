@@ -18,3 +18,5 @@
 .gamesPage .gameButtons button{min-width:120px}
 .gameModal{max-height:calc(100dvh - 30px);overflow-y:auto;padding:20px 17px}
 }
+
+.gameGuestMatches{display:grid;gap:5px;margin-top:8px;padding:6px;border:1px solid #d1dcbc;border-radius:12px;background:#fff;max-height:180px;overflow:auto}.gameGuestMatches button{width:100%;text-align:left;padding:10px;border:0;border-radius:8px;background:#f1f5e9;color:#394d2b;white-space:normal}.gameGuestMatches button:hover{background:#dfeaca}.gameUnlistedBadge,.gameListedBadge{display:block;font-size:11px;font-weight:700;margin-top:4px}.gameUnlistedBadge{color:#9b5b37}.gameListedBadge{color:#657b48}
