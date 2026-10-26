@@ -145,3 +145,16 @@
 .olieResultsHint strong{font-size:16px}
 .olieResultsHint p{margin:5px 0 0;font-size:13px}
 @media(max-width:760px){.oliePredictionColumns{grid-template-columns:1fr}.gamesPage .oliverArrival.oliverArrivalPublished{padding:25px 14px}.oliverArrivalPublished .oliverArrivalStats>div{padding:11px;border-width:3px}.oliverArrivalPublished .oliverArrivalStats strong{font-size:20px}.olieCalendarDay{min-height:40px}.oliePredictionSidebar{padding:18px}}
+
+/* Uma única mensagem principal, visual consistente antes e depois do nascimento */
+.gamesPage .oliverArrival.oliverArrivalCentered{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:24px;padding:clamp(30px,5vw,60px) 20px;background:linear-gradient(160deg,#fafbf5,#f9f4e7);border:1px solid #dbe5d1;border-radius:28px}
+.oliverArrivalCentered .oliverArrivalInfo{width:100%;max-width:730px}
+.oliverArrivalCentered .oliverArrivalInfo h2{font-size:clamp(34px,5vw,60px);line-height:1.1;margin:12px 0 16px;color:#435d37}
+.oliverArrivalCentered .oliverArrivalInfo p{max-width:640px;margin:12px auto;color:#586c4e;line-height:1.65;font-size:clamp(15px,1.8vw,20px)}
+.oliverArrivalCentered .oliverArrivalPhoto{width:min(100%,400px);max-width:400px;max-height:none;min-height:0;aspect-ratio:4/5;margin:0 auto;box-sizing:border-box;border-radius:26px;justify-self:center}
+.oliverArrivalCentered .oliverArrivalPhoto .oliverArrivalImage{aspect-ratio:4/5;object-fit:cover}
+.oliverArrivalWaiting .oliverArrivalPhoto{background:linear-gradient(145deg,#e4eddb,#f1f5e9);border:2px dashed #b1c6a3}
+.oliverArrivalWaiting .oliverArrivalDpp{margin-top:19px;color:#4f6940;font-size:clamp(23px,3vw,31px)}
+.oliverArrivalWaiting .oliverArrivalCountdown{margin:5px auto 0;padding:15px 24px;font-size:clamp(17px,2vw,23px);border-radius:14px;background:#e8efdf;color:#536f43}
+.oliverArrivalCentered.oliverArrivalPublished .oliverArrivalStats{width:min(100%,690px);max-width:690px;margin:0 auto;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:600px){.gamesPage .oliverArrival.oliverArrivalCentered{padding:28px 14px}.oliverArrivalCentered .oliverArrivalPhoto{max-width:320px}.oliverArrivalCentered.oliverArrivalPublished .oliverArrivalStats>div{padding:12px}}
