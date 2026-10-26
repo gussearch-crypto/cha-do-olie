@@ -35,7 +35,7 @@ items.sort((a,b)=>a[0]-b[0]||a[1].localeCompare(b[1],'pt-BR'));
 box.innerHTML='<div class="oliverPrepListHead"><h3>Precisa de atenção</h3><span>'+items.length+' alerta(s)</span></div>'+(data?items.length?'<div class="oliverPriorityRows">'+items.slice(0,7).map(x=>'<button type="button" class="oliverPriorityItem priority-'+x[0]+'" data-priority-tab="'+x[3]+'"><i class="oliverPriorityDot"></i><span class="oliverPriorityText"><strong>'+safe(x[1])+'</strong><small>'+safe(x[2])+'</small></span><span>›</span></button>').join('')+'</div>':'<p class="oliverPriorityEmpty">Nenhuma pendência urgente.</p>':'<p class="oliverPriorityEmpty">Aguardando sincronização do planejamento.</p>');
 box.querySelectorAll('[data-priority-tab]').forEach(b=>b.addEventListener('click',()=>document.querySelector('[data-admin-tab="'+b.dataset.priorityTab+'"]')?.click()));
 }
-const obs=new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.nodeType===1&&n.id==='oliver-prep-summary')))render()});obs.observe(document.body,{childList:true,subtree:true});
+const obs=new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.nodeType===1&&(n.id==='oliver-prep-summary'||n.classList?.contains('oliverPrepLists'))))&&!document.querySelector('#oliver-prep-summary .oliverPriority'))render()});obs.observe(document.body,{childList:true,subtree:true});
 window.addEventListener('focus',load);document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab="overview"],[data-prep-refresh]'))setTimeout(load,300)},true);
 setInterval(()=>{if(sessionStorage.getItem('oliverAdminTab')==='overview')load()},60000);
 setTimeout(load,500);setTimeout(render,800);
