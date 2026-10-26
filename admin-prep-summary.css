@@ -12,3 +12,29 @@
 .oliverPrepLists li small{flex:0 0 auto;color:#718065;font-size:11px;text-align:right}
 .oliverPrepSync{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;color:#738166;font-size:12px}
 @media(max-width:720px){.oliverPrepLists{grid-template-columns:1fr}.oliverPrepLists li{flex-wrap:wrap}.oliverPrepSync{flex-wrap:wrap}}
+
+/* Dashboard único: métricas antigas permanecem no DOM como fonte, mas não duplicam a tela. */
+body:has(.adminTabs [data-admin-tab="overview"].active) .adminWrap .countdownCard,
+body:has(.adminTabs [data-admin-tab="overview"].active) .adminWrap .eventCentral,
+body:has(.adminTabs [data-admin-tab="overview"].active) .adminWrap .dashboard{display:none!important}
+.oliverPrepSummary{margin-top:12px;padding:24px}
+.oliverPrepHead{margin-bottom:20px}
+.oliverPrepHead h2{font-size:clamp(22px,2vw,30px);margin:7px 0}
+.oliverPrepHead>strong{background:#657744;color:white;padding:13px 19px;border-radius:12px;font-size:16px}
+.oliverPrepGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.oliverPrepGrid article{background:#f7f9f3;padding:18px;display:flex;flex-direction:column}
+.oliverPrepGrid article>strong{font-size:clamp(25px,2.4vw,35px);margin:9px 0}
+.oliverPrepGrid article p{margin:0 0 12px;min-height:36px;line-height:1.45}
+.oliverPrepGrid article button{margin-top:auto;text-align:left}
+.oliverPrepDetails{margin-top:16px;border:1px solid #dfe6d6;border-radius:13px;background:#fafcf7;overflow:hidden}
+.oliverPrepDetails summary{cursor:pointer;font-weight:800;color:#465e39;padding:16px 18px;list-style-position:inside}
+.oliverPrepDetails summary span{font-weight:500;color:#75846a;font-size:12px}
+.oliverPrepDetails[open] summary{border-bottom:1px solid #e1e8da}
+.oliverPrepDetailGrid{padding:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.oliverPrepDetailGrid>div{background:white;border:1px solid #e5e9df;border-radius:10px;padding:13px;min-width:0}
+.oliverPrepDetailGrid small{display:block;color:#718166;font-size:10px;font-weight:750;letter-spacing:.04em}
+.oliverPrepDetailGrid strong{display:block;color:#445b38;font-size:23px;margin:9px 0 5px}
+.oliverPrepDetailGrid p{font-size:11px;color:#78856b;margin:0;line-height:1.4}
+.oliverPrepDiapersLink{margin:0 14px 15px;background:#eaf1e4;border:1px solid #ccdac3;color:#506a42;border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
+@media(max-width:900px){.oliverPrepGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.oliverPrepDetailGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:560px){.oliverPrepDetailGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.oliverPrepSummary{padding:14px}.oliverPrepHead>strong{font-size:14px}}
