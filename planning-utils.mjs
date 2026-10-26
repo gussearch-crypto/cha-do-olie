@@ -122,7 +122,7 @@ export function generateInstallments({amount, count, firstDue, startIndex = 1}, 
   });
 }
 export function categoryBudgets(expenses, budgets = {}, categories = []) {
-  const names = [...new Set([...categories, ...Object.keys(budgets), ...expenses.map(e => e.category || 'Outros')])];
+  const names = [...new Set([...categories, ...Object.keys(budgets).filter(k => !k.startsWith('__')), ...expenses.map(e => e.category || 'Outros')])];
   return names.map(category => {
     const contracted = expenses.filter(e => (e.category || 'Outros') === category).reduce((s,e) => s + cents(expenseTotals(e).planned),0) / 100;
     const raw = budgets[category], defined = raw !== '' && raw != null && Number.isFinite(Number(raw)) && Number(raw) >= 0;
