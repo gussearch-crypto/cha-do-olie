@@ -100,3 +100,48 @@
 
 /* A espera do Oliver: anúncio de chegada editorial e responsivo */
 .gamesPage:has(.oliverArrivalPublished) .gamesHero{padding-top:30px;padding-bottom:34px;background:linear-gradient(160deg,#e9eedf,#f6f3e8)}.gamesPage:has(.oliverArrivalPublished) .gamesHero h1{font-size:clamp(35px,4.5vw,58px)}.gamesPage:has(.oliverArrivalPublished) .gamesHero p{max-width:650px;margin:10px auto 0;line-height:1.6}.oliverArrival.oliverArrivalPublished{grid-template-columns:minmax(0,1fr) minmax(240px,380px);gap:clamp(22px,4vw,65px);padding:clamp(24px,4vw,54px);align-items:center;background:linear-gradient(135deg,#fffefa,#faf8ee);border:1px solid #dbe5d1;border-radius:25px}.oliverArrivalPublished .oliverArrivalInfo h2{font-size:clamp(32px,4vw,54px);line-height:1.1;margin:11px 0 16px}.oliverArrivalPublished .oliverArrivalInfo>p{font-size:clamp(16px,1.7vw,20px);max-width:660px;line-height:1.65;color:#596a4b}.oliverArrivalPublished .oliverArrivalStats{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:26px;max-width:680px}.oliverArrivalPublished .oliverArrivalStats>div{padding:18px 20px;min-height:78px;box-sizing:border-box;border:1px solid #dce6d4;background:#edf3e7;border-radius:15px;display:flex;flex-direction:column;justify-content:center;gap:8px}.oliverArrivalPublished .oliverArrivalStats small{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:#718565}.oliverArrivalPublished .oliverArrivalStats strong{font-size:clamp(19px,2.1vw,28px);color:#425b37;line-height:1.1}.oliverArrivalPublished .oliverArrivalPhoto{width:100%;max-width:380px;aspect-ratio:4/5;max-height:none;min-height:350px;justify-self:center;box-sizing:border-box;border-radius:25px;box-shadow:0 12px 40px rgba(64,84,49,.09)}.oliverArrivalPublished .oliverArrivalPhoto:not(:has(img)){background:linear-gradient(155deg,#e4ebd9,#f3f4e9);border:2px dashed #aec49d}.oliverArrivalPublished .oliverArrivalPhoto .oliverArrivalImage{width:100%;height:100%;max-height:none;object-fit:cover}.oliverArrivalPublished .oliverArrivalPhoto span{font-size:75px}.oliverArrivalPublished .oliverArrivalPhoto strong{font-size:clamp(17px,2vw,22px)}@media(max-width:850px){.oliverArrival.oliverArrivalPublished{grid-template-columns:1fr;padding:24px;gap:20px}.oliverArrivalPublished .oliverArrivalPhoto{max-width:350px;min-height:300px}.oliverArrivalPublished .oliverArrivalStats{margin-top:18px}}@media(max-width:540px){.oliverArrivalPublished .oliverArrivalStats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.oliverArrivalPublished .oliverArrivalStats>div{padding:13px;min-height:77px}.oliverArrivalPublished .oliverArrivalStats strong{font-size:18px}.oliverArrivalPublished .oliverArrivalPhoto{max-width:100%;min-height:290px}.oliverArrivalPublished .oliverArrivalInfo h2{font-size:33px}}
+
+/* Anuncio centralizado e calendario mensal — A espera do Oliver */
+.gamesPage:has(.oliverArrivalPublished) .gamesHero{padding:26px 18px 30px}
+.gamesPage .oliverArrival.oliverArrivalPublished{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding:40px 22px;background:linear-gradient(160deg,#fafbf5,#f9f4e7);border-radius:28px}
+.oliverArrivalPublished .oliverArrivalInfo{max-width:740px}
+.oliverArrivalPublished .oliverArrivalInfo h2{font-size:clamp(33px,5vw,58px);margin:11px 0}
+.oliverArrivalPublished .oliverArrivalInfo>p{margin:0 auto;max-width:660px}
+.oliverArrivalPublished .oliverArrivalPhoto{width:min(100%,410px);min-height:0;max-height:none;aspect-ratio:4/5;margin:4px auto 0;border-radius:30px;box-sizing:border-box;flex-shrink:0}
+.oliverArrivalPublished .oliverArrivalPhoto .oliverArrivalImage{width:100%;height:100%;aspect-ratio:4/5;object-fit:cover;border-radius:28px}
+.oliverArrivalPublished .oliverArrivalStats{width:min(100%,690px);max-width:690px;margin:2px auto 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:left}
+.oliverArrivalPublished .oliverArrivalStats>div{min-height:84px;display:grid;align-content:center;gap:7px;padding:16px 21px;background:#eff3e8;border:5px solid #fff;border-radius:19px;box-shadow:0 3px 14px rgba(63,88,42,.08)}
+.oliverArrivalPublished .oliverArrivalStats small{display:flex;align-items:center;gap:9px;font-size:14px;color:#53684a}
+.oliverArrivalPublished .oliverArrivalStats strong{font-size:clamp(22px,2.7vw,29px)}
+.olieStatIcon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#e2eacc;color:#547041;font-size:20px}
+.oliePredictionCard{padding:clamp(20px,3vw,35px)}
+.oliePredictionColumns{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr);gap:23px;margin-top:20px}
+.olieCalendar{padding:18px;background:#fff;border:1px solid #e4e8dd;border-radius:18px;min-width:0}
+.olieCalendarTop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.olieCalendarTop strong{text-transform:capitalize;color:#3e5635;font-size:17px}
+.olieCalendarTop button{border:0;background:#eff3e9;color:#506a40;border-radius:10px;width:35px;height:35px;cursor:pointer;font-size:26px}
+.olieCalendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.olieCalendarWeek{text-align:center;font-size:11px;font-weight:800;color:#798676;padding:8px 0;text-transform:uppercase}
+.olieCalendarDay{border:1px solid #eef0e9;border-radius:7px;min-height:48px;background:#fff;color:#40543a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:inherit;cursor:pointer;font-size:14px}
+.olieCalendarDay:disabled{border-color:transparent;cursor:default;background:transparent}
+.olieCalendarDay.hasGuesses{background:#f1f4e9}
+.olieCalendarDay i{height:5px;width:5px;border-radius:50%;background:#94aa79}
+.olieCalendarDay.isBorn{background:#617e47;color:white;font-weight:850;border-color:#617e47}
+.olieCalendarDay.isBorn i{background:#fff}
+.olieCalendarDay.picked{outline:2px solid #b5a477;outline-offset:-2px}
+.olieCalendarDay:not(:disabled):hover{filter:brightness(.96)}
+.olieCalendarLegend{display:flex;flex-wrap:wrap;gap:12px;margin-top:17px;font-size:11px;color:#5d6d55}
+.olieCalendarLegend span{display:flex;align-items:center;gap:5px}
+.olieCalendarLegend i{display:inline-block;width:11px;height:11px;border-radius:50%}
+.olieCalendarLegend .born{background:#617e47}.olieCalendarLegend .guesses{background:#dae4cd}.olieCalendarLegend .empty{background:#e9ece5}
+.olieCalendarSelected,.olieCalendarTotal{font-size:12px;color:#6a7d5c;margin:12px 0 0}
+.oliePredictionSidebar{display:flex;flex-direction:column;gap:22px;padding:22px;background:#eef3e7;border-radius:18px}
+.oliePredictionSidebar h3{margin:0;color:#3e5635}
+.oliePredictionNumbers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.oliePredictionNumbers>div{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#5a714b}
+.oliePredictionNumbers strong{font-size:25px;color:#364f30}
+.oliePredictionNumbers small{width:100%;color:#677a5e}
+.olieResultsHint{display:flex;gap:13px;padding:16px;background:#fffdf8;border-radius:13px;align-items:flex-start;color:#526a43}
+.olieResultsHint strong{font-size:16px}
+.olieResultsHint p{margin:5px 0 0;font-size:13px}
+@media(max-width:760px){.oliePredictionColumns{grid-template-columns:1fr}.gamesPage .oliverArrival.oliverArrivalPublished{padding:25px 14px}.oliverArrivalPublished .oliverArrivalStats>div{padding:11px;border-width:3px}.oliverArrivalPublished .oliverArrivalStats strong{font-size:20px}.olieCalendarDay{min-height:40px}.oliePredictionSidebar{padding:18px}}
