@@ -1,7 +1,7 @@
 /* Central de prioridades: sem criar cadastros. */
 (function(){
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/planning-api';
-let data=null,loading=false;
+let data=null,loading=false,filter='all',lastKey='',pendingReload=false;
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const safe=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const stamp=x=>/^\d{4}-\d{2}-\d{2}$/.test(x||'')?x.slice(8,10)+'/'+x.slice(5,7):'Sem prazo';
@@ -32,11 +32,13 @@ const guestCards=[...document.querySelectorAll('.eventCentral .centralCard')];
 const pending=Number(guestCards.find(c=>c.querySelector('span')?.textContent.trim()==='PESSOAS A CONFIRMAR')?.querySelector('strong')?.textContent);
 if(Number.isFinite(pending)&&pending>0)items.push([4,pending+' pessoas aguardando confirmação','Prazo inicial: 30/11','guests']);
 items.sort((a,b)=>a[0]-b[0]||a[1].localeCompare(b[1],'pt-BR'));
-box.innerHTML='<div class="oliverPrepListHead"><h3>Precisa de atenção</h3><span>'+items.length+' alerta(s)</span></div>'+(data?items.length?'<div class="oliverPriorityRows">'+items.slice(0,7).map(x=>'<button type="button" class="oliverPriorityItem priority-'+x[0]+'" data-priority-tab="'+x[3]+'"><i class="oliverPriorityDot"></i><span class="oliverPriorityText"><strong>'+safe(x[1])+'</strong><small>'+safe(x[2])+'</small></span><span>›</span></button>').join('')+'</div>':'<p class="oliverPriorityEmpty">Nenhuma pendência urgente.</p>':'<p class="oliverPriorityEmpty">Aguardando sincronização do planejamento.</p>');
+const filtered=items.filter(x=>filter==='all'||filter==='critical'&&x[0]===0||filter==='soon'&&[1,2].includes(x[0])||filter==='followup'&&x[0]>=3);
+box.innerHTML='<div class="oliverPrepListHead"><h3>Precisa de atenção</h3><span>'+items.length+' alerta(s)</span></div><div class="oliverPriorityFilters">'+[['all','Todos'],['critical','Atrasados'],['soon','Próximos 7 dias'],['followup','Acompanhamento']].map(([value,label])=>'<button type="button" class="'+(filter===value?'active':'')+'" data-priority-filter="'+value+'">'+label+'</button>').join('')+'</div>'+(data?filtered.length?'<div class="oliverPriorityRows">'+filtered.slice(0,7).map(x=>'<button type="button" class="oliverPriorityItem priority-'+x[0]+'" data-priority-tab="'+x[3]+'"><i class="oliverPriorityDot"></i><span class="oliverPriorityText"><strong>'+safe(x[1])+'</strong><small>'+safe(x[2])+'</small></span><span>›</span></button>').join('')+'</div>':'<p class="oliverPriorityEmpty">Nenhuma pendência urgente.</p>':'<p class="oliverPriorityEmpty">Aguardando sincronização do planejamento.</p>');
+box.querySelectorAll('[data-priority-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.priorityFilter;render()}));
 box.querySelectorAll('[data-priority-tab]').forEach(b=>b.addEventListener('click',()=>document.querySelector('[data-admin-tab="'+b.dataset.priorityTab+'"]')?.click()));
 }
 const obs=new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.nodeType===1&&(n.id==='oliver-prep-summary'||n.classList?.contains('oliverPrepLists'))))&&!document.querySelector('#oliver-prep-summary .oliverPriority'))render()});obs.observe(document.body,{childList:true,subtree:true});
-window.addEventListener('focus',load);document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab="overview"],[data-prep-refresh]'))setTimeout(load,300)},true);
+window.addEventListener('focus',load);window.addEventListener('oliver-planning-updated',load);window.addEventListener('oliver-admin-refresh',load);window.addEventListener('storage',e=>{if(e.key==='oliverEventPlanningV2')load()});document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab="overview"],[data-prep-refresh]'))setTimeout(load,300)},true);
 setInterval(()=>{if(sessionStorage.getItem('oliverAdminTab')==='overview')load()},60000);
 setTimeout(load,500);setTimeout(render,800);
 })();
