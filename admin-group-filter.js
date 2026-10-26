@@ -37,10 +37,10 @@
       wrap=document.createElement('label');
       wrap.className='adminGroupFilter';
       wrap.innerHTML='<span>Grupo</span><select aria-label="Filtrar convidados por grupo"></select>';
-      const input=tools.querySelector('input');
-      input?input.insertAdjacentElement('afterend',wrap):tools.prepend(wrap);
+      tools.appendChild(wrap);
       wrap.querySelector('select').addEventListener('change',e=>{selected=e.target.value;apply()});
     }
+    if(wrap.parentElement!==tools)tools.appendChild(wrap);
     const select=wrap.querySelector('select');
     const values=groups();
     if(selected!=='all'&&!values.includes(selected))selected='all';
