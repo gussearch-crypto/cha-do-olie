@@ -4,7 +4,7 @@ export function usePlanningSync({data,setData,api,normalize,storageKey}) {
   const [sync,setSync]=useState('loading'),[conflict,setConflict]=useState(null);
   const current=useRef(data),engine=useRef({ready:false,busy:false,base:null,revision:0,conflict:null,timer:null,live:true});
   current.current=data;
-  const cache=()=>{const e=engine.current;localStorage.setItem(storageKey,JSON.stringify(current.current));if(e.base)localStorage.setItem(storageKey+'Sync',JSON.stringify({base:e.conflict?.base||e.base,revision:e.revision}))};
+  const cache=()=>{const e=engine.current;localStorage.setItem(storageKey,JSON.stringify(current.current));if(e.base)localStorage.setItem(storageKey+'Sync',JSON.stringify({base:e.conflict?.base||e.base,revision:e.revision}));window.dispatchEvent(new Event('oliver-planning-updated'))};
   const adopt=value=>{current.current=value;setData(value);cache()};
   const reconcile=async()=>{
     const e=engine.current,remote=await api('get');if(!e.live)return;
