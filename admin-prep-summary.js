@@ -42,7 +42,7 @@ function render(){
 }
 const observer=new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.adminTabs,.dashboard')||n.querySelector?.('.adminTabs,.dashboard')))))schedule()});
 observer.observe(document.body,{childList:true,subtree:true});
-window.addEventListener('focus',()=>refresh(true));window.addEventListener('oliver-admin-refresh',()=>refresh(true));
+window.addEventListener('focus',()=>refresh(true));window.addEventListener('oliver-planning-saved',()=>refresh(true));window.addEventListener('oliver-admin-refresh',()=>refresh(true));
 document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab]')){setTimeout(()=>{schedule();if((sessionStorage.getItem('oliverAdminTab')||'overview')==='overview')refresh()},0)}},true);
 setInterval(()=>{if((sessionStorage.getItem('oliverAdminTab')||'overview')==='overview')refresh()},60000);
 schedule();refresh(true);
