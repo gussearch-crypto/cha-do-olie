@@ -15,3 +15,17 @@
 
 /* Filtro Grupo independente: segunda linha completa, alinhada aos outros campos */
 .adminTools>.adminGroupFilter{grid-column:1/-1!important;grid-row:2!important;display:flex!important;align-items:center!important;gap:12px!important;padding:2px 0 0!important}.adminTools>.adminGroupFilter>span{font-size:12px;font-weight:700;color:#647553;padding:0}.adminTools>.adminGroupFilter select{height:42px;min-width:210px;max-width:320px;padding:0 14px;border-radius:11px}.adminTools>.adminGroupCount{grid-column:1/-1;grid-row:3;justify-self:start}@media(max-width:1150px){.adminTools>.adminGroupFilter{grid-row:3!important}.adminTools>.adminGroupCount{grid-row:4}}@media(max-width:640px){.adminTools>.adminGroupFilter{grid-row:4!important}.adminTools>.adminGroupFilter select{min-width:0;max-width:100%}.adminTools>.adminGroupCount{grid-row:5}}
+
+/* Isolamento robusto das seções nas abas, inclusive após renderização React. */
+body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .giftDashboard,
+body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .diaperManagement,
+body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .eventReceipts{display:none!important}
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .confirmationFilter,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .adminTools,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestList,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestActiveFilters,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestExportBar,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestHistoryPanel,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap #oliver-rsvp-followup,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestValidation,
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestReview{display:none!important}
