@@ -25,8 +25,8 @@ if(!String(t.responsible||'').trim())items.push([3,title,'Sem responsável','pla
 for(const e of data?.expenses||[])for(const p of e.installments||[]){
 const balance=Math.max(0,Math.round((Number(p.amount||0)-Number(p.paidAmount||0))*100))/100;
 if(!balance||!p.due)continue;const title=e.description||'Despesa',detail=stamp(p.due)+' · '+format(balance);
-if(p.due<start)items.push([0,title,'Pagamento vencido · '+detail,'planning']);
-else if(p.due<=week)items.push([1,title,'Pagamento próximo · '+detail,'planning']);
+if(p.due<start)items.push([0,title,'Pagamento vencido · '+detail,'finance']);
+else if(p.due<=week)items.push([1,title,'Pagamento próximo · '+detail,'finance']);
 }
 const guestCards=[...document.querySelectorAll('.eventCentral .centralCard')];
 const pending=Number(guestCards.find(c=>c.querySelector('span')?.textContent.trim()==='PESSOAS A CONFIRMAR')?.querySelector('strong')?.textContent);
