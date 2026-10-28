@@ -38,7 +38,7 @@ box.querySelectorAll('[data-priority-filter]').forEach(b=>b.addEventListener('cl
 box.querySelectorAll('[data-priority-tab]').forEach(b=>b.addEventListener('click',()=>document.querySelector('[data-admin-tab="'+b.dataset.priorityTab+'"]')?.click()));
 }
 const obs=new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.nodeType===1&&(n.id==='oliver-prep-summary'||n.classList?.contains('oliverPrepLists'))))&&!document.querySelector('#oliver-prep-summary .oliverPriority'))render()});obs.observe(document.body,{childList:true,subtree:true});
-window.addEventListener('oliver-admin-guests',render);window.addEventListener('focus',load);window.addEventListener('oliver-planning-updated',load);window.addEventListener('oliver-admin-refresh',load);window.addEventListener('storage',e=>{if(e.key==='oliverEventPlanningV2')load()});document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab="overview"],[data-prep-refresh]'))setTimeout(load,300)},true);
+window.addEventListener('oliver-admin-guests',render);window.addEventListener('focus',load);window.addEventListener('oliver-planning-saved',load);window.addEventListener('oliver-planning-updated',load);window.addEventListener('oliver-admin-refresh',load);window.addEventListener('storage',e=>{if(e.key==='oliverEventPlanningV2')load()});document.addEventListener('click',e=>{if(e.target.closest('[data-admin-tab="overview"],[data-prep-refresh]'))setTimeout(load,300)},true);
 setInterval(()=>{if(sessionStorage.getItem('oliverAdminTab')==='overview')load()},60000);
 setTimeout(load,500);setTimeout(render,800);
 })();
