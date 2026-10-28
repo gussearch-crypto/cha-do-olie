@@ -257,6 +257,7 @@ function Planning(){
   const clearExpenses=()=>{setExpenseSearch('');setExpenseCat('all');setExpensePeriod('all');setExpenseStatus('all')};
   const focusPanel=ref=>requestAnimationFrame(()=>{ref.current?.scrollIntoView({behavior:'smooth',block:'start'});ref.current?.focus({preventScroll:true})});
   const filterAlert=(type,period)=>{
+    document.querySelector('[data-admin-tab="'+(type==='task'?'planning':'finance')+'"]')?.click();
     if(type==='task'){setTaskSection('checklist');clearTasks();setTaskView('open');setTaskPeriod(period);setTaskFiltersOpen(true);focusPanel(taskPanel)}
     else{setFinanceSection('services');clearExpenses();setExpenseView('open');setExpensePeriod(period);setExpenseFiltersOpen(true);focusPanel(expensePanel)}
   };
