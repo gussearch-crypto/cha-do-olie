@@ -247,3 +247,17 @@ body.oliverFinanceTab .planningIntro>p::after{content:"Orçamentos, cotações, 
 @media(max-width:650px){body.oliverFinanceTab .planningSummary{grid-template-columns:1fr}}
 
 .planningClosing{margin:18px 0;padding:18px;background:#fffdf7;border:1px solid #dce5d2;border-radius:15px}.planningClosingTotals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:13px 0}.planningClosingTotals>div{background:#f4f8ef;border:1px solid #e0e8d8;border-radius:11px;padding:13px;display:grid;gap:7px}.planningClosingTotals small{font-size:11px;color:#697d5c}.planningClosingTotals strong{font-size:clamp(16px,1.7vw,23px);color:#445d36}.planningClosingTable{overflow-x:auto}.planningClosingTable table{width:100%;min-width:760px;border-collapse:collapse;font-size:12px}.planningClosingTable th,.planningClosingTable td{padding:11px;text-align:left;border-bottom:1px solid #e1e9d9}.planningClosingTable thead{background:#edf3e7}.planningClosingTable .closingOver{background:#fff0e9}.planningClosingTable .closingOver td:last-child{color:#a44d3d;font-weight:800}@media(max-width:800px){.planningClosingTotals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Custo por convidado: controles claros e alinhamento responsivo */
+.planningGuestCost .guestCostControls{display:grid;grid-template-columns:minmax(230px,1fr) minmax(280px,1fr);gap:14px;align-items:end;margin:16px 0}
+.planningGuestCost .guestCostField{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:13px;font-weight:600;color:#536746}
+.planningGuestCost .guestCostField select,.planningGuestCost .guestCostField input{width:100%;min-height:48px}
+.planningGuestCost .guestCostOption{display:flex;align-items:center;gap:12px;min-height:48px;padding:9px 14px;background:#f5f5e9;border:1px solid #e4dac1;border-radius:12px;cursor:pointer}
+.planningGuestCost .guestCostOption input{appearance:auto!important;accent-color:#697b45;width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 18px;margin:0}
+.planningGuestCost .guestCostOption span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.planningGuestCost .guestCostOption strong{font-size:13px;color:#455a37}
+.planningGuestCost .guestCostOption small{font-size:11px;color:#79846a;line-height:1.4}
+.planningGuestCost .guestCostNotes{margin-top:14px;padding:12px 14px;background:#f9f7f0;border-radius:12px}
+.planningGuestCost .guestCostNotes p{font-size:12px;line-height:1.6;color:#68735c;margin:0 0 6px}
+.planningGuestCost .guestCostNotes p:last-child{margin-bottom:0}
+@media(max-width:720px){.planningGuestCost .guestCostControls{grid-template-columns:minmax(0,1fr)}}
