@@ -297,3 +297,26 @@ export function guestCostAnalysis(expenses,counts,settings) {
   const people=settings.basis==='estimate'?(Number.isInteger(settings.estimatedGuests)&&settings.estimatedGuests>0?settings.estimatedGuests:null):counts?Math.max(0,counts.total-(settings.excludeUnder5?counts.under5:0)):null;
   return {contracted,people,perGuest:people>0?Math.round(contracted*100/people)/100:null};
 }
+
+export function financialClosingProjection(expenses=[],quotes=[],budgets={},categories=[]) {
+ const centsOf=value=>Math.max(0,Math.round((Number(value)||0)*100));
+ const contractedByCategory=new Map();
+ for(const expense of expenses){const category=expense.category||'Outros';contractedByCategory.set(category,(contractedByCategory.get(category)||0)+centsOf(expenseTotals(expense).planned));}
+ const negotiatingByCategory=new Map();
+ for(const quote of quotes){
+  if(quote.expenseId||expenses.some(e=>e.quoteId===quote.id))continue;
+  const amounts=(quote.proposals||[]).map(p=>Number(p.amount)).filter(n=>Number.isFinite(n)&&n>=0);
+  if(!amounts.length)continue;
+  const category=quote.category||'Outros';negotiatingByCategory.set(category,(negotiatingByCategory.get(category)||0)+centsOf(Math.min(...amounts)));
+ }
+ const names=[...new Set([...categories,...Object.keys(budgets).filter(k=>!k.startsWith('__')),...contractedByCategory.keys(),...negotiatingByCategory.keys()])];
+ const rows=names.map(category=>{
+  const raw=budgets[category],budget=raw==null||raw===''?null:centsOf(raw)/100;
+  const contracted=(contractedByCategory.get(category)||0)/100,negotiating=(negotiatingByCategory.get(category)||0)/100;
+  const projected=contracted+negotiating;
+  return {category,budget,contracted,negotiating,projected,variance:budget===null?null:Math.round((budget-projected)*100)/100};
+ });
+ const sum=key=>Math.round(rows.reduce((total,row)=>total+centsOf(row[key]),0))/100;
+ const goal=budgets.__goal==null||budgets.__goal===''?null:centsOf(budgets.__goal)/100;
+ return {rows,goal,budgeted:rows.reduce((total,row)=>total+(row.budget||0),0),contracted:sum('contracted'),negotiating:sum('negotiating'),projected:sum('projected'),goalVariance:goal===null?null:Math.round((goal-sum('projected'))*100)/100};
+}
