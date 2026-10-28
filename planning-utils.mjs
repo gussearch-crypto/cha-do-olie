@@ -48,6 +48,7 @@ export function recordExpensePayment(expense, {installmentId, amount, paidAt, pa
   const value = cents(amount);
   if (!(Number(amount) > 0) || value === 0) throw new Error('Informe um valor maior que zero.');
   if (civilDay(paidAt) === null) throw new Error('Informe a data do pagamento.');
+  if (paidAt > eventToday()) throw new Error('A data de pagamento não pode ser futura. Para programar pagamentos, informe o vencimento da parcela.');
   const ps = (expense.installments || []).map(p => ({...p}));
   let p;
   if (installmentId === '__unallocated__') {
@@ -83,6 +84,7 @@ export function reviseExpensePayment(expense, {installmentId, paymentId, action,
     const value = cents(amount), other = history.reduce((s,h) => s + (h.id === paymentId || h.reversedAt ? 0 : cents(h.amount)), 0);
     if (!(Number(amount) > 0) || value === 0 || value + other > cents(p.amount)) throw new Error('O valor deve ser positivo e não superar o valor da parcela.');
     if (civilDay(paidAt) === null) throw new Error('Informe a data do pagamento.');
+  if (paidAt > eventToday()) throw new Error('A data de pagamento não pode ser futura. Para programar pagamentos, informe o vencimento da parcela.');
     const changes = [...(entry.changes || []), {amount: entry.amount, paidAt: entry.paidAt, payment: entry.payment, changedAt: now.toISOString(), reason: reason.trim()}];
     Object.assign(entry, {amount: value / 100, paidAt, payment, changes});
   } else throw new Error('Ação inválida.');
