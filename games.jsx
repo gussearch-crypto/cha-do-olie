@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from 'react';import{createRoot}from'react-dom/client';import{Heart,Trophy,CalendarDays,Ruler,LockKeyhole}from'lucide-react';import './style.css';import './games.css';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/oliver-games';
 async function api(b){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json();if(!r.ok)throw Error(d.error||'Falha');return d}
-const after=location.pathname.startsWith('/a-espera-do-oliver');
+const after=location.pathname.startsWith('/a-espera-do-oliver')||location.pathname.startsWith('/games/resultado');
 const maskDigits=(value,max=6)=>String(value||'').replace(/\D/g,'').replace(/^0+(?=\d)/,'').slice(-max);
 const showDecimal=(digits,places)=> (Number(digits||0)/Math.pow(10,places)).toFixed(places).replace('.',',');
 function Result({title,data,unit=''}){if(!data)return null;let winners=data.ranking?.filter(x=>x.difference===data.ranking[0]?.difference)||[];return <section className="gameCard reveal"><Trophy/><h3>{title}</h3><p>Resultado oficial: <b>{data.actual} {unit}</b></p><strong>{winners.length?winners.map(x=>x.name).join(', '):'Sem participantes'}</strong><p>{winners.length?(winners[0].difference===0?'Acertou em cheio!':'Palpite mais próximo!'):''}</p><div className="guessTable">{data.ranking?.map((r,i)=><div key={i}><span>{r.name}</span><span>{r.guess} {unit}</span><b>Δ {r.difference} {unit}</b></div>)}</div></section>}
