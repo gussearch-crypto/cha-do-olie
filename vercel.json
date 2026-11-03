@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/games/online",
+      "destination": "/index.html"
+    },
+    {
       "source": "/games",
       "destination": "/index.html"
     },
