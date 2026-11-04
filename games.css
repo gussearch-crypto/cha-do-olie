@@ -277,3 +277,5 @@
 @media(max-width:1000px){.olieGamesNav button{flex:0 0 auto}.olieGamesKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.olieGamesOverviewGrid,.olieGamesSecondaryGrid{grid-template-columns:1fr}.olieGamesKpis{gap:8px}.olieGamesKpis>div{padding:14px 12px}.olieGamesOverviewGrid>.gameCard{padding:19px}.olieGamesProgress span{font-size:9px;padding:9px 3px}.olieGamesNav{margin:11px 0 19px}.olieGamesNav button{min-height:42px;padding:10px 12px}.olieGamesShortcutLinks a{flex:1 1 calc(50% - 9px);text-align:center}.olieGamesShortcuts{padding:17px!important}}
 @media(prefers-reduced-motion:reduce){.olieGamesSection{animation:none}.olieGamesNav button{transition:none}}
+
+.olieGamesDisclosureInner{padding:16px 19px}.olieGamesDisclosureInner .oliverBirthAdmin{max-width:100%}
