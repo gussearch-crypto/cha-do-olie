@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/games/teste",
+      "destination": "/index.html"
+    },
+    {
       "source": "/apresentacao-jogos",
       "destination": "/index.html"
     },
