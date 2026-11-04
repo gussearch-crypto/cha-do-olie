@@ -5,10 +5,6 @@
       "destination": "/index.html"
     },
     {
-      "source": "/apresentacao-jogos",
-      "destination": "/index.html"
-    },
-    {
       "source": "/games/resultado",
       "destination": "/index.html"
     },
@@ -23,6 +19,13 @@
     {
       "source": "/a-espera-do-oliver",
       "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/apresentacao-jogos",
+      "destination": "/games/resultado",
+      "permanent": false
     }
   ]
 }
