@@ -176,3 +176,41 @@
 
 /* Auditoria administrativa: somente para organizadores */
 .oliverAuditTotals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:18px 0}.oliverAuditTotals>div{background:#f0f5e9;border:1px solid #d8e4ce;border-radius:12px;padding:13px;display:grid;gap:5px}.oliverAuditTotals b{font-size:23px;color:#4b6840}.oliverAuditTotals small{font-size:12px;color:#687e62}.oliverAuditFilters{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:14px 0}.oliverAuditFilters label{display:grid;gap:7px;font-size:13px}.oliverAuditFilters input:not([type=checkbox]),.oliverAuditReview input,.oliverAuditReview select{padding:11px;border:1px solid #bccdab;border-radius:9px;background:#fff;max-width:100%}.oliverAuditCheck{display:flex!important;flex-direction:row;align-items:center;gap:7px!important}.oliverAuditCheck input{width:17px;height:17px}.oliverAuditFilters button,.oliverAuditReview button{background:#617747;color:white;padding:11px 14px;border:0;border-radius:9px;cursor:pointer;font-weight:700}.oliverAuditRows{display:grid;gap:13px}.oliverAuditEntry{border:1px solid #dae4d0;border-radius:13px;padding:17px;background:#fffefa;display:grid;gap:10px}.oliverAuditHead{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}.oliverAuditHead small,.oliverAuditEntry>small{font-size:12px;color:#6d7b62}.oliverAuditFlags{display:flex;flex-wrap:wrap;gap:6px}.oliverAuditFlags span{background:#fff2da;color:#835f30;border:1px solid #eed7a9;border-radius:14px;padding:5px 9px;font-size:11px;font-weight:700}.oliverAuditEntry p{margin:0;font-size:13px}.oliverAuditEntry a{color:#537d42}.oliverAuditReview{display:grid;grid-template-columns:minmax(140px,.7fr) minmax(190px,1.5fr) auto;gap:9px;align-items:end}.oliverAuditReview label{display:grid;gap:6px;font-size:12px;font-weight:650}.oliverAuditReview button:disabled{opacity:.5}@media(max-width:780px){.oliverAuditTotals{grid-template-columns:repeat(2,minmax(0,1fr))}.oliverAuditReview{grid-template-columns:1fr}}
+
+/* Resultado oficial integrado à página dos Jogos do Oliver */
+.olieResultsPage{min-height:100vh;background:linear-gradient(180deg,#e9efdf 0,#f8f6ed 280px,#f8f6ed 100%)}
+.olieResultsHero{text-align:center;padding:52px 20px 32px;max-width:880px;margin:auto;color:#455e37}
+.olieResultsHero>span{font-size:12px;letter-spacing:3px;font-weight:850;color:#72885e}
+.olieResultsHero h1{font-size:clamp(28px,5vw,52px);line-height:1.16;margin:13px 0 14px}
+.olieResultsHero p{font-size:16px;line-height:1.65;color:#677b5a;margin:0 auto;max-width:620px}
+.olieResultsPage .gamesWrap{max-width:1040px;margin:auto;padding:10px 20px 60px}
+.olieResultsPage .oliverRankingPublic,.olieResultsPage .oliverRankingWaiting{text-align:center;border:1px solid #dbe5cf;border-radius:24px;padding:clamp(20px,4vw,40px);box-shadow:0 13px 40px #435f3016;background:#fffdf8}
+.olieResultsPage .oliverRankingPublic>svg{color:#b69b55}
+.olieResultsPage .oliverRankingPublic h2{font-size:clamp(23px,3.6vw,35px);margin:14px 0}
+.olieResultsPage .oliverRankingPublic>p{max-width:680px;margin:0 auto 20px;line-height:1.65;color:#6c7c5e}
+.olieOfficialBirthStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:23px 0}
+.olieOfficialBirthStats>span{display:grid;gap:7px;padding:15px 12px;border-radius:14px;background:#edf3e5;border:1px solid #d6e3c9}
+.olieOfficialBirthStats small{font-size:12px;color:#697d5c}
+.olieOfficialBirthStats b{font-size:clamp(15px,2vw,21px);color:#405938}
+.oliePublicPodium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px;margin:27px 0}
+.oliePublicWinner{display:flex;flex-direction:column;align-items:center;gap:12px;padding:25px 17px 22px;border:2px solid #dce4d3;border-radius:21px;background:#f7f9f2;text-align:center;box-shadow:0 9px 23px #465e3011}
+.oliePublicWinner1{grid-column:2;grid-row:1;background:linear-gradient(150deg,#fff7df,#f9f4e4);border-color:#d8c18b;transform:translateY(-11px)}
+.oliePublicWinner2{grid-column:1;grid-row:1}
+.oliePublicWinner3{grid-column:3;grid-row:1}
+.oliePublicPlacement{font-size:15px;font-weight:850;letter-spacing:.4px;color:#846d42}
+.oliePublicWinner>strong{font-size:clamp(18px,2.2vw,26px);color:#435a37;line-height:1.25;overflow-wrap:anywhere}
+.oliePublicWinner>b{font-size:clamp(23px,3vw,31px);color:#536c40}
+.oliePublicWinner>b small{font-size:12px;font-weight:600;color:#7a866d}
+.oliePublicWinner>p{font-size:12px;line-height:1.55;color:#72816a;margin:0}
+.oliePublicWinner>p strong{color:#536846}
+.oliePublicWinner>small{font-size:11px;line-height:1.65;color:#6b7e60}
+.oliePublicScore{display:grid;gap:5px;width:100%;padding:11px 0;border-block:1px solid #dae4cf}
+.oliePublicScore span{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#647757;text-align:left}
+.oliePublicScore b{color:#405f35}
+.oliePublicCta,.olieResultFooter{display:flex;flex-wrap:wrap;justify-content:center;gap:11px;margin-top:19px}
+.oliePublicCta a,.olieResultFooter a,.oliverRankingWaiting a{display:inline-flex;justify-content:center;text-decoration:none;padding:12px 17px;border:1px solid #acbea0;border-radius:11px;color:#4c663f;background:#eef5e8;font-weight:750}
+.oliePublicCta a{background:#617747;color:white;border-color:#617747}
+.olieResultsPage .olieResultFooter{padding:14px 0 0}
+.oliverRankingWaiting>svg{color:#7e8c70}
+.oliverRankingWaiting>p{max-width:540px;margin:14px auto 24px;line-height:1.7}
+@media(max-width:760px){.oliePublicPodium{grid-template-columns:1fr;gap:12px}.oliePublicWinner1,.oliePublicWinner2,.oliePublicWinner3{grid-column:1;grid-row:auto;transform:none}.oliePublicWinner{padding:22px 17px}.olieOfficialBirthStats{grid-template-columns:1fr}.olieResultsPage .gamesWrap{padding:10px 14px 45px}}
