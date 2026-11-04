@@ -1,4 +1,5 @@
 import React,{useEffect,useRef} from 'react';
+import {createPortal} from 'react-dom';
 import {CalendarDays,Clock3,Scale,Ruler,CheckCircle2,ShieldCheck} from 'lucide-react';
 import './game-guess-experience.css';
 
@@ -27,12 +28,14 @@ export function GameGuessReview({open,onClose,onConfirm,busy=false,name='',birth
     backRef.current?.focus();
     const onKey=e=>{if(e.key==='Escape'&&!busy)onClose()};
     document.addEventListener('keydown',onKey);
-    return()=>document.removeEventListener('keydown',onKey);
+    const previousOverflow=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    return()=>{document.removeEventListener('keydown',onKey);document.body.style.overflow=previousOverflow};
   },[open,busy,onClose]);
   if(!open)return null;
   const birth=!!birthDate;
   const belly=bellyCm!==null&&bellyCm!==''&&Number(bellyCm)>0;
-  return <div className="olieReviewBackdrop">
+  return createPortal(<div className="olieReviewBackdrop" data-olie-review="active" style={{position:'fixed',inset:0,zIndex:2147483000,display:'grid',placeItems:'center',padding:'16px',overflowY:'auto',background:'rgba(34,48,30,.68)'}}>
     <section className="olieReviewModal" role="dialog" aria-modal="true" aria-labelledby="olie-review-title" aria-describedby="olie-review-description">
       <span className="olieReviewEyebrow"><ShieldCheck size={16}/> CONFIRMAÇÃO DO PALPITE</span>
       <h2 id="olie-review-title">Confira antes de registrar 💚</h2>
@@ -51,5 +54,5 @@ export function GameGuessReview({open,onClose,onConfirm,busy=false,name='',birth
         <button type="button" className="olieReviewConfirm" disabled={busy} onClick={onConfirm}>{busy?'Registrando...':'Confirmar meu palpite'}</button>
       </div>
     </section>
-  </div>;
+  </div>,document.body);
 }
