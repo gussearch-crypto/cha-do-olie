@@ -1,14 +1,45 @@
-/* Relógio ilustrado compartilhado pelos palpites presenciais e online */
-.olieTimeCard{min-width:0;box-sizing:border-box;display:flex;flex-direction:column;gap:15px;padding:19px 20px;background:#fffdf8;border:1px solid #d4dec7;border-radius:17px;color:#415737}
-.olieTimeHeading{display:flex;align-items:center;gap:9px;color:#4d6741}.olieTimeHeading>strong{font-size:15px;line-height:1.4}.olieTimeHeading svg{flex:none}
-.olieTimeMain{display:grid;grid-template-columns:minmax(140px,.85fr) minmax(180px,1.15fr);align-items:center;gap:17px;margin:auto 0}
-.olieTimeDial{position:relative;isolation:isolate;aspect-ratio:1;width:min(100%,205px);margin:auto;border-radius:50%;background:radial-gradient(circle at 38% 29%,#fffef7 0 26%,#f0f4e9 76%,#dbe7d0 100%);border:7px solid #d0dfc5;box-shadow:inset 0 0 0 3px #fffdf8,0 10px 22px #405a3220}
-.olieTimeTickRing{position:absolute;inset:9px;border-radius:50%;background:repeating-conic-gradient(from 0deg,#8da47e 0deg 1.9deg,transparent 2deg 30deg);mask:radial-gradient(circle,transparent 0 83%,#000 85% 100%);-webkit-mask:radial-gradient(circle,transparent 0 83%,#000 85% 100%)}
-.olieTimeDial>span:not(.olieTimeHand):not(.olieTimePin){position:absolute;font-size:14px;font-weight:800;color:#607b51}.olieTimeTwelve{top:12%;left:50%;transform:translateX(-50%)}.olieTimeThree{right:13%;top:50%;transform:translateY(-50%)}.olieTimeSix{bottom:9%;left:50%;transform:translateX(-50%)}.olieTimeNine{left:14%;top:50%;transform:translateY(-50%)}
-.olieTimeHand{position:absolute;bottom:50%;left:50%;width:6px;border-radius:7px;transform-origin:center bottom;box-shadow:0 1px 2px #48613a21}.olieTimeHandHour{height:25%;background:#5e7548;transform:translateX(-50%) rotate(var(--olie-hour-angle,0deg))}.olieTimeHandMinute{height:34%;width:4px;background:#a68a58;transform:translateX(-50%) rotate(var(--olie-minute-angle,0deg))}.olieTimePin{position:absolute;top:50%;left:50%;width:13px;height:13px;border-radius:50%;background:#4d6540;border:3px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #718b60}
-.olieTimeEditor{min-width:0;display:flex;flex-direction:column;gap:10px}.olieTimeEyebrow{font-size:12px;font-weight:700;color:#718362}.olieTimeInputLabel{display:grid;gap:6px;min-width:0!important;font-size:12px!important;font-weight:700;color:#5b7050}.olieTimeCard .olieTimeInput{box-sizing:border-box;width:100%;min-width:0;min-height:64px;padding:10px 12px;border:2px solid #c3d2b5;border-radius:13px;background:#f7faf3;color:#435f35;font-family:inherit;font-size:clamp(20px,2.4vw,29px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.04em;text-align:center}.olieTimeCard .olieTimeInput:focus{outline:3px solid #b2c8a2;outline-offset:2px}.olieTimeCurrent{color:#758567;font-size:11px;min-height:16px}.olieTimeStepGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.olieTimeCard .olieTimeStepGrid>button{grid-column:auto;min-width:0;min-height:37px;padding:7px 5px;border:1px solid #d6e1cb;border-radius:9px;background:#eef3e7;color:#526b44;font:inherit;font-size:12px;font-weight:750;cursor:pointer}.olieTimeStepGrid>button:hover{background:#e2ebd9}
-.olieTimePeriods{border-top:1px solid #e3eadd;padding-top:12px;display:grid;gap:9px}.olieTimePeriods>span{font-size:12px;font-weight:700;color:#718362}.olieTimePeriodButtons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.olieTimeCard .olieTimePeriodButtons>button{grid-column:auto;min-width:0;min-height:43px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 3px;border:1px solid #d7e2cc;border-radius:10px;background:#f3f6ee;color:#617751;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.olieTimePeriodButtons>button:hover{background:#e9f1e3}.olieTimeCard .olieTimePeriodButtons>button.is-selected{background:#e2eddb;border-color:#83a16e;color:#3f6638}.olieTimeFootnote{margin:0!important;line-height:1.55;font-size:12px;color:#718261}
-@media(max-width:1150px){.olieTimeMain{grid-template-columns:minmax(118px,.75fr) minmax(160px,1.25fr);gap:12px}.olieTimeCard{padding:17px}.olieTimeCard .olieTimeInput{font-size:23px}.olieTimeDial{width:min(100%,180px)}}
-@media(max-width:500px){.olieTimeCard{padding:16px;gap:13px}.olieTimeMain{grid-template-columns:minmax(110px,.75fr) minmax(0,1.25fr);gap:12px}.olieTimeDial{border-width:5px}.olieTimeDial>span:not(.olieTimeHand):not(.olieTimePin){font-size:11px}.olieTimeCard .olieTimeInput{min-height:54px;font-size:20px;padding:8px 3px}.olieTimeEyebrow{font-size:11px}.olieTimeCard .olieTimeStepGrid>button{font-size:11px;min-height:36px}.olieTimeCard .olieTimePeriodButtons>button{font-size:10px;min-height:44px}.olieTimeFootnote{font-size:11px}}
-@media(max-width:360px){.olieTimeMain{grid-template-columns:1fr}.olieTimeDial{width:150px}.olieTimeEditor{width:100%}}
-@media(prefers-reduced-motion:reduce){.olieTimeCard *{transition:none!important}}
+/* Campo único de horário HH:MM, compartilhado entre jogos presenciais e online. */
+.olieTimeCard{
+  min-width:0;box-sizing:border-box;display:flex;flex-direction:column;
+  gap:16px;padding:20px;background:#fffdf8;border:1px solid #d4dec7;
+  border-radius:17px;color:#415737;min-height:100%;
+}
+.olieTimeHeading{display:flex;align-items:center;gap:9px;color:#4d6741}
+.olieTimeHeading>strong{font-size:15px;line-height:1.4}
+.olieTimeHeading svg{flex:none}
+.olieTimeCore{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;width:100%;min-height:195px;
+}
+.olieTimeCard .olieTimeInputLabel{
+  display:grid;gap:12px;box-sizing:border-box;width:min(100%,380px);
+  font-size:14px;font-weight:650;line-height:1.5;color:#596d4e;
+}
+.olieTimeCard .olieTimeInputLabel>span{text-align:center}
+.olieTimeCard .olieTimeInput{
+  box-sizing:border-box;display:block;width:100%;min-width:0;min-height:76px;
+  padding:12px 17px;background:#f7faf3;border:2px solid #bdcfb0;
+  border-radius:15px;color:#415d35;font:inherit;font-size:clamp(25px,3vw,34px);
+  font-weight:800;line-height:1.3;letter-spacing:.025em;text-align:center;
+  font-variant-numeric:tabular-nums;color-scheme:light;
+}
+.olieTimeCard .olieTimeInput:focus-visible{outline:3px solid #a8c398;outline-offset:2px}
+.olieTimeCard .olieTimeInput::-webkit-calendar-picker-indicator{cursor:pointer}
+.olieTimeHelp{
+  min-height:17px;font-size:12px;color:#76846b;text-align:center;
+}
+.olieTimeFootnote{
+  margin:0!important;padding-top:14px;border-top:1px solid #e0e8d8;
+  font-size:12px;line-height:1.55;text-align:center;color:#718261;
+}
+@media(max-width:730px){
+  .olieTimeCard{padding:17px;min-height:0}
+  .olieTimeCore{min-height:165px}
+  .olieTimeCard .olieTimeInput{min-height:68px;font-size:28px}
+}
+@media(max-width:500px){
+  .olieTimeCard{gap:12px;padding:15px}
+  .olieTimeCore{min-height:145px}
+  .olieTimeCard .olieTimeInputLabel{font-size:13px}
+  .olieTimeCard .olieTimeInput{min-height:60px;font-size:27px}
+}
