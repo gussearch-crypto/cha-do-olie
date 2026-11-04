@@ -432,3 +432,21 @@
 
 /* Canal de cada brincadeira visível no resumo sem criar novos controles. */
 .olieGamesOverviewSimple .olieGamesChannelInfo{display:block;color:#7c8d70;font-size:11px;font-weight:700;line-height:1.45}
+
+
+/* Resumo dos jogos: explicar cada brincadeira e separar leitura de controle */
+.olieGamesOverviewSimple>.olieGamesOverviewCard{gap:12px!important;min-height:260px}
+.olieGamesOverviewSimple .olieGamesCardTop{align-items:flex-start}
+.olieGamesOverviewSimple .olieGamesCardTop h3{font-size:clamp(16px,2vw,20px);line-height:1.3}
+.olieGamesOverviewSimple .olieGamesOverviewExplainer{margin:0!important;flex:none!important;font-size:13px!important;line-height:1.55;color:#728167!important}
+.olieGamesOverviewSimple .olieGamesOverviewCount{gap:8px;margin-top:3px}
+.olieGamesOverviewFooter{display:grid;justify-items:start;gap:11px;margin-top:auto;padding-top:13px;border-top:1px solid #e4ebdd;width:100%}
+.olieGamesOverviewFooter>small{font-size:12px;line-height:1.5;color:#73816b}
+.olieGamesOverviewSimple .olieGamesOverviewAction{align-self:start;max-width:100%}
+#olie-birth-control,#olie-belly-control{scroll-margin-top:94px}
+@media(max-width:760px){
+ .olieGamesOverviewSimple>.olieGamesOverviewCard{min-height:0;gap:10px!important}
+ .olieGamesOverviewSimple .olieGamesCardTop h3{font-size:18px}
+ .olieGamesOverviewFooter{gap:10px}
+ .olieGamesOverviewSimple .olieGamesOverviewAction{width:100%;align-self:stretch}
+}
