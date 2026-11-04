@@ -24,3 +24,17 @@
 
 @media(max-width:730px){.olieRemotePredictionGrid{grid-template-columns:minmax(0,1fr);gap:13px}.olieRemotePredictionGrid>.olieRemoteDateField,.olieRemotePredictionGrid>.olieTimeCard,.olieRemotePredictionGrid>.gameScale,.olieRemotePredictionGrid>.gameLength{grid-column:1}}
 @media(max-width:500px){.olieRemotePredictionGrid .gameWidget,.olieRemotePredictionGrid .olieTimeCard,.olieRemoteDateField{padding:13px}.olieRemotePredictionGrid .gameCalendar{padding:8px}.olieRemotePredictionGrid .gameCalendarGrid button{min-height:40px}}
+
+
+/* Indicador de progresso e cards mais compactos no celular */
+.olieRemoteForm>.olieGuessProgress{margin:0 0 3px}
+@media(max-width:600px){
+ .olieRemotePredictionGrid .gameVerticalScene{height:232px}
+ .olieRemotePredictionGrid .gameScaleVisual{margin:7px auto 8px}
+ .olieRemotePredictionGrid .gameWidget{gap:9px}
+ .olieRemotePredictionGrid .gameWidgetControls button{min-height:42px}
+ .olieRemotePredictionGrid .gameCalendarGrid button{min-height:42px}
+ .olieRemotePredictionGrid .gameCalendarGrid>span{min-height:23px}
+ .olieRemoteForm{gap:14px}
+ .olieRemotePredictionGrid{gap:11px}
+}
