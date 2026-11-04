@@ -62,9 +62,12 @@ const officialStarted=!!settings&&(settings.actual_birth_date!=null||settings.ac
 const officialComplete=!!settings&&settings.actual_birth_date!=null&&settings.actual_weight_g!=null&&settings.actual_length_cm!=null&&!!birthTime;
 const phase= !settings?'loading':settings.results_published?'published':officialStarted?'official':settings.birth_open?'open':'closed';
 const phaseLabel={loading:'Carregando',open:'Recebendo palpites',closed:'Palpites encerrados',official:officialComplete?'Dados oficiais registrados':'Dados oficiais incompletos',published:'Resultados publicados'}[phase];
-const nextTarget=phase==='open'?'entries':phase==='closed'||phase==='official'?'results':'results';
-const nextTitle=phase==='open'?'Acompanhar as inscrições':phase==='closed'?'Registrar os dados de chegada':phase==='official'?officialComplete?'Conferir e publicar o Top 3':'Completar os dados de chegada':'Conferir os resultados publicados';
-const nextText=phase==='open'?'Os palpites estão abertos. Quando decidir, encerre as inscrições nos controles de Palpites.':phase==='closed'?'As inscrições já estão encerradas. Registre a data, horário, peso e comprimento oficiais quando o Oliver nascer.':phase==='official'?'O ranking só será exibido aos participantes após a publicação autorizada no painel.':'A página dos jogos já apresenta os vencedores. Os palpites continuam preservados.';
+const birthAction=phase==='open'?'Gerenciar palpites':phase==='closed'?'Registrar dados oficiais':phase==='official'?officialComplete?'Conferir ranking':'Completar dados oficiais':'Ver resultados';
+const birthDescription=phase==='open'?'Formulários presencial e online disponíveis.':phase==='closed'?'Novos palpites encerrados. Registre os dados após o nascimento.':phase==='official'?'Confira os dados reais e controle a publicação dos vencedores.':'A classificação está disponível para os participantes.';
+const bellyPhase=settings?.belly_revealed?'published':savedBellyMeasure!=null?'official':settings?.belly_open?'open':'closed';
+const bellyLabel=settings?.belly_revealed?'Resultado revelado':savedBellyMeasure!=null?'Aguardando revelação':settings?.belly_open?'Palpites abertos':'Palpites fechados';
+const bellyDescription=settings?.belly_revealed?'Os vencedores da brincadeira já foram divulgados.':savedBellyMeasure!=null?'Medida oficial registrada. Os vencedores continuam em segredo.':settings?.belly_open?'A brincadeira está recebendo palpites.':'A brincadeira está encerrada e ainda não tem medida oficial.';
+const bellyAction=settings?.belly_revealed?'Ver resultado':savedBellyMeasure!=null?'Revelar vencedores':'Validar barriga';
 const sections=[['overview','Visão geral'],['entries','Palpites'],['results','Resultados']];
 return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{padding:'22px 0'}}>
  <div className="planningIntro oliverGamesTop"><span className="eyebrow">JOGOS E BRINCADEIRAS</span><h2>Jogos do Oliver</h2><p>Acompanhe o andamento e acesse somente o que precisa fazer em cada etapa.</p></div>
@@ -74,28 +77,28 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
    <details className={'olieGamesUtilities'+(section==='audit'||section==='tests'?' is-active':'')}><summary>⚙ Mais opções {missingTimes.length>0&&<span className="olieGamesNavCount">{missingTimes.length} horário(s) pendente(s)</span>}</summary><div className="olieGamesUtilitiesActions"><button type="button" aria-current={section==='audit'?'page':undefined} className={section==='audit'?'active':''} onClick={()=>setSection('audit')}>Auditoria e participantes</button><button type="button" aria-current={section==='tests'?'page':undefined} className={section==='tests'?'active':''} onClick={()=>setSection('tests')}>Testes e manutenção</button></div></details>
   {section==='overview'&&<div className="olieGamesSection">
    <div className="olieGamesSectionIntro"><h3>Visão geral</h3><p>O essencial para acompanhar os jogos sem abrir todos os controles.</p></div>
-   <div className="olieGamesKpis">
-    <div><small>Palpites de nascimento</small><strong>{birthGuesses.length}</strong><span>Registrados</span></div>
-    <div><small>Palpites da barriga</small><strong>{bellyGuesses.length}</strong><span>Registrados</span></div>
-    <div><small>Presenciais</small><strong>{localGuesses.length}</strong><span>Nascimento</span></div>
-    <div><small>Online</small><strong>{remoteGuesses.length}</strong><span>Nascimento</span></div>
-    
+   <div className="olieGamesOverviewGrid olieGamesOverviewSimple">
+      <div className="gameCard olieGamesOverviewCard">
+        <div className="olieGamesCardTop">
+          <h3>Nascimento</h3>
+          <span className={'olieGamesStatus olieGamesStatus-'+phase}>{phaseLabel}</span>
+        </div>
+        <div className="olieGamesOverviewCount"><strong>{birthGuesses.length}</strong><span>palpites registrados</span></div>
+        <div className="olieGamesOverviewSources"><span>{localGuesses.length} presenciais</span><span>{remoteGuesses.length} online</span></div>
+        <p>{birthDescription}</p>
+        <button type="button" className="olieGamesOverviewAction" onClick={()=>setSection(phase==='open'?'entries':'results')}>{birthAction}</button>
+      </div>
+      <div className="gameCard olieGamesOverviewCard">
+        <div className="olieGamesCardTop">
+          <h3>Casinha do Olie</h3>
+          <span className={'olieGamesStatus olieGamesStatus-'+bellyPhase}>{bellyLabel}</span>
+        </div>
+        <div className="olieGamesOverviewCount"><strong>{bellyGuesses.length}</strong><span>palpites da barriga</span></div>
+        <p>{bellyDescription}</p>
+        <button type="button" className="olieGamesOverviewAction" onClick={()=>setSection('entries')}>{bellyAction}</button>
+      </div>
    </div>
    {missingTimes.length>0&&<div className="olieGamesAttention"><span><strong>{missingTimes.length} palpite(s) sem horário</strong> precisam de conferência antes do ranking.</span><button type="button" onClick={()=>setSection('audit')}>Revisar pendências</button></div>}
-   <div className="olieGamesOverviewGrid">
-    <div className="gameCard olieGamesStateCard">
-      <div className="olieGamesCardTop"><h3>Nascimento</h3><span className={'olieGamesStatus olieGamesStatus-'+phase}>{phaseLabel}</span></div>
-      <div className="olieGamesProgress" aria-label="Etapas do jogo do nascimento">{[['Inscrições',1],['Encerramento',2],['Dados oficiais',3],['Divulgação',4]].map(([label,number])=><span key={number} className={(phase==='published'?4:phase==='official'?3:phase==='closed'?2:1)>=number?'completed':''}>{number}. {label}</span>)}</div>
-      <p>{settings.birth_open?'Formulários presencial e online disponíveis.':'O formulário de novos palpites de nascimento está bloqueado.'}</p>
-      {settings.birth_closed_at&&<small>Último encerramento: {new Date(settings.birth_closed_at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</small>}
-      <div className="olieGamesSubstatus"><span>Jogo da barriga</span><b>{settings.belly_revealed?'Resultado revelado':savedBellyMeasure!=null?'Medida salva · aguardando publicação':settings.belly_open?'Palpites abertos':'Palpites fechados'}</b><button type="button" className="olieGamesBellyQuickAction" onClick={()=>setSection('entries')}>{settings.belly_revealed?'Ver controle':'Validar barriga'}</button></div>
-    </div>
-    <div className="gameCard olieGamesNextCard">
-      <span className="olieGamesNextEyebrow">PRÓXIMA AÇÃO</span><h3>{nextTitle}</h3><p>{nextText}</p>
-      <button type="button" onClick={()=>setSection(nextTarget)}>Ir para {nextTarget==='entries'?'Palpites':'Resultados'}</button>
-      {missingTimes.length>0&&<button className="olieGamesTextAction" type="button" onClick={()=>setSection('audit')}>Conferir {missingTimes.length} palpite(s) sem horário</button>}
-    </div>
-   </div>
    <div className="olieGamesShortcuts"><span>Acessar páginas</span><div className="olieGamesShortcutLinks"><a href="/games" target="_blank" rel="noopener noreferrer">Presencial ↗</a><a href="/games/online" target="_blank" rel="noopener noreferrer">Online ↗</a>{settings.results_published&&<a href="/games/resultado" target="_blank" rel="noopener noreferrer">Ver resultados ↗</a>}</div></div>
   </div>}
   {section==='entries'&&<div className="olieGamesSection"><div className="olieGamesSectionIntro"><h3>Controle dos palpites</h3><p>Abra, encerre ou reabra os palpites de nascimento. A brincadeira da barriga funciona de modo independente.</p></div>
