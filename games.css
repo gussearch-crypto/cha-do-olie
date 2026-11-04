@@ -429,3 +429,6 @@
  .olieGamesOverviewSimple .olieGamesOverviewAction{width:100%;min-height:45px;align-self:stretch}
  .olieGamesOverviewCount strong{font-size:36px}
 }
+
+/* Canal de cada brincadeira visível no resumo sem criar novos controles. */
+.olieGamesOverviewSimple .olieGamesChannelInfo{display:block;color:#7c8d70;font-size:11px;font-weight:700;line-height:1.45}
