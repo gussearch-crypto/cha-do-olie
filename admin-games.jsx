@@ -85,6 +85,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
         </div>
         <div className="olieGamesOverviewCount"><strong>{birthGuesses.length}</strong><span>palpites registrados</span></div>
         <div className="olieGamesOverviewSources"><span>{localGuesses.length} presenciais</span><span>{remoteGuesses.length} online</span></div>
+        <small className="olieGamesChannelInfo">Disponível nas páginas presencial e online</small>
         <p>{birthDescription}</p>
         <button type="button" className="olieGamesOverviewAction" onClick={()=>setSection(phase==='open'?'entries':'results')}>{birthAction}</button>
       </div>
@@ -94,6 +95,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
           <span className={'olieGamesStatus olieGamesStatus-'+bellyPhase}>{bellyLabel}</span>
         </div>
         <div className="olieGamesOverviewCount"><strong>{bellyGuesses.length}</strong><span>palpites da barriga</span></div>
+        <small className="olieGamesChannelInfo">Disponível somente na página presencial</small>
         <p>{bellyDescription}</p>
         <button type="button" className="olieGamesOverviewAction" onClick={()=>setSection('entries')}>{bellyAction}</button>
       </div>
