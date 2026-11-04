@@ -450,3 +450,42 @@
  .olieGamesOverviewFooter{gap:10px}
  .olieGamesOverviewSimple .olieGamesOverviewAction{width:100%;align-self:stretch}
 }
+
+
+/* Resumo público coletivo dos palpites, idêntico na página online e nos resultados */
+.olieCommunitySummary{
+  box-sizing:border-box;min-width:0;margin:20px 0 17px;padding:22px;
+  background:linear-gradient(145deg,#f1f6eb 0%,#fffdf8 85%);
+  border:1px solid #d1dfc6;border-radius:19px;color:#4b603d;
+}
+.olieCommunitySummaryHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
+.olieCommunityEyebrow{display:block;font-size:10px;font-weight:850;letter-spacing:1.1px;color:#739060;margin-bottom:7px}
+.olieCommunitySummary h2{font-size:clamp(18px,2.7vw,24px);line-height:1.25;margin:0 0 7px;color:#455d3a;font-weight:800}
+.olieCommunitySummaryHeader p{font-size:13px;line-height:1.55;color:#738069;margin:0;max-width:580px}
+.olieCommunityNumbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0 12px}
+.olieCommunityNumbers>div{
+  min-width:0;display:grid;grid-template-columns:auto 1fr;gap:5px 9px;
+  align-content:center;align-items:center;
+  padding:16px;background:#fffefa;border:1px solid #dce7d2;border-radius:13px;
+}
+.olieCommunityNumbers svg{grid-row:1/3;color:#829a6f}
+.olieCommunityNumbers span{font-size:12px;font-weight:650;color:#73846a}
+.olieCommunityNumbers strong{
+  grid-column:2;font-size:clamp(18px,2.7vw,24px);line-height:1.1;
+  font-variant-numeric:tabular-nums;color:#49673c;
+}
+.olieCommunityFootnote{display:block;font-size:11px;line-height:1.55;color:#798671}
+.olieCommunityEmpty{font-size:13px;line-height:1.55;color:#697d5d;padding:14px;border:1px dashed #c8d9bd;background:#fffdf9;border-radius:10px;margin:16px 0}
+.olieResultsPage .olieCommunitySummary{margin-top:0;margin-bottom:20px}
+@media(max-width:600px){
+ .olieCommunitySummary{margin:15px 0;padding:16px;border-radius:16px}
+ .olieCommunitySummary h2{font-size:19px}
+ .olieCommunitySummaryHeader p{font-size:12px}
+ .olieCommunityNumbers{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:13px 0 10px}
+ .olieCommunityNumbers>div{padding:12px 10px;gap:4px 7px}
+ .olieCommunityNumbers>div:first-child{grid-column:1/-1}
+ .olieCommunityNumbers svg{width:19px;height:19px}
+ .olieCommunityNumbers span{font-size:11px}
+ .olieCommunityNumbers strong{font-size:20px}
+ .olieCommunityFootnote{font-size:10px}
+}
