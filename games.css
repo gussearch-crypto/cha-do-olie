@@ -286,3 +286,24 @@
 .olieGamesHistory{margin-top:16px}
 .olieGamesHistory>.oliverBirthHistory{padding:16px}
 @media(max-width:760px){.olieGamesUtilities{margin-bottom:17px}.olieGamesUtilitiesActions{display:grid;grid-template-columns:1fr}.olieGamesUtilitiesActions button{text-align:left}.olieGamesShortcuts{align-items:flex-start}.olieGamesShortcutLinks a{flex:0 1 auto}}
+
+
+/* Operação direta da brincadeira da barriga no painel Jogos */
+.olieGamesBellyCard{padding:22px!important;background:linear-gradient(160deg,#fcfdf7,#f2f7ec)!important;border:1px solid #c6d7ba!important;border-radius:17px}
+.olieGamesBellyHeading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.olieGamesBellyEyebrow{display:block;color:#7a8d6a;font-size:10px;font-weight:800;letter-spacing:1.5px;margin-bottom:7px}
+.olieGamesBellyHeading h3{margin:0 0 6px;color:#4b6741;font-size:20px}
+.olieGamesBellyHeading p{margin:0;color:#718066;font-size:13px;line-height:1.5}
+.olieGamesBellyBody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.olieGamesBellyPanel{min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:18px;border:1px solid #dce6d5;border-radius:13px;background:#fffefa}
+.olieGamesBellyPanel h4{font-size:15px;margin:0;color:#536a46}
+.olieGamesBellyPanel>small{font-size:12px;color:#718066;line-height:1.5}
+.olieGamesBellySwitch{display:flex;align-items:center;gap:10px;min-height:46px;font-size:14px;font-weight:700;color:#435c37}
+.olieGamesBellySwitch input{flex:0 0 auto;width:20px;height:20px;accent-color:#667f50}
+.olieGamesBellyOfficial label{display:grid;gap:7px;font-size:13px;font-weight:700;color:#526847}
+.olieGamesBellyOfficial input{box-sizing:border-box;max-width:100%;width:100%;min-height:48px;border:1px solid #c6d5bb;border-radius:10px;background:white;padding:10px 13px;font:inherit;font-size:17px}
+.olieGamesBellyPanel .revealButton{margin-top:auto;min-height:44px;border-radius:10px;align-self:flex-start}
+.olieGamesBellyNotice{margin:13px 0 0!important;font-size:12px;color:#6b805e;line-height:1.6}
+.olieGamesSubstatus .olieGamesBellyQuickAction{border:1px solid #bad0ab;border-radius:9px;background:#e6efdf;color:#456638;padding:8px 11px;min-height:37px;cursor:pointer;font-weight:750;font-size:12px}
+.olieGamesSubstatus .olieGamesBellyQuickAction:hover{background:#d7e9cf}
+@media(max-width:760px){.olieGamesBellyCard{padding:16px!important}.olieGamesBellyBody{grid-template-columns:1fr}.olieGamesBellyPanel{padding:14px}.olieGamesBellyPanel .revealButton{align-self:stretch}}
