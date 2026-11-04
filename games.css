@@ -324,3 +324,22 @@
  .gameBirthForm .gameWidgetControls button{min-height:42px}
  .gameSubmitAll{padding:17px 14px}
 }
+
+
+/* Painel: status, pendências e publicação protegida da brincadeira da barriga */
+.olieGamesAttention{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 14px;padding:14px 16px;background:#fff8e9;border:1px solid #e8d6ad;border-radius:12px;font-size:13px;color:#755a30}
+.olieGamesAttention button{border:1px solid #d7bd8c;border-radius:9px;background:#fffdf5;color:#806332;cursor:pointer;padding:9px 12px;font-weight:750}
+.olieGamesBellyPublish{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:15px;padding:16px;background:#edf4e8;border:1px solid #c9ddbf;border-radius:13px}
+.olieGamesBellyPublish>div:first-child{display:grid;gap:6px;min-width:0;flex:1}
+.olieGamesBellyPublish strong{font-size:14px;color:#47663c}
+.olieGamesBellyPublish small{font-size:12px;color:#6d8062;line-height:1.55}
+.olieGamesBellyPublishBtn{min-height:44px;padding:11px 15px;background:#617847;color:#fff;border:0;border-radius:10px;cursor:pointer;font-weight:750}
+.olieGamesBellyPublishBtn:disabled{opacity:.55;cursor:not-allowed}
+.olieGamesBellyConfirm{width:100%;display:grid;gap:12px;padding:15px;border:1px solid #c6d7ba;border-radius:12px;background:#fffefa}
+.olieGamesBellyConfirm>label{display:grid;gap:6px;font-size:13px;font-weight:700;color:#546a49}
+.olieGamesBellyConfirm input{min-height:44px;box-sizing:border-box;width:100%;max-width:460px;padding:10px 12px;border:1px solid #c2d0b6;border-radius:9px;background:#fff}
+.olieGamesBellyConfirm>div{display:flex;flex-wrap:wrap;gap:10px}
+.olieGamesBellyConfirm>div>button:first-child{min-height:44px;padding:10px 15px;border:1px solid #bed0b4;border-radius:9px;background:#fffefa;color:#516945;cursor:pointer}
+.olieGamesKpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.olieGamesKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.olieGamesAttention{align-items:stretch}.olieGamesAttention button{width:100%}.olieGamesBellyPublish{align-items:stretch}.olieGamesBellyPublishBtn{width:100%}}
