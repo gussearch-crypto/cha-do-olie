@@ -3,3 +3,24 @@
 .olieRemoteTabs{display:flex;gap:8px;max-width:640px;margin:20px auto 5px;justify-content:center}.olieRemoteTabs button{flex:1;border:1px solid #becbab;border-radius:12px;background:#fffdf7;color:#587146;padding:13px 9px;font-size:14px;font-weight:700;cursor:pointer}.olieRemoteTabs button.active{background:#617747;color:white;border-color:#617747}.olieRemoteForm label small{font-weight:400;color:#728167;line-height:1.6}.olieRemoteLookupResult{margin-top:22px;border-top:1px solid #dbe3cf;padding-top:20px}.olieRemoteLookupResult h3{margin:0 0 10px;color:#4f6841}.olieRemoteLookupResult>p{line-height:1.7}.olieRemoteLookupResult .olieRemoteSummary{margin-top:15px}@media(max-width:600px){.olieRemoteTabs{margin:12px 0}.olieRemoteTabs button{font-size:12px;padding:12px 7px}}
 
 .olieRemoteClosedActions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:17px 0}.olieRemoteClosedActions a,.olieRemoteClosedActions button{flex:1;min-width:180px}.olieRemoteClosedActions .olieRemoteOutline{min-height:49px}
+
+
+/* Mesma experiência interativa de palpites da versão presencial. */
+.olieRemotePredictionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:15px;margin:4px 0 0}
+.olieRemotePredictionGrid>.olieRemoteDateField,.olieRemotePredictionGrid>.olieTimeCard,.olieRemotePredictionGrid>.gameScale,.olieRemotePredictionGrid>.gameLength{min-width:0;max-width:none;width:100%;box-sizing:border-box;margin:0;grid-column:auto}
+.olieRemoteDateField{display:flex;flex-direction:column;gap:10px;padding:17px;background:#fffdf8;border:1px solid #d4dec7;border-radius:17px}
+.olieRemotePredictionHead{display:flex;align-items:center;gap:8px;color:#4f6840}.olieRemotePredictionHead strong{font-size:14px}.olieRemotePredictionHead svg{flex:none}
+.olieRemotePredictionGrid .gameCalendar{margin-top:0;width:100%;box-sizing:border-box;padding:10px}
+.olieRemotePredictionGrid .gameCalendarGrid{gap:3px}
+.olieRemotePredictionGrid .gameCalendarGrid button{min-height:36px}
+.olieRemotePredictionGrid .gameCalendarGrid>span{min-height:24px}
+.olieRemotePredictionGrid .gameWidget{padding:18px;gap:13px}
+.olieRemotePredictionGrid .gameWidgetControls{margin-top:auto}
+.olieRemotePredictionGrid .gameVerticalScene{height:270px}
+.olieRemotePredictionGrid .gameScaleVisual{margin:18px auto 14px}
+.olieRemotePredictionGrid .olieTimeCard{padding:18px}
+.olieRemotePredictionGrid .olieTimeMain{grid-template-columns:minmax(104px,.75fr) minmax(145px,1.25fr);gap:10px}
+.olieRemotePredictionGrid .olieTimeDial{width:min(100%,160px)}
+.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:21px;min-height:52px}
+@media(max-width:730px){.olieRemotePredictionGrid{grid-template-columns:minmax(0,1fr);gap:13px}.olieRemotePredictionGrid>.olieRemoteDateField,.olieRemotePredictionGrid>.olieTimeCard,.olieRemotePredictionGrid>.gameScale,.olieRemotePredictionGrid>.gameLength{grid-column:1}.olieRemotePredictionGrid .olieTimeMain{grid-template-columns:minmax(115px,.75fr) minmax(0,1.25fr)}.olieRemotePredictionGrid .olieTimeDial{width:min(100%,195px)}.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:24px}}
+@media(max-width:500px){.olieRemotePredictionGrid .gameWidget,.olieRemotePredictionGrid .olieTimeCard,.olieRemoteDateField{padding:13px}.olieRemotePredictionGrid .gameCalendar{padding:8px}.olieRemotePredictionGrid .gameCalendarGrid button{min-height:40px}.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:20px}}
