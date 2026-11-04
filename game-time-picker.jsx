@@ -2,7 +2,7 @@ import React from 'react';
 import {Clock3} from 'lucide-react';
 import './game-time-picker.css';
 
-const validTime = value => /^([01]\\d|2[0-3]):[0-5]\\d$/.test(value);
+const validTime = value => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 /** Campo único de horário em 24 horas, compartilhado pelas páginas presencial e online. */
 export default function GameTimePicker({value='',onChange}){
