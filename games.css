@@ -308,3 +308,19 @@
 .olieGamesSubstatus .olieGamesBellyQuickAction{border:1px solid #bad0ab;border-radius:9px;background:#e6efdf;color:#456638;padding:8px 11px;min-height:37px;cursor:pointer;font-weight:750;font-size:12px}
 .olieGamesSubstatus .olieGamesBellyQuickAction:hover{background:#d7e9cf}
 @media(max-width:760px){.olieGamesBellyCard{padding:16px!important}.olieGamesBellyBody{grid-template-columns:1fr}.olieGamesBellyPanel{padding:14px}.olieGamesBellyPanel .revealButton{align-self:stretch}}
+
+
+/* Progresso ocupa a largura inteira e ajustes de densidade no celular */
+.gameBirthForm>.olieGuessProgress{grid-column:1/-1;grid-row:auto}
+.gameBirthForm>.olieTimeCard,.gameBirthForm>.gameWidget,.gameBirthForm>.gameCalendarField{scroll-margin-top:80px}
+@media(max-width:600px){
+ .gameBirthForm{gap:11px}
+ .gameBirthForm .gameVerticalScene{height:232px}
+ .gameBirthForm .gameScaleVisual{margin:6px auto 8px}
+ .gameBirthForm .gameWidget{gap:9px}
+ .gameBirthForm .gameCalendarHeader button{width:40px;height:40px}
+ .gameBirthForm .gameCalendarGrid button{min-height:42px}
+ .gameBirthForm .gameCalendarGrid>span{min-height:24px}
+ .gameBirthForm .gameWidgetControls button{min-height:42px}
+ .gameSubmitAll{padding:17px 14px}
+}
