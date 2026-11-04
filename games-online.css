@@ -38,3 +38,42 @@
  .olieRemoteForm{gap:14px}
  .olieRemotePredictionGrid{gap:11px}
 }
+
+
+/* Entrada simplificada: uma brincadeira online, quatro previsões */
+.olieRemoteHero{padding:28px 12px 14px}
+.olieRemoteHero>span{font-size:28px}
+.olieRemoteHero h1{font-size:clamp(25px,4.7vw,35px);margin:8px 0}
+.olieRemoteHero p{max-width:550px;font-size:14px;line-height:1.55}
+.olieRemoteGameGuide{margin:8px 0 18px;display:grid;gap:10px}
+.olieRemoteGameGuideMain{padding:19px 20px;background:linear-gradient(125deg,#eff5e8,#fffdf8);border:1px solid #cedfc3;border-radius:17px}
+.olieRemoteGameGuideHeader{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.olieRemoteGameGuideHeader strong{font-size:17px;color:#48623c}
+.olieRemoteGameGuideHeader>span{border:1px solid #d8dcca;border-radius:20px;background:#f2f2ea;padding:6px 10px;font-size:11px;color:#69776a;font-weight:750}
+.olieRemoteGameGuideHeader>span.is-open{background:#e3efdd;border-color:#bed8ae;color:#4a7240}
+.olieRemoteGameGuideMain>p{font-size:13px;color:#687a60;line-height:1.5;margin:10px 0 13px}
+.olieRemoteGameGuideTags{display:flex;flex-wrap:wrap;gap:7px}
+.olieRemoteGameGuideTags span{padding:7px 10px;border:1px solid #dbe5d1;background:#fffdf9;color:#59734e;border-radius:9px;font-size:12px;font-weight:700}
+.olieRemoteGameGuideNote{margin:0 3px;color:#78856e;font-size:12px;line-height:1.5}
+.olieRemoteTabs{margin:13px auto 4px}
+.olieRemoteRulesDisclosure{margin-top:17px;border:1px solid #dce4cc;border-radius:17px;background:#fffdf8;overflow:hidden}
+.olieRemoteRulesDisclosure>summary{display:flex;gap:12px;align-items:center;cursor:pointer;padding:17px 19px;list-style:none}
+.olieRemoteRulesDisclosure>summary::-webkit-details-marker{display:none}
+.olieRemoteRulesDisclosure>summary>svg{color:#6b8457;flex:none}
+.olieRemoteRulesDisclosure>summary>span:not(.olieRemoteRulesChevron){display:grid;gap:4px;flex:1}
+.olieRemoteRulesDisclosure>summary strong{color:#4f6943;font-size:15px}
+.olieRemoteRulesDisclosure>summary small{font-size:12px;color:#7d8c72}
+.olieRemoteRulesChevron{color:#627a53;font-size:24px;line-height:1;transition:transform .16s}
+.olieRemoteRulesDisclosure[open] .olieRemoteRulesChevron{transform:rotate(180deg)}
+.olieRemoteRulesDisclosure .olieRemoteRules{border:0;border-top:1px solid #dce4cc;border-radius:0;margin:0;box-shadow:none;padding:19px}
+@media(max-width:600px){
+ .olieRemoteHero{padding:18px 7px 9px}
+ .olieRemoteHero>span{font-size:24px}
+ .olieRemoteGameGuide{margin:5px 0 14px;gap:8px}
+ .olieRemoteGameGuideMain{padding:15px}
+ .olieRemoteGameGuideHeader strong{font-size:15px}
+ .olieRemoteGameGuideTags{gap:5px}
+ .olieRemoteGameGuideTags span{padding:6px 8px;font-size:11px}
+ .olieRemoteRulesDisclosure>summary{padding:14px}
+ .olieRemoteRulesDisclosure .olieRemoteRules{padding:15px}
+}
