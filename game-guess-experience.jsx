@@ -1,7 +1,7 @@
 import React,{useEffect,useRef} from 'react';
 import {createPortal} from 'react-dom';
 import {CalendarDays,Clock3,Scale,Ruler,CheckCircle2,ShieldCheck} from 'lucide-react';
-import './game-guess-experience.css';
+/* Estilos compartilhados carregados por games.css nas duas páginas. */
 
 const validTime=value=>/^([01]\d|2[0-3]):[0-5]\d$/.test(String(value||''));
 const dateLabel=value=>/^\d{4}-\d{2}-\d{2}$/.test(String(value||''))?value.split('-').reverse().join('/'):'—';
