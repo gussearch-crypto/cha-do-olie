@@ -19,8 +19,8 @@
 .olieRemotePredictionGrid .gameVerticalScene{height:270px}
 .olieRemotePredictionGrid .gameScaleVisual{margin:18px auto 14px}
 .olieRemotePredictionGrid .olieTimeCard{padding:18px}
-.olieRemotePredictionGrid .olieTimeMain{grid-template-columns:minmax(104px,.75fr) minmax(145px,1.25fr);gap:10px}
-.olieRemotePredictionGrid .olieTimeDial{width:min(100%,160px)}
-.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:21px;min-height:52px}
-@media(max-width:730px){.olieRemotePredictionGrid{grid-template-columns:minmax(0,1fr);gap:13px}.olieRemotePredictionGrid>.olieRemoteDateField,.olieRemotePredictionGrid>.olieTimeCard,.olieRemotePredictionGrid>.gameScale,.olieRemotePredictionGrid>.gameLength{grid-column:1}.olieRemotePredictionGrid .olieTimeMain{grid-template-columns:minmax(115px,.75fr) minmax(0,1.25fr)}.olieRemotePredictionGrid .olieTimeDial{width:min(100%,195px)}.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:24px}}
-@media(max-width:500px){.olieRemotePredictionGrid .gameWidget,.olieRemotePredictionGrid .olieTimeCard,.olieRemoteDateField{padding:13px}.olieRemotePredictionGrid .gameCalendar{padding:8px}.olieRemotePredictionGrid .gameCalendarGrid button{min-height:40px}.olieRemotePredictionGrid .olieTimeCard .olieTimeInput{font-size:20px}}
+
+
+
+@media(max-width:730px){.olieRemotePredictionGrid{grid-template-columns:minmax(0,1fr);gap:13px}.olieRemotePredictionGrid>.olieRemoteDateField,.olieRemotePredictionGrid>.olieTimeCard,.olieRemotePredictionGrid>.gameScale,.olieRemotePredictionGrid>.gameLength{grid-column:1}}
+@media(max-width:500px){.olieRemotePredictionGrid .gameWidget,.olieRemotePredictionGrid .olieTimeCard,.olieRemoteDateField{padding:13px}.olieRemotePredictionGrid .gameCalendar{padding:8px}.olieRemotePredictionGrid .gameCalendarGrid button{min-height:40px}}
