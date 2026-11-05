@@ -5,6 +5,7 @@ export function downloadOliverTicket(entry){
   canvas.width=900;canvas.height=1150;
   const c=canvas.getContext('2d');
   if(!c)return false;
+  const rounded=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
   const date=entry.birth_date?String(entry.birth_date).split('-').reverse().join('/'):'';
   const time=String(entry.birth_time||'').slice(0,5);
   const weight=entry.weight_g!=null&&Number.isFinite(Number(entry.weight_g))
@@ -12,8 +13,8 @@ export function downloadOliverTicket(entry){
   const length=entry.length_cm!=null?String(entry.length_cm).replace('.',',')+' cm':'';
   const belly=entry.belly_cm!=null?String(entry.belly_cm).replace('.',',')+' cm':'';
   c.fillStyle='#faf6ec';c.fillRect(0,0,900,1150);
-  c.strokeStyle='#c5d2b6';c.lineWidth=8;c.beginPath();c.roundRect(28,28,844,1094,37);c.stroke();
-  c.fillStyle='#eff4e8';c.beginPath();c.roundRect(48,48,804,225,26);c.fill();
+  c.strokeStyle='#c5d2b6';c.lineWidth=8;rounded(28,28,844,1094,37);c.stroke();
+  c.fillStyle='#eff4e8';rounded(48,48,804,225,26);c.fill();
   c.textAlign='center';
   c.fillStyle='#5d724b';c.font='700 24px Georgia,serif';c.fillText('CHÁ DO OLIVER',450,99);
   c.fillStyle='#425e36';c.font='700 42px Georgia,serif';c.fillText('Meu palpite para o Oliver',450,167);
@@ -34,7 +35,7 @@ export function downloadOliverTicket(entry){
   const xPos=[90,465],yPos=[492,677];
   fields.slice(0,4).forEach(([label,value],idx)=>{
     const col=idx%2,row=Math.floor(idx/2),x=xPos[col],y=yPos[row];
-    c.fillStyle='#eff4e7';c.beginPath();c.roundRect(x,y,345,154,19);c.fill();
+    c.fillStyle='#eff4e7';rounded(x,y,345,154,19);c.fill();
     c.fillStyle='#738363';c.textAlign='left';c.font='700 17px Arial,sans-serif';c.fillText(label,x+20,y+41);
     c.fillStyle='#45633c';c.font='700 27px Arial,sans-serif';c.fillText(value,x+20,y+99,304);
   });
