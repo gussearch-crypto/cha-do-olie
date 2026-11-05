@@ -15,7 +15,6 @@ export default function OliverWaitingHero({summary,settings}){
    <div className="olieWaitingIntro">
     <span className="olieWaitingKicker">🦁 🐼 🦒 🐓 &nbsp; A ESPERA DO OLIVER</span>
     <h1>Nosso pequeno está a caminho! <span aria-hidden="true">💛</span></h1>
-    <p>{phase.afterEvent?'O chá foi um capítulo especial. Agora seguimos juntos contando os dias para conhecer o Oliver!':'Antes do nosso encontro no chá, já contamos os dias para conhecer o Oliver!'}</p>
     <div className="olieWaitingHeart" aria-hidden="true"><Heart size={34}/></div>
    </div>
    <div className="olieWaitingMain">
