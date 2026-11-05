@@ -4,7 +4,13 @@ import {eventPriorityReadiness,eventRsvpReadiness} from './admin-final-readiness
 (function(){
  let data=null,families=null,filter='all',lastKey='';
  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+ function readGuestCache(){
+   try{const c=JSON.parse(sessionStorage.getItem('oliverAdminListCache')||'null');
+     if(sessionStorage.getItem('oliverAdmin')&&Array.isArray(c?.data?.families)&&Date.now()-c.at<30000)return c.data.families;
+   }catch{}return null;
+ }
  function render(){
+   if(families===null)families=readGuestCache();
    const root=document.querySelector('#oliver-prep-summary');if(!root)return;
    let box=root.querySelector('.oliverPriority');
    if(!box){box=document.createElement('section');box.className='oliverPriority';root.querySelector('.oliverPrepLists')?.insertAdjacentElement('beforebegin',box)}
