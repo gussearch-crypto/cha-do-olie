@@ -39,7 +39,7 @@ function GamesQRCode(){
    if(!printable){setError('Para imprimir, selecione Endereço oficial. Links temporários são somente para testes.');return}
    if(image)window.print();
  };
- return <main className={'olieQrPage '+(paper==='A5'?'is-a5':'is-a4')}>
+ return <main className={'olieQrPage '+(paper==='A5'?'is-a5':'is-a4')+(printable?'':' is-temporary')}>
   <nav className="olieQrToolbar" aria-label="Ferramentas do QR Code">
    <a href="/?painel=1"><ArrowLeft size={18}/> Voltar ao painel</a>
    <span className="olieQrToolTag">MATERIAIS DO EVENTO</span>
@@ -81,6 +81,7 @@ function GamesQRCode(){
    {error&&<p role="alert">{error}</p>}
   </section>
   <div className="olieQrPreviewLabel"><strong>Prévia da placa · {paper}</strong><span>Somente o quadro abaixo será impresso.</span></div>
+  <p className="olieQrPrintStop" role="alert">QR Code temporário: a impressão está bloqueada. Selecione Endereço oficial antes de imprimir.</p>
   <article className="olieQrPoster" aria-label={'Placa '+paper+' com QR Code para jogos '+channel}>
    <div className="olieQrPosterTop">
     <span className="olieQrMascots" aria-hidden="true">🦁 🐼 🦒 🐓</span>
