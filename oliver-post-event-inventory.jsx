@@ -21,7 +21,7 @@ function initial(){
 export default function OliverPostEventInventory(){
  const [localRows,setLocalRows]=useState(initial);
  const localRowsRef=useRef(localRows);localRowsRef.current=localRows;
- const endpoint=inventoryApiUrl(window.location.hostname,import.meta.env.VITE_SUPABASE_URL);
+ const endpoint=inventoryApiUrl(window.location.hostname,import.meta.env.VITE_SUPABASE_URL,import.meta.env.VITE_OLIVER_INVENTORY_TEST_URL);
  const [remote,setRemote]=useState({status:endpoint?'checking':'unavailable',items:[],revision:0,updatedAt:null});
  const [mode,setMode]=useState('local'),[saving,setSaving]=useState(false);
  const rows=mode==='shared'?remote.items:localRows;
@@ -126,7 +126,7 @@ export default function OliverPostEventInventory(){
  return <section id="oliver-post-event-inventory" className="oliePostInventory adminTabbedBlock" aria-label="Inventário pós-chá">
   <div className="oliePostHeader"><div><span className="eyebrow">APÓS O CHÁ · INVENTÁRIO</span><h2>O que recebemos para o Oliver 💛</h2><p>Registre quantos pacotes recebeu e quantas fraldas há em cada pacote, sem vincular itens aos convidados.</p></div><span className="oliePostTag">{mode==='shared'?'Sincronizado · revisão '+remote.revision:'Rascunho local'}</span></div>
   <div className="oliePostCaution" role="note">
-    <strong>{mode==='shared'?'Inventário compartilhado · protegido pelo painel administrativo':endpoint?'Modo local — conexão compartilhada não disponível':'Preview em modo local — sem alterações no Supabase real'}</strong>
+    <strong>{mode==='shared'?'Inventário compartilhado · protegido pelo painel administrativo':endpoint?'Rascunho local — sincronização disponível somente após selecionar o modo compartilhado':'Preview em modo local — sem alterações no Supabase real'}</strong>
     {mode==='shared'?'As alterações só são confirmadas após salvar no servidor. Outros dispositivos podem atualizar o inventário; conflitos exigem revisão.':'Os registros deste modo ficam somente neste navegador. Faça backup JSON. O compartilhamento será ativado após homologação e implantação do backend separado.'} Não há controle de quem presenteou.
    </div>
    {endpoint&&<div className="oliePostSyncControls" aria-label="Modo de armazenamento">
