@@ -71,7 +71,7 @@ Deno.serve(async request=>{
   body=JSON.parse(raw);
  } catch {return json({error:'invalid_json'},400,origin)}
  if(!body||typeof body!=='object'||!['get','save'].includes(body.action))return json({error:'unknown_action'},400,origin);
- if(!await hash(body.adminCode) || (await hash(body.adminCode))!==ADMIN_HASH)return json({error:'unauthorized'},403,origin);
+ if(typeof body.adminCode!=='string'||body.adminCode.length>128||(await hash(body.adminCode))!==ADMIN_HASH)return json({error:'unauthorized'},403,origin);
  const supabaseUrl=Deno.env.get('SUPABASE_URL');
  const adminKey=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
  if(!supabaseUrl||!adminKey)return json({error:'not_configured'},503,origin);
