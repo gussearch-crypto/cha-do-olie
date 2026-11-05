@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/games/qr",
+      "destination": "/index.html"
+    },
+    {
       "source": "/games/teste",
       "destination": "/index.html"
     },
