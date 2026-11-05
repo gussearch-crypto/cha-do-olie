@@ -10,12 +10,12 @@ export default function OliverWaitingHero({summary,settings}){
  useEffect(()=>{const refresh=()=>setToday(todaySP());const t=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(t);document.removeEventListener('visibilitychange',refresh)}},[]);
  const days=daysToOliverDpp(today),phase=oliverPublicPhase({today,settings,announcement:{published:false}});
  const count=Number(summary?.birth?.count||0);
- const mode=phase.canGuess?'open':phase.results?'revealed':'closed';
+ const mode=summary==null?'loading':phase.canGuess?'open':phase.results?'revealed':'closed';
  return <section className="olieWaitingJourney" aria-label="A espera do Oliver">
    <div className="olieWaitingIntro">
     <span className="olieWaitingKicker">🦁 🐼 🦒 🐓 &nbsp; A ESPERA DO OLIVER</span>
     <h1>Nosso pequeno está a caminho! <span aria-hidden="true">💛</span></h1>
-    <p>O chá foi um capítulo especial. Agora seguimos juntos contando os dias para conhecer o Oliver!</p>
+    <p>{phase.afterEvent?'O chá foi um capítulo especial. Agora seguimos juntos contando os dias para conhecer o Oliver!':'Antes do nosso encontro no chá, já contamos os dias para conhecer o Oliver!'}</p>
     <div className="olieWaitingHeart" aria-hidden="true"><Heart size={34}/></div>
    </div>
    <div className="olieWaitingMain">
@@ -26,7 +26,7 @@ export default function OliverWaitingHero({summary,settings}){
       <small>A data provável é somente uma referência. O nascimento pode acontecer antes ou depois, e não será anunciado automaticamente.</small>
     </div>
     <div className="olieWaitingStatus">
-      {mode==='open'?<><span className="olieWaitingStatusIcon"><Clock3 size={23}/></span><strong>Os palpites continuam!</strong><p>Você ainda pode participar e adivinhar a data, o horário, o peso e o comprimento do Oliver.</p><a href="/games/online" className="olieWaitingButton">Fazer meu palpite <ArrowRight size={17}/></a></>:
+      {mode==='loading'?<><span className="olieWaitingStatusIcon"><Clock3 size={23}/></span><strong>Consultando os jogos...</strong><p>Verificando se os palpites estão abertos e como a turma está participando.</p></>:mode==='open'?<><span className="olieWaitingStatusIcon"><Clock3 size={23}/></span><strong>Os palpites continuam!</strong><p>Você ainda pode participar e adivinhar a data, o horário, o peso e o comprimento do Oliver.</p><a href="/games/online" className="olieWaitingButton">Fazer meu palpite <ArrowRight size={17}/></a></>:
        mode==='revealed'?<><span className="olieWaitingStatusIcon"><Trophy size={23}/></span><strong>Ranking disponível</strong><p>Os resultados da brincadeira foram liberados pela organização. Confira os vencedores.</p><a href="/games/resultado" className="olieWaitingButton">Ver vencedores <ArrowRight size={17}/></a></>:
        <><span className="olieWaitingStatusIcon"><LockKeyhole size={23}/></span><strong>Palpites encerrados</strong><p>Os registros foram preservados. Os resultados aparecerão quando a organização autorizar.</p><a href="/games/online" className="olieWaitingButton">Consultar meu palpite <ArrowRight size={17}/></a></>}
     </div>
