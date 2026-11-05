@@ -1,6 +1,7 @@
 /* Sprint 3 — Central de Preparação: somente leitura dos módulos existentes. */
 import {eventToday,daysUntil} from './planning-utils.mjs';
 import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,eventFinanceReadiness} from './admin-final-readiness.mjs';
+import {productionReference,productionReferenceCsv} from './oliver-production-reference.mjs';
 
 (function(){
  const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/planning-api';
@@ -9,7 +10,20 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  const date=value=>/^\d{4}-\d{2}-\d{2}$/.test(value||'')?value.slice(8,10)+'/'+value.slice(5,7):'Sem data';
  const navTo=tab=>document.querySelector('[data-admin-tab="'+tab+'"]')?.click();
- const navigate=e=>{const btn=e.target.closest('[data-prep-tab]');if(btn){navTo(btn.dataset.prepTab);return}if(e.target.closest('[data-prep-refresh]'))refresh(true)};
+ const downloadProductionReference=()=>{
+  if(!Array.isArray(guests)||!planningReady)return;
+  const today=eventToday();
+  const report=productionReference(guests,planning,today);
+  const blob=new Blob([productionReferenceCsv(report)],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='base-producao-oliver-'+today+'.csv';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+ };
+ const navigate=e=>{
+  const btn=e.target.closest('[data-prep-tab]');if(btn){navTo(btn.dataset.prepTab);return}
+  if(e.target.closest('[data-prep-export]')){downloadProductionReference();return}
+  if(e.target.closest('[data-prep-refresh]'))refresh(true)
+ };
  function guestCache(){
    try{
      const cache=JSON.parse(sessionStorage.getItem('oliverAdminListCache')||'null');
@@ -100,6 +114,8 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
       (rsvp.afterDeadline?'A referência de produção foi fechada em 30/11. Quem não respondeu pode ser revisado para substituição, sem exclusão automática.':'30/11 é a referência para estimar alimentos, materiais e custos; não fecha a lista de convidados.')+
      ' Novos convidados podem entrar até 04/12, enquanto houver vagas na capacidade de 100 pessoas contabilizadas.</p></div><button type="button" data-prep-tab="guests">Gerenciar convidados</button></div>':
      '<div class="oliverRetaStatus"><div><strong>Estimativa de produção e convidados</strong><p>30/11 é a referência para produção; inclusões seguem até 04/12 dentro da capacidade.</p></div></div>';
+   const productionExport=rsvp&&planningReady?
+    '<div class="oliverProductionExport"><div><strong>Base de custos e produção</strong><p>Exporta uma fotografia dos números atuais. Para registrar exatamente a base de 30/11, faça a exportação nesse dia. Isso não bloqueia novas inclusões até 04/12.</p></div><button type="button" data-prep-export>Exportar base atual (CSV)</button></div>':'';
    const paymentNote=finance?.unplannedBalance>0?'<p class="oliverPrepNotice">Há '+esc(money(finance.unplannedBalance))+' de saldo sem vencimento ou sem parcelamento definido. Revise no Financeiro.</p>':'';
    const budgetNote=finance?.goal!=null?'<p class="oliverPrepGoal">Meta financeira: '+esc(money(finance.goal))+' · Fechamento projetado: '+esc(money(finance.projected))+' · '+esc(finance.goalVariance<0?'Acima da meta: '+money(-finance.goalVariance):'Margem prevista: '+money(finance.goalVariance))+'</p>':'';
    const scheduleBlock='<section class="oliverDayBlock"><div class="oliverPrepListHead"><div><span class="eyebrow">SEXTA-FEIRA · 04 DE DEZEMBRO</span><h3>Cronograma do dia do chá</h3><p>Atividades registradas nas Ações, com responsáveis e situação atual.</p></div><button type="button" data-prep-tab="planning">Abrir cronograma completo</button></div>'+
@@ -112,7 +128,7 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
    const tiles=readinessTiles.map(([label,value,hint,tab])=>tile(label,value,hint,tab)).join('');
    const list=(items,renderRow)=>items.length?items.map(x=>renderRow(x,today)).join(''):'<li class="oliverPrepEmpty">Nenhum vencimento cadastrado.</li>';
    root.innerHTML='<div class="oliverPrepHead"><div><span class="eyebrow">RETA FINAL · 04/12/2026</span><h2>Central de Preparação do Oliver</h2><p>Acompanhe o que precisa estar pronto antes e durante o chá.</p></div><strong>'+days+' dias para o chá</strong></div>'+
-     '<div class="oliverPrepGrid">'+tiles+'</div>'+rsvpBlock+
+     '<div class="oliverPrepGrid">'+tiles+'</div>'+rsvpBlock+productionExport+
      scheduleBlock+
      '<div class="oliverPrepLists"><article><div class="oliverPrepListHead"><h3>Próximas ações</h3><button data-prep-tab="planning">Ver todas</button></div><ul>'+(planningReady?list(upcoming,taskRow):'<li>Sincronizando ações…</li>')+'</ul></article>'+
      '<article><div class="oliverPrepListHead"><h3>Pagamentos programados</h3><button data-prep-tab="finance">Ver financeiro</button></div><ul>'+(planningReady?list(payments,paymentRow):'<li>Sincronizando pagamentos…</li>')+'</ul>'+paymentNote+budgetNote+'</article></div>'+
