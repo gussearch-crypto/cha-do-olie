@@ -8,6 +8,10 @@ test('Preview nunca aponta para o banco principal; Production usa função próp
  for(const name of ['localhost','cha-oliver-mvp-git-dev-supabase-gh-57f5.vercel.app','outro.com','cha-oliver-mvp.vercel.app.evil.io']){
   assert.equal(inventoryApiUrl(name,endpoint),null);
  }
+ const isolated='https://branch-oliver-test.supabase.co';
+ assert.equal(inventoryApiUrl('cha-oliver-test.vercel.app',endpoint,isolated),isolated+'/functions/v1/oliver-inventory');
+ assert.equal(inventoryApiUrl('cha-oliver-test.vercel.app',endpoint,endpoint),null);
+ assert.equal(inventoryApiUrl('cha-oliver-test.vercel.app',endpoint,'http://branch-oliver-test.supabase.co'),null);
 });
 test('mescla apenas IDs novos, sem dobrar estoque ao importar duas vezes',()=>{
  const a=item('pacote123',1),b=item('pacote456',1,'M',56);
