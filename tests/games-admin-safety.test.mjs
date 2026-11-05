@@ -18,6 +18,6 @@ test('etapas separadas: encerrar, registrar oficialmente e divulgar ranking',()=
  assert.deepEqual(closed.steps.map(x=>x.done),[true,false,false]);
  const ready=gamesAdminPhase({birth_open:false,actual_birth_date:'2027-01-15',actual_weight_g:3200,actual_length_cm:50});
  assert.deepEqual(ready.steps.map(x=>x.done),[true,true,false]);
- const published=gamesAdminPhase({...ready,results_published:true});
+ const published=gamesAdminPhase({birth_open:false,actual_birth_date:'2027-01-15',actual_weight_g:3200,actual_length_cm:50,results_published:true});
  assert.deepEqual(published.steps.map(x=>x.done),[true,true,true]);
 });
