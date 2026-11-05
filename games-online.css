@@ -207,3 +207,12 @@
  .olieRemotePredictionGrid .olieTimeClock{width:153px}
  .olieRemotePredictionGrid .olieTimeCore{padding:1px 0;gap:8px}
 }
+
+
+/* Cartão de lembrança: duas ações claras também em telas estreitas. */
+.olieRemoteReceiptActions{display:flex;justify-content:center;align-items:stretch;gap:10px;flex-wrap:wrap;margin:16px 0}
+.olieRemoteReceiptActions>button{flex:1 1 190px;max-width:290px;min-height:46px}
+@media(max-width:520px){
+ .olieRemoteReceiptActions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ .olieRemoteReceiptActions>button{max-width:100%;width:100%}
+}
