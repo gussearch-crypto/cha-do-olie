@@ -3,7 +3,7 @@
 ## Estado atual
 - Frontend, migração e Edge Function estão versionados na branch `dev-supabase`.
 - Não houve migração, deploy de função ou operação de gravação no Supabase principal.
-- A Vercel Preview mantém exclusivamente o inventário **local** para não contaminar o banco principal.
+- A Vercel Preview mantém o inventário **local por padrão** para não contaminar o banco principal. A sincronização em Preview só pode ser habilitada com um endpoint de branch Supabase diferente da principal.
 - Apenas um projeto Supabase está disponível; criar branch de teste exige aprovação prévia de custos.
 
 ## Componentes
@@ -19,7 +19,7 @@
 1. Obter aprovação de custos para branch de desenvolvimento Supabase e criá-la. Nunca usar produção para dados fictícios.
 2. Aplicar a migração **apenas** nessa branch e conferir RLS, ausência de grants a `anon`/`authenticated` e o registro `id='main'`.
 3. Configurar um segredo **somente no servidor**, `OLIVER_INVENTORY_ADMIN_CODE_SHA256`, com o SHA-256 do código administrativo da organização. Calcular e informar o hash diretamente em um ambiente seguro; não publicar a senha nem seu hash nos chats ou commits.
-4. Se a branch usar um domínio de homologação, configurar nela `OLIVER_INVENTORY_ALLOWED_ORIGIN` com a origem HTTPS **exata** permitida. A produção aceita apenas `https://cha-oliver-mvp.vercel.app` por padrão.
+4. Se a branch usar um domínio de homologação, configurar nela `OLIVER_INVENTORY_ALLOWED_ORIGIN` com a origem HTTPS **exata** permitida. Configurar também `VITE_OLIVER_INVENTORY_TEST_URL=https://<ref-da-branch>.supabase.co` **somente nas variáveis Vercel Preview**. O frontend rejeita URLs de teste iguais à origem Supabase principal. A produção aceita apenas `https://cha-oliver-mvp.vercel.app` por padrão.
 5. Implantar **somente** a nova função `oliver-inventory` na branch de teste; conferir status de `get`, `save`, 403 para código inválido e 409 para revisão obsoleta. O endpoint de gravação deve rejeitar Origem de Production na branch de teste.
 6. Validar simultaneidade com dois navegadores: A salva revisão 1, B tenta salvar revisão 0 e recebe 409, sem sobrescrever A.
 7. Testar importação local → compartilhado e repetição idempotente. **Nenhuma migração automática ou silenciosa** do armazenamento do navegador.
