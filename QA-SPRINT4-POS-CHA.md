@@ -31,6 +31,13 @@
 ### Inventário pós-evento
 - [ ] Painel → Fraldas → O que recebemos para o Oliver.
 - [ ] Cadastrar fraldas RN, P, M, G, GG, XG, outras categorias de presente e valores opcionais.
+- [ ] Registrar **1 pacote M com 32 fraldas** e **1 pacote M com 56 fraldas**: exibir **2 pacotes M e 88 fraldas M**.
+- [ ] Registrar **3 pacotes P com 40 fraldas**: exibir **120 fraldas P e 3 pacotes P**.
+- [ ] No formulário, campo **Quantidade de pacotes** e **Fraldas por pacote** são distintos e obrigatórios para fraldas; valor estimado é por pacote.
+- [ ] Total geral apresenta pacotes e fraldas separadamente; o quadro por tamanho apresenta fraldas e pacotes.
+- [ ] Backups antigos sem fraldas por pacote carregam normalmente, exibem aviso para completar os dados e não inventam unidades.
+- [ ] CSV contém quantidade de pacotes, fraldas por pacote e total de fraldas, inclusive para embalagens diferentes do mesmo tamanho.
+
 - [ ] Editar, excluir e confirmar totais (quantidades e estimativas).
 - [ ] CSV abre corretamente no Excel, sem nomes de participantes.
 - [ ] Exportar JSON e importar backup em outro navegador; os registros devem ser restaurados.
