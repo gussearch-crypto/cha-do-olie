@@ -621,3 +621,39 @@
  background:#fff8e9;color:#70592f;font-size:13px;line-height:1.6;
 }
 @media(max-width:600px){.olieGamePreviewNote{padding:12px;font-size:12px;line-height:1.5}}
+
+
+/* Sprint 2 — ergonomia mobile dos Jogos presenciais (sem alterar regras). */
+@media(max-width:760px){
+ .gamesPage .gamesWrap,.gamesPage .gameCard,.gamesPage .gameBirthForm,
+ .gamesPage .gameBirthForm>*,.gamesPage .gameForm>*,.gamesPage .gameWidget{
+  box-sizing:border-box;min-width:0;max-width:100%;
+ }
+ .gamesPage .gameBirthForm{grid-template-columns:minmax(0,1fr)!important;gap:12px}
+ .gamesPage .gameBirthForm>.olieGuessProgress,
+ .gamesPage .gameBirthForm>.gameCalendarField,
+ .gamesPage .gameBirthForm>.olieTimeCard,
+ .gamesPage .gameBirthForm>.gameWidget{
+  grid-column:1/-1!important;grid-row:auto!important;
+ }
+ .gamesPage .gameBirthForm .gameCalendarGrid button,
+ .gamesPage .gameBirthForm .gameWidgetControls>button{min-height:44px}
+ .gamesPage .gameBirthForm .gameWidgetControls input[type="number"]{min-height:44px;font-size:16px}
+ .gamesPage .gameSubmitAll>button{min-height:48px}
+ .gamesPage .gameFinalSummary{scroll-margin-top:24px}
+}
+@media(max-width:440px){
+ .gamesPage .gamesWrap{padding-left:10px;padding-right:10px}
+ .gamesPage .gameBirthForm{padding:8px;gap:10px}
+ .gamesPage .gameBirthForm .gameCalendarGrid{gap:3px}
+ .gamesPage .gameBirthForm .gameCalendarGrid button{font-size:13px;min-height:44px}
+ .gamesPage .gameBirthForm .gameWidgetControls{gap:5px}
+ .gamesPage .gameBirthForm .gameWidgetControls>button{min-height:44px}
+ .gamesPage .gameBirthForm .gameVerticalScene{height:220px}
+ .gamesPage .gameBirthForm .olieTimeClock{width:155px}
+ .gamesPage .gameBirthForm .olieTimeCard{padding:14px}
+ .gamesPage .gameBirthForm .olieTimeInput{font-size:26px;min-height:58px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gamesPage .gameBirthForm *{scroll-behavior:auto}
+}
