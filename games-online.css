@@ -216,3 +216,32 @@
  .olieRemoteReceiptActions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
  .olieRemoteReceiptActions>button{max-width:100%;width:100%}
 }
+
+
+/* Sprint 2 — controles acessíveis e sem rolagem lateral em celulares pequenos. */
+.olieRemotePage,.olieRemotePage *{min-width:0}
+.olieRemotePage .olieRemoteForm>label>input,
+.olieRemotePage .olieRemoteForm>label>textarea{
+  box-sizing:border-box;max-width:100%;min-height:45px;
+}
+.olieRemotePage .olieRemotePredictionGrid>*{box-sizing:border-box;min-width:0}
+.olieRemotePage .olieRemotePredictionGrid .olieTimeInput{font-variant-numeric:tabular-nums}
+.olieRemotePage .olieRemoteResultLink>a,.olieRemotePage .olieRemoteGift a{overflow-wrap:anywhere}
+@media(max-width:760px){
+ .olieRemotePage .olieRemotePredictionGrid{grid-template-columns:minmax(0,1fr)!important;gap:12px}
+ .olieRemotePage .olieRemotePredictionGrid>*{grid-column:1/-1!important;grid-row:auto!important}
+ .olieRemotePage .olieRemoteForm>label>input{font-size:16px}
+ .olieRemotePage .olieRemotePredictionGrid .gameWidgetControls input[type="number"]{font-size:16px;min-height:44px}
+ .olieRemotePage .olieRemotePredictionGrid .gameCalendarGrid button{min-height:44px}
+ .olieRemotePage .olieRemoteForm>button.olieRemotePrimary{min-height:48px}
+ .olieRemotePage .olieRemoteRulesDisclosure>summary{min-height:48px}
+}
+@media(max-width:390px){
+ .olieRemotePage .olieRemotePredictionGrid .gameWidgetControls{gap:4px}
+ .olieRemotePage .olieRemotePredictionGrid .gameWidgetControls>button{padding:8px 5px;font-size:11px}
+ .olieRemotePage .olieRemotePredictionGrid .gameVerticalScene{height:210px}
+ .olieRemotePage .olieRemotePredictionGrid .olieTimeClock{width:148px}
+ .olieRemotePage .olieRemotePredictionGrid .gameCalendarGrid{gap:2px}
+ .olieRemotePage .olieRemoteGameGuideTags span{padding:6px 7px}
+ .olieRemotePage .olieRemoteTabs button{font-size:12px}
+}
