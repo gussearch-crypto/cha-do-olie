@@ -325,3 +325,15 @@ article.olieQrPoster {
  .olieQrPage.is-a5 .olieQrAddress{font-size:7pt!important;margin-bottom:5mm}
  .olieQrPage.is-a5 .olieQrPoster footer{font-size:8pt!important}
 }
+
+
+/* Ctrl+P também não pode transformar uma Preview temporária em material definitivo. */
+.olieQrPrintStop{display:none}
+@media print{
+ .olieQrPage.is-temporary .olieQrPoster{display:none!important}
+ .olieQrPage.is-temporary .olieQrPrintStop{
+   display:block!important;padding:18mm 12mm;border:2px solid #aa763c;
+   background:#fff8e8;color:#754f23;font:700 17pt/1.6 Arial,sans-serif;
+   text-align:center
+ }
+}
