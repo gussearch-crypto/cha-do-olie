@@ -72,7 +72,7 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
      .sort((a,b)=>a.due.localeCompare(b.due)).slice(0,4);
    const payments=finance?.dated.slice(0,4)||[];
    const deadline=daysUntil(RSVP_DEADLINE,today);
-   const deadlineTitle=deadline===null?'Prazo: 30/11':deadline>0?'Faltam '+deadline+' dia(s) para 30/11':deadline===0?'Último dia para confirmar':'Prazo de 30/11 encerrado';
+   const deadlineTitle=deadline===null?'Estimativa: 30/11':deadline>0?'Faltam '+deadline+' dia(s) para a estimativa de 30/11':deadline===0?'Hoje: base de produção de 30/11':'Estimativa de produção de 30/11 concluída';
    const readinessTiles=[
      ['CONFIRMADOS CONTABILIZADOS',rsvp?rsvp.counted+' / 100':'— / 100',rsvp?rsvp.available+' vagas disponíveis · '+rsvp.confirmedUnderFive+' criança(s) menores de 5 fora da contagem':'Aguardando lista de convidados','guests'],
      ['A CONFIRMAR',rsvp?rsvp.waiting:'—',rsvp?deadlineTitle+' · '+rsvp.waitingFamilies+' núcleo(s)':'Aguardando confirmações','guests'],
@@ -82,7 +82,7 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
    const stats=[
      ['Convidados confirmados',rsvp?rsvp.confirmed:'—','Inclui menores de 5 anos'],
      ['Crianças menores de 5',rsvp?rsvp.confirmedUnderFive:'—','Não contam na capacidade'],
-     ['Vagas remanescentes',rsvp?rsvp.available:'—','Podem receber novos convidados após 30/11'],
+     ['Vagas remanescentes',rsvp?rsvp.available:'—','Inclusões permitidas até 04/12, enquanto houver vagas'],
      ['Pessoas aguardando',rsvp?rsvp.waiting:'—','Revisar confirmação por núcleo'],
      ['Atividades de 04/12',scheduleData?scheduleData.scheduled:'—','Somente horários cadastrados'],
      ['Conflitos de horário',scheduleData?scheduleData.conflicts.length:'—','Mesmo responsável e horário sobreposto'],
@@ -97,9 +97,9 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
    root.dataset.key=summary;
    const rsvpBlock=rsvp?
     '<div class="oliverRetaStatus'+(rsvp.afterDeadline?' is-late':'')+'"><div><strong>'+esc(deadlineTitle)+'</strong><p>'+
-      (rsvp.afterDeadline?'Quem não respondeu até 30/11 pode ser revisado para substituição; ninguém será excluído automaticamente.':'O prazo de confirmação é 30/11. Até lá, acompanhe as respostas por núcleo.')+
-     ' Novos convidados podem ser incluídos depois do prazo para completar a capacidade de 100 pessoas.</p></div><button type="button" data-prep-tab="guests">Gerenciar convidados</button></div>':
-     '<div class="oliverRetaStatus"><div><strong>Confirmações do evento</strong><p>Carregue o painel de convidados para acompanhar o prazo de 30/11.</p></div></div>';
+      (rsvp.afterDeadline?'A referência de produção foi fechada em 30/11. Quem não respondeu pode ser revisado para substituição, sem exclusão automática.':'30/11 é a referência para estimar alimentos, materiais e custos; não fecha a lista de convidados.')+
+     ' Novos convidados podem entrar até 04/12, enquanto houver vagas na capacidade de 100 pessoas contabilizadas.</p></div><button type="button" data-prep-tab="guests">Gerenciar convidados</button></div>':
+     '<div class="oliverRetaStatus"><div><strong>Estimativa de produção e convidados</strong><p>30/11 é a referência para produção; inclusões seguem até 04/12 dentro da capacidade.</p></div></div>';
    const paymentNote=finance?.unplannedBalance>0?'<p class="oliverPrepNotice">Há '+esc(money(finance.unplannedBalance))+' de saldo sem vencimento ou sem parcelamento definido. Revise no Financeiro.</p>':'';
    const budgetNote=finance?.goal!=null?'<p class="oliverPrepGoal">Meta financeira: '+esc(money(finance.goal))+' · Fechamento projetado: '+esc(money(finance.projected))+' · '+esc(finance.goalVariance<0?'Acima da meta: '+money(-finance.goalVariance):'Margem prevista: '+money(finance.goalVariance))+'</p>':'';
    const scheduleBlock='<section class="oliverDayBlock"><div class="oliverPrepListHead"><div><span class="eyebrow">SEXTA-FEIRA · 04 DE DEZEMBRO</span><h3>Cronograma do dia do chá</h3><p>Atividades registradas nas Ações, com responsáveis e situação atual.</p></div><button type="button" data-prep-tab="planning">Abrir cronograma completo</button></div>'+
