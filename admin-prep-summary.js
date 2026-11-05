@@ -29,7 +29,7 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
      const payload=await r.json();
      if(!r.ok||!Array.isArray(payload.data?.tasks)||!Array.isArray(payload.data?.expenses))throw Error('Resposta inválida');
      if(ticket!==seq)return;
-     planning=payload.data;planningReady=true;last=Date.now();
+     planning=payload.data;planningReady=true;last=Date.now();window.dispatchEvent(new CustomEvent('oliver-prep-planning',{detail:{data:planning,at:last}}));
    }catch{error='Não foi possível sincronizar o planejamento. Tente atualizar.'}
    finally{loading=false;schedule()}
  }
