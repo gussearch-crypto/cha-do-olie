@@ -2,7 +2,7 @@ import React,{useEffect,useMemo,useState} from 'react';
 import {Package,Gift,Download,Save,Trash2,FileUp,Plus,Wallet} from 'lucide-react';
 import {expenseTotals} from './planning-utils.mjs';
 import {POST_EVENT_SIZES,postEventSummary,postEventCsv,postEventBackup,parsePostEventBackup,validatePostEventItem} from './oliver-post-event-utils.mjs';
-import './oliver-post-event.css';
+// Estilos do inventário carregados estaticamente pelo index.html.
 
 const KEY='oliver-post-event-local-draft-v1';
 const empty=()=>({type:'fralda',description:'Pacote de fraldas',size:'M',brand:'',quantity:1,unitValue:'',notes:''});
