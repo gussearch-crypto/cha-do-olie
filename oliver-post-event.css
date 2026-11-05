@@ -1,0 +1,64 @@
+.oliePostInventory{border:1px solid #dedfc9;background:#fffefa;border-radius:19px;padding:22px;margin:18px 0 23px;color:#455b39}
+.oliePostInventory *{box-sizing:border-box}
+.oliePostHeader{display:flex;align-items:start;justify-content:space-between;gap:14px;margin-bottom:15px}
+.oliePostHeader h2{margin:6px 0;font-size:clamp(19px,2.5vw,26px);color:#455d38}
+.oliePostHeader p{margin:0;font-size:13px;color:#7a846d;line-height:1.5}
+.oliePostTag{background:#eaf1df;border-radius:99px;padding:7px 12px;color:#607b49;font-weight:800;font-size:11px;white-space:nowrap}
+.oliePostCaution{padding:12px 15px;border:1px solid #e6cf9d;background:#fff8e9;color:#795f32;border-radius:12px;font-size:12px;line-height:1.6}
+.oliePostCaution strong{display:block}
+.oliePostStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.oliePostStats>div{display:grid;gap:6px;justify-items:start;padding:15px;border-radius:13px;background:#f4f8ef;border:1px solid #e0ead4;min-width:0}
+.oliePostStats svg{color:#748b5b}
+.oliePostStats strong{font-size:clamp(17px,2.4vw,27px);color:#486138;overflow-wrap:anywhere}
+.oliePostStats small{font-size:11px;color:#76876a}
+.oliePostSizes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.oliePostSizes span{padding:10px 4px;border-radius:10px;border:1px solid #e4ebdd;text-align:center;background:#f8faf5}
+.oliePostSizes b,.oliePostSizes strong{display:block}
+.oliePostSizes b{font-size:11px;color:#77896a}
+.oliePostSizes strong{font-size:20px;color:#475d3a}
+.oliePostForm,.oliePostList,.oliePostExport,.oliePostBalance{padding:18px;border:1px solid #dce6d1;border-radius:14px;margin-top:16px;background:#fdfefb}
+.oliePostForm h3,.oliePostList h3,.oliePostExport h3,.oliePostBalance h3{font-size:16px;margin:0 0 13px;color:#455e39}
+.oliePostFields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.oliePostFields label{display:grid;gap:6px;font-size:12px;font-weight:750;color:#596e4c;min-width:0}
+.oliePostFields input,.oliePostFields select{width:100%;min-width:0;border:1px solid #d0dac4;background:#fff;border-radius:10px;padding:10px 12px;min-height:44px;font-size:14px;color:#435b38}
+.oliePostFields .oliePostWide{grid-column:1/-1}
+.oliePostButtons{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:15px}
+.oliePostButtons button,.oliePostImport,.oliePostRowActions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 13px;min-height:44px;border:1px solid #c6d6b7;border-radius:10px;background:#eff4ea;color:#526b43;cursor:pointer;font:750 12px 'DM Sans',Arial,sans-serif;text-decoration:none}
+.oliePostButtons button.oliePostPrimary{background:#667d4f;color:white;border-color:#667d4f}
+.oliePostButtons button:disabled{cursor:not-allowed;opacity:.45}
+.oliePostNotice{color:#557048;font-size:12px;background:#f0f7e9;border-radius:10px;padding:10px 12px}
+.oliePostListHead small{font-size:12px;color:#77836c;font-weight:500}
+.oliePostEmpty{padding:10px;color:#7c8a72;font-size:12px}
+.oliePostRows{display:grid;gap:8px}
+.oliePostRows article{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #e6ecdf;padding:9px 0}
+.oliePostRows article:last-child{border:0}
+.oliePostRows article>div:first-child{min-width:0;display:grid;gap:5px}
+.oliePostRows article strong{font-size:13px;overflow-wrap:anywhere}
+.oliePostRows article small{font-size:11px;color:#74856a;overflow-wrap:anywhere}
+.oliePostRowActions{display:flex;gap:6px;flex:none}
+.oliePostRowActions button{min-height:40px}
+.oliePostExport{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.oliePostExport p,.oliePostBalance p{font-size:12px;line-height:1.5;color:#7a8670;margin:0}
+.oliePostExport .oliePostButtons{margin:0}
+.oliePostBalance>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+.oliePostBalance>div span{display:grid;gap:5px;background:#f5f8f0;border:1px solid #e4eadd;padding:12px;border-radius:11px}
+.oliePostBalance>div small{font-size:11px;color:#748469}
+.oliePostBalance strong{font-size:clamp(16px,2vw,23px)}
+.oliePostBalance>small{color:#8b896d;font-size:11px}
+@media(max-width:800px){.oliePostFields{grid-template-columns:repeat(2,minmax(0,1fr))}.oliePostExport{display:block}.oliePostExport .oliePostButtons{margin-top:12px}}
+@media(max-width:550px){
+ .oliePostInventory{padding:13px}
+ .oliePostHeader{display:block}
+ .oliePostTag{display:inline-block;margin-top:10px}
+ .oliePostStats{gap:6px}
+ .oliePostStats>div{padding:11px}
+ .oliePostStats small{font-size:10px}
+ .oliePostSizes{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .oliePostFields{grid-template-columns:minmax(0,1fr)}
+ .oliePostForm,.oliePostList,.oliePostExport,.oliePostBalance{padding:12px}
+ .oliePostButtons{display:grid;grid-template-columns:minmax(0,1fr)}
+ .oliePostButtons button,.oliePostImport{width:100%;min-height:44px}
+ .oliePostRows article{align-items:start;flex-wrap:wrap}
+ .oliePostRowActions{width:100%}
+ .oliePostBalance>div{grid-template-columns:minmax(0,1fr)}
+}
