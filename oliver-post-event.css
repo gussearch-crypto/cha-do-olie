@@ -40,7 +40,7 @@
 .oliePostExport{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .oliePostExport p,.oliePostBalance p{font-size:12px;line-height:1.5;color:#7a8670;margin:0}
 .oliePostExport .oliePostButtons{margin:0}
-.oliePostBalance>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+.oliePostBalance>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:13px 0}
 .oliePostBalance>div span{display:grid;gap:5px;background:#f5f8f0;border:1px solid #e4eadd;padding:12px;border-radius:11px}
 .oliePostBalance>div small{font-size:11px;color:#748469}
 .oliePostBalance strong{font-size:clamp(16px,2vw,23px)}
@@ -108,3 +108,5 @@
  .oliePostSyncControls .oliePostButtons{grid-template-columns:minmax(0,1fr)}
  .oliePostExport .oliePostButtons{width:100%}
 }
+
+@media(max-width:850px){.oliePostBalance>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
