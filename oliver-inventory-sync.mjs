@@ -1,10 +1,14 @@
 import {validatePostEventItem,POST_EVENT_SIZES,postEventSummary} from './oliver-post-event-utils.mjs';
 export const INVENTORY_PRODUCTION_HOST='cha-oliver-mvp.vercel.app';
-export function inventoryApiUrl(hostname,supabaseUrl){
- if(String(hostname||'').toLowerCase()!==INVENTORY_PRODUCTION_HOST)return null;
- const url=String(supabaseUrl||'');
- if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(url))return null;
- return url.replace(/\/$/,'')+'/functions/v1/oliver-inventory';
+export function inventoryApiUrl(hostname,supabaseUrl,previewTestUrl=''){
+ const official=String(hostname||'').toLowerCase()===INVENTORY_PRODUCTION_HOST;
+ const main=String(supabaseUrl||'').replace(/\/$/,'');
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(main))return null;
+ if(official)return main+'/functions/v1/oliver-inventory';
+ // Preview só pode usar uma branch Supabase com hostname diferente do projeto principal.
+ const test=String(previewTestUrl||'').replace(/\/$/,'');
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(test)||test===main)return null;
+ return test+'/functions/v1/oliver-inventory';
 }
 export function mergeInventoryRows(current=[],incoming=[]){
  const rows=new Map();
