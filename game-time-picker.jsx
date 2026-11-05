@@ -1,6 +1,6 @@
 import React from 'react';
 import {Clock3} from 'lucide-react';
-import './game-time-picker.css';
+// O estilo do relógio é compartilhado em games.css nas duas páginas.
 
 const validTime=value=>/^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
