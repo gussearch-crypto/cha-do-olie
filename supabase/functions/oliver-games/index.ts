@@ -29,6 +29,15 @@ Deno.serve(async req=>{if(req.method==="OPTIONS")return new Response("ok",{heade
 try {const b=await req.json(),db=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);const action=String(b.action||"");
 const {data:config,error:ce}=await db.from("oliver_game_settings").select("*").eq("id",1).single();if(ce)return reply({error:"settings_unavailable"},500);
 
+if(action==="adminGiftSet"){
+  if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
+  if(typeof b.remote_gift_url!=="string"||typeof b.remote_gift_message!=="string")return reply({error:"invalid_gift_fields"},400);
+  const url=b.remote_gift_url.trim(),message=b.remote_gift_message.trim();
+  if(url.length>2048||message.length>600)return reply({error:"gift_content_too_long"},400);
+  if(url){try{const parsed=new URL(url);if(parsed.protocol!=="https:"||!parsed.hostname||parsed.username||parsed.password||/\s/.test(url))return reply({error:"invalid_gift_url"},400);}catch{return reply({error:"invalid_gift_url"},400);}}
+  const {error}=await db.from("oliver_game_settings").update({remote_gift_url:url,remote_gift_message:message,updated_at:new Date().toISOString()}).eq("id",1);
+  return error?reply({error:"gift_save_failed"},500):reply({ok:true});
+}
 if(action==="adminBirthToggle"){
  if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
  const reopen=b.open===true;
@@ -53,7 +62,7 @@ if(action==="adminBirthToggle"){
  await db.from("oliver_game_access_history").insert({game:"birth",operation:"closed",details:{closed_at:now}});
  return reply({ok:true,birth_open:false,birth_closed_at:now});
 }
-if(action==="remoteGameStatus"){const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();const closed=!!config.birth_closed_at||!config.birth_open||birthOfficialStarted(config,announcement?.birth_time);return reply({open:!closed,phase:config.results_published?"revealed":closed?"closed":"open",closed_at:config.birth_closed_at||null,results_published:!!config.results_published});}
+if(action==="remoteGameStatus"){const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();const closed=!!config.birth_closed_at||!config.birth_open||birthOfficialStarted(config,announcement?.birth_time);return reply({open:!closed,phase:config.results_published?"revealed":closed?"closed":"open",closed_at:config.birth_closed_at||null,results_published:!!config.results_published,remote_gift_url:config.remote_gift_url||"",remote_gift_message:config.remote_gift_message||""});}
 if(action==="remoteBirthSubmit"){
  if(!config.birth_open||config.birth_closed_at||config.actual_birth_date!=null||config.actual_weight_g!=null||config.actual_length_cm!=null||config.results_published||config.birth_date_revealed||config.weight_revealed||config.length_revealed||config.jackpot_revealed)return reply({error:"game_closed"},409);
  const name=String(b.name||"").trim().replace(/\s+/g," ");
