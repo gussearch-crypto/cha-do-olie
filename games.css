@@ -612,3 +612,12 @@
 .olieGiftAdminSave:hover{background:#51693f}
 .olieGiftAdminSave:disabled{opacity:.55;cursor:wait}
 @media(max-width:600px){.olieGiftAdmin>summary{padding:14px 15px}.olieGiftAdminBody{padding:14px;gap:13px}.olieGiftAdminSave{width:100%}}
+
+/* Preview usa o mesmo Supabase da produção: aviso explícito e registro bloqueado. */
+.olieGamePreviewNote{
+ display:flex;align-items:center;gap:10px;box-sizing:border-box;
+ padding:13px 16px;margin:10px 0 17px;
+ border:1px solid #dcc69b;border-left:4px solid #b28c4f;border-radius:12px;
+ background:#fff8e9;color:#70592f;font-size:13px;line-height:1.6;
+}
+@media(max-width:600px){.olieGamePreviewNote{padding:12px;font-size:12px;line-height:1.5}}
