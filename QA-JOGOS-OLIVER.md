@@ -2,6 +2,13 @@
 
 **Preparação para 04/12/2026** · Testar em desktop e celular (preferencialmente Chrome e Safari).
 
+## Ambientes de teste
+
+- Preview serve para avaliar layout, navegação, calendário, relógio e o diálogo de conferência. **Enviar palpites reais é bloqueado em domínios de Preview**.
+- Para testar inscrição, consulta, encerramento, revelação e ranking com dados fictícios, use o **Laboratório dos Jogos** em `/games/teste`.
+- Os controles administrativos conectam-se ao Supabase real; não alterar dados, status oficiais ou senhas via Preview sem autorização explícita.
+- Para revisão final e promoção manual, seguir `PUBLICACAO-CONTROLADA.md`.
+
 ## Cuidados antes de começar
 - [ ] Executar cadastros, consulta, encerramento e premiação fictícia apenas em `/games/teste` (laboratório isolado).
 - [ ] Não cadastrar palpites de teste nas páginas `/games` ou `/games/online`.
