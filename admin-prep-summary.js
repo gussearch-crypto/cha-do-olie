@@ -86,7 +86,8 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
      ['Pessoas aguardando',rsvp?rsvp.waiting:'—','Revisar confirmação por núcleo'],
      ['Atividades de 04/12',scheduleData?scheduleData.scheduled:'—','Somente horários cadastrados'],
      ['Conflitos de horário',scheduleData?scheduleData.conflicts.length:'—','Mesmo responsável e horário sobreposto'],
-     ['Orçado/contratado',finance?money(finance.planned):'—','Valor contratado, não orçamento'],
+     ['Orçado por categorias',finance&&finance.budgeted>0?money(finance.budgeted):'—','Limites definidos por categoria no Financeiro'],
+     ['Valor contratado',finance?money(finance.planned):'—','Serviços contratados registrados'],
      ['Valor já pago',finance?money(finance.paid):'—','Pagamentos efetivamente registrados']
    ];
    const summary=JSON.stringify([readinessTiles,stats,upcoming,payments,scheduleData,finance&&{open:finance.open,goal:finance.goal,projected:finance.projected,unplannedBalance:finance.unplannedBalance},today,error,loading,last]);
@@ -100,7 +101,7 @@ import {EVENT_DATE,RSVP_DEADLINE,eventRsvpReadiness,eventScheduleReadiness,event
      ' Novos convidados podem ser incluídos depois do prazo para completar a capacidade de 100 pessoas.</p></div><button type="button" data-prep-tab="guests">Gerenciar convidados</button></div>':
      '<div class="oliverRetaStatus"><div><strong>Confirmações do evento</strong><p>Carregue o painel de convidados para acompanhar o prazo de 30/11.</p></div></div>';
    const paymentNote=finance?.unplannedBalance>0?'<p class="oliverPrepNotice">Há '+esc(money(finance.unplannedBalance))+' de saldo sem vencimento ou sem parcelamento definido. Revise no Financeiro.</p>':'';
-   const budgetNote=finance?.goal!=null?'<p class="oliverPrepGoal">Meta financeira: '+esc(money(finance.goal))+' · Fechamento projetado: '+esc(money(finance.projected))+'</p>':'';
+   const budgetNote=finance?.goal!=null?'<p class="oliverPrepGoal">Meta financeira: '+esc(money(finance.goal))+' · Fechamento projetado: '+esc(money(finance.projected))+' · '+esc(finance.goalVariance<0?'Acima da meta: '+money(-finance.goalVariance):'Margem prevista: '+money(finance.goalVariance))+'</p>':'';
    const scheduleBlock='<section class="oliverDayBlock"><div class="oliverPrepListHead"><div><span class="eyebrow">SEXTA-FEIRA · 04 DE DEZEMBRO</span><h3>Cronograma do dia do chá</h3><p>Atividades registradas nas Ações, com responsáveis e situação atual.</p></div><button type="button" data-prep-tab="planning">Abrir cronograma completo</button></div>'+
       (scheduleData?
        '<div class="oliverDaySummary"><span>'+scheduleData.scheduled+' atividades</span><span>'+scheduleData.pending+' a realizar</span><span'+(scheduleData.conflicts.length?' class="is-warning"':'')+'>'+scheduleData.conflicts.length+' conflito(s)</span><span>'+scheduleData.missingOwners+' sem responsável</span></div>'+
