@@ -6,7 +6,7 @@
 .oliePostTag{background:#eaf1df;border-radius:99px;padding:7px 12px;color:#607b49;font-weight:800;font-size:11px;white-space:nowrap}
 .oliePostCaution{padding:12px 15px;border:1px solid #e6cf9d;background:#fff8e9;color:#795f32;border-radius:12px;font-size:12px;line-height:1.6}
 .oliePostCaution strong{display:block}
-.oliePostStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.oliePostStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
 .oliePostStats>div{display:grid;gap:6px;justify-items:start;padding:15px;border-radius:13px;background:#f4f8ef;border:1px solid #e0ead4;min-width:0}
 .oliePostStats svg{color:#748b5b}
 .oliePostStats strong{font-size:clamp(17px,2.4vw,27px);color:#486138;overflow-wrap:anywhere}
@@ -61,4 +61,23 @@
  .oliePostRows article{align-items:start;flex-wrap:wrap}
  .oliePostRowActions{width:100%}
  .oliePostBalance>div{grid-template-columns:minmax(0,1fr)}
+}
+
+
+/* Inventário 4.4 — contar pacotes e unidades de fraldas separadamente. */
+.oliePostSizes span{display:grid;align-content:start;justify-items:center;gap:4px}
+.oliePostSizes span small{font-size:10px;font-style:normal;color:#738568}
+.oliePostSizes span em{font-size:10px;font-weight:700;font-style:normal;color:#596f4c}
+.oliePostSizes .oliePostSizePending{font-size:10px;color:#a27135;background:#fff4e2;padding:4px;border-radius:5px}
+.oliePostMissing{padding:12px 14px;margin:12px 0 0;background:#fff8e9;color:#8a6635;border:1px solid #e4cca5;border-radius:11px;font-size:12px;line-height:1.55}
+.oliePostMissing strong{display:block;margin-bottom:3px}
+.oliePostCalculation{margin:14px 0 0;padding:12px 14px;border:1px solid #c7ddbd;border-radius:10px;background:#eff7ea;color:#4c6b3e;font-size:13px;line-height:1.5}
+.oliePostCalculation strong{font-weight:800}
+.oliePostRows article small.oliePostRowTotal{color:#537549;font-weight:750}
+.oliePostRows article small.oliePostRowPending{color:#a27135;font-weight:750}
+@media(max-width:900px){.oliePostStats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){
+ .oliePostStats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .oliePostSizes span{min-width:0}
+ .oliePostCalculation{padding:11px;font-size:12px}
 }
