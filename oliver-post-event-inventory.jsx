@@ -139,7 +139,7 @@ export default function OliverPostEventInventory(){
        <button type="button" onClick={refreshRemote} disabled={saving||remote.status==='checking'}>Atualizar compartilhado</button>
        <button type="button" onClick={mergeDraft} disabled={saving||!localRows.length||remote.status!=='ready'}>Mesclar rascunho ({localRows.length})</button>
      </div>
-   </div>
+   </div>}
   <div className="oliePostStats">
    <div><Package size={21}/><strong>{sum.diaperPacks}</strong><small>Pacotes de fraldas</small></div>
    <div><Package size={21}/><strong>{sum.diaperUnits.toLocaleString('pt-BR')}</strong><small>Fraldas contabilizadas</small></div>
