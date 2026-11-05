@@ -19,6 +19,8 @@ export function eventRsvpReadiness(families=[],today='2026-11-05'){
   const affectedFamilies=real.filter(f=>(f.guests||[]).some(g=>!hasAnswer(g)));
   const deadlineDays=daysUntil(RSVP_DEADLINE,today);
   const afterDeadline=deadlineDays!==null&&deadlineDays<0;
+  const eventDays=daysUntil(EVENT_DATE,today);
+  const inviteWindowOpen=eventDays!==null&&eventDays>=0;
   const unknownAges=yes.filter(g=>g.person_type==='child'&&!['under_5','five_or_more'].includes(g.child_age_group)).length;
   return {
     families:real.length,
@@ -28,6 +30,8 @@ export function eventRsvpReadiness(families=[],today='2026-11-05'){
     waiting:waiting.length,pendingEligible,waitingFamilies:affectedFamilies.length,
     declined:guests.filter(g=>g.attendance==='no').length,
     unknownAges,deadlineDays,afterDeadline,
+    productionEstimateClosed:afterDeadline,
+    inviteWindowOpen,canAddGuests:inviteWindowOpen&&counted<EVENT_CAPACITY,
     substitutionCandidates:afterDeadline?affectedFamilies.length:0,
     possibleCount:counted+pendingEligible
   };
@@ -77,7 +81,7 @@ export function eventPriorityReadiness(data={},rsvp={},today='2026-11-05'){
   if(rsvp.waiting>0){
     add(days!==null&&days<0?0:days!==null&&days<=7?1:2,'guests',
       rsvp.waiting+' pessoa(s) aguardando confirmação',
-      days!==null&&days<0?'Prazo de 30/11 encerrado · revisar substituições sem remover automaticamente':'Prazo para confirmação: 30/11 · '+rsvp.waitingFamilies+' núcleo(s)','guests');
+      days!==null&&days<0?'Estimativa de produção de 30/11 fechada · revisar substituições sem remoção automática':'Prazo inicial para estimativa: 30/11 · '+rsvp.waitingFamilies+' núcleo(s)','guests');
   }
   if(rsvp.overCapacity>0)add(0,'guests','Capacidade confirmada acima de 100',rsvp.overCapacity+' pessoa(s) além da capacidade','guests');
   if(rsvp.unknownAges>0)add(1,'guests','Verificar faixa etária',rsvp.unknownAges+' criança(s) confirmadas sem classificação de idade','guests');
