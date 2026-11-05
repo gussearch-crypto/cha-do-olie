@@ -1,0 +1,36 @@
+name: Validação de Preview — Chá do Oliver
+
+on:
+  push:
+    branches: [dev-supabase]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Testes e compilação (sem deploy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obter código
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Configurar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - name: Executar testes
+        run: npm test
+      - name: Compilar páginas
+        run: npm run build
+      - name: Confirmar política de entrega
+        run: |
+          echo "Somente testes e build: esta rotina não realiza deployments."
+          echo "Production somente após validação e aprovação explícita."
