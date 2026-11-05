@@ -25,7 +25,8 @@ test('api requer PIN por hash não versionado e oferece controle otimista de rev
 test('Preview jamais aponta por padrão para o Supabase real',()=>{
  const code=file('oliver-inventory-sync.mjs');
  assert.match(code,/INVENTORY_PRODUCTION_HOST/);
- assert.match(code,/if\(String\(hostname\|\|''\)\.toLowerCase\(\)!==INVENTORY_PRODUCTION_HOST\)return null/);
+ assert.match(code,/const official=String\(hostname\|\|''\)\.toLowerCase\(\)===INVENTORY_PRODUCTION_HOST/);
+ assert.match(code,/test===main/);
  const ui=file('oliver-post-event-inventory.jsx');
  assert.match(ui,/Mesclar rascunho/);
  assert.match(ui,/Conflito/);
