@@ -77,3 +77,91 @@
  .olieRemoteRulesDisclosure>summary{padding:14px}
  .olieRemoteRulesDisclosure .olieRemoteRules{padding:15px}
 }
+
+
+
+/* Refinamento da experiência online: cabeçalho, apresentação, resultados e rodapé */
+.olieRemotePage>.olieRemoteHeader{
+  position:relative;top:auto;z-index:1;box-sizing:border-box;
+  width:100%;min-height:58px;height:auto;padding:12px 17px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  color:#586e4b;background:#fffdf8;
+  border:1px solid #e1e6d7;border-radius:14px;box-shadow:none;
+  font:inherit;font-size:13px;letter-spacing:0;
+}
+.olieRemotePage>.olieRemoteHeader a{color:#506b43!important;text-decoration:none;font-size:13px;font-weight:750}
+.olieRemotePage>.olieRemoteHeader span{color:#7b8a71;font-size:12px}
+.olieRemotePage .olieRemoteHero{padding:22px 12px 16px}
+.olieRemotePage .olieRemoteHero h1{font-size:clamp(25px,4.5vw,35px);color:#425b36;margin:8px 0 9px}
+.olieRemotePage .olieRemoteHero p{max-width:530px;font-size:14px;color:#6f8065}
+.olieRemotePage .olieRemoteGameGuide{margin:0 0 8px;gap:8px}
+.olieRemotePage .olieRemoteGameGuideMain{
+  padding:17px 19px;border:1px solid #d4e1ca;border-radius:18px;
+  background:#fffdf8;box-shadow:0 6px 20px rgba(63,81,49,.045);
+}
+.olieRemotePage .olieRemoteGameGuideHeader{gap:10px}
+.olieRemotePage .olieRemoteGameGuideHeader strong{font-size:17px;color:#4b6640}
+.olieRemotePage .olieRemoteGameGuideHeader>span{font-size:11px;white-space:normal;text-align:center}
+.olieRemotePage .olieRemoteGameGuideMain>p{font-size:13px;margin:9px 0 11px;line-height:1.5}
+.olieRemotePage .olieRemoteGameGuideTags{gap:7px}
+.olieRemotePage .olieRemoteGameGuideTags span{
+  border:1px solid #e0e7d8;background:#f5f8ef;color:#607851;
+  border-radius:9px;padding:6px 10px;font-size:11px;font-weight:750;
+}
+.olieRemotePage .olieRemoteGameGuideNote{
+  margin:0 4px 0;padding:1px 0 3px;font-size:11px;line-height:1.5;color:#7d8874;
+}
+.olieRemotePage .olieRemoteTabs{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  width:100%;max-width:none;gap:10px;margin:15px 0 16px;
+}
+.olieRemotePage .olieRemoteTabs button{
+  box-sizing:border-box;min-width:0;min-height:48px;
+  border-radius:12px;font-size:13px;
+  border:1px solid #c7d3bd;background:#fffefa;color:#536d45;
+  box-shadow:0 3px 8px rgba(64,77,47,.03);
+}
+.olieRemotePage .olieRemoteTabs button.active{background:#60794b;border-color:#60794b;color:#fff;box-shadow:0 4px 12px rgba(68,94,46,.13)}
+.olieRemotePage .olieRemoteResultLink{margin:17px 0 12px}
+.olieRemotePage .olieRemoteResultLink>a{
+  box-sizing:border-box;width:100%;min-height:65px;display:flex;
+  align-items:center;gap:12px;padding:14px 18px;
+  border:1px solid #d6e2ca;border-radius:15px;background:#f7faf3;
+  color:#4d683f!important;text-decoration:none!important;
+  font:inherit;letter-spacing:0;
+}
+.olieRemotePage .olieRemoteResultLink>a:hover{background:#ecf3e8;border-color:#b9cdaa}
+.olieRemotePage .olieRemoteResultLink>a:focus-visible{outline:3px solid #a4c196;outline-offset:2px}
+.olieRemotePage .olieRemoteResultLink>a>svg{flex:none;color:#6f885a}
+.olieRemotePage .olieRemoteResultLink>a>span:not(.olieRemoteResultArrow){display:grid;flex:1;gap:4px;min-width:0}
+.olieRemotePage .olieRemoteResultLink strong{font-size:14px;line-height:1.25;font-weight:800}
+.olieRemotePage .olieRemoteResultLink small{font-size:11px;line-height:1.4;color:#738367}
+.olieRemotePage .olieRemoteResultArrow{font-size:29px;line-height:.7;color:#7a9367}
+.olieRemotePage .olieRemoteRulesDisclosure{margin:0;border-radius:15px;background:#fffdf9;border-color:#dce5d3}
+.olieRemotePage .olieRemoteRulesDisclosure>summary{padding:15px 18px}
+.olieRemotePage .olieRemoteRulesDisclosure>summary strong{color:#516d44}
+.olieRemotePage .olieRemoteRulesDisclosure>summary small{color:#78866c}
+.olieRemotePage>.olieRemoteFooter{
+  box-sizing:border-box;margin:20px 0 0;padding:19px 8px 6px;
+  border-top:1px solid #dce4d2;background:transparent;box-shadow:none;
+  color:#8a8e78;font:600 12px/1.5 'Playfair Display',Georgia,serif;
+  letter-spacing:.08em;text-align:center;
+}
+.olieRemotePage .olieRemoteGift>p{white-space:pre-line;overflow-wrap:anywhere}
+.olieRemotePage .olieRemoteGift>a.olieRemotePrimary{max-width:100%}
+@media(max-width:600px){
+  .olieRemotePage>.olieRemoteHeader{padding:11px 13px;min-height:51px;border-radius:12px}
+  .olieRemotePage>.olieRemoteHeader span{display:none}
+  .olieRemotePage .olieRemoteHero{padding:14px 6px 13px}
+  .olieRemotePage .olieRemoteGameGuideMain{padding:14px}
+  .olieRemotePage .olieRemoteGameGuideHeader strong{font-size:15px}
+  .olieRemotePage .olieRemoteGameGuideHeader>span{font-size:10px;padding:5px 8px}
+  .olieRemotePage .olieRemoteGameGuideTags{gap:5px}
+  .olieRemotePage .olieRemoteGameGuideTags span{padding:6px 8px;font-size:10px}
+  .olieRemotePage .olieRemoteTabs{gap:8px;margin:13px 0 14px}
+  .olieRemotePage .olieRemoteTabs button{min-height:44px;padding:9px 7px;font-size:12px}
+  .olieRemotePage .olieRemoteResultLink>a{padding:13px 14px;min-height:60px;gap:10px}
+  .olieRemotePage .olieRemoteResultLink strong{font-size:13px}
+  .olieRemotePage .olieRemoteRulesDisclosure>summary{padding:14px}
+  .olieRemotePage>.olieRemoteFooter{font-size:11px;letter-spacing:.06em}
+}
