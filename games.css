@@ -657,3 +657,83 @@
 @media(prefers-reduced-motion:reduce){
  .gamesPage .gameBirthForm *{scroll-behavior:auto}
 }
+
+
+/* Sprint 4 — jornada dos resultados: destaque alinhado aos cartões existentes. */
+.oliverGamesAdmin .olieGamesPhaseGuide{
+  display:grid;gap:17px;margin:0 0 24px;padding:24px;
+  background:linear-gradient(140deg,#fffdf8,#f0f5e8);
+  border:1px solid #d9e4cf;border-radius:20px;
+  box-shadow:0 8px 28px rgba(64,82,47,.045);min-width:0;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide>.olieGamesPhaseIntro{display:grid;gap:6px}
+.oliverGamesAdmin .olieGamesPhaseGuide .eyebrow{
+  display:block;color:#728862;font-size:10px;letter-spacing:1.8px;font-weight:850;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide h3{
+  font-size:clamp(19px,2.4vw,24px);line-height:1.3;margin:5px 0 7px;color:#405a37;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide p{
+  color:#75846c;line-height:1.6;font-size:13px;margin:0;max-width:790px;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;
+  margin:0;padding:0;list-style:none;counter-reset:none;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li{
+  display:flex;align-items:center;gap:11px;padding:16px 13px;min-width:0;
+  border:1px solid #dee8d5;border-radius:14px;background:#fffefa;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li>span{
+  flex:0 0 39px;width:39px;height:39px;border-radius:50%;
+  display:grid;place-items:center;color:#637b53;background:#eaf2e3;
+  border:1px solid #d4e2c9;font-size:14px;font-weight:850;line-height:1;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li.is-done{
+  border-color:#c6dcc0;background:#f1f9ed;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li.is-done>span{
+  background:#56754e;color:white;border-color:#56754e;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li>strong{
+  font-size:14px;font-weight:800;line-height:1.35;color:#4a653d;overflow-wrap:anywhere;
+}
+.oliverGamesAdmin .olieGamesPhaseGuide ol li>small{
+  margin-left:auto;font-size:10px;font-weight:700;color:#819171;white-space:nowrap;
+}
+.oliverGamesAdmin .olieGamesPhaseLinks{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:2px;
+}
+.oliverGamesAdmin .olieGamesPhaseLinks button,
+.oliverGamesAdmin .olieGamesPhaseLinks a{
+  appearance:none;display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:11px 16px;border:1px solid #667e55;
+  border-radius:11px;background:#647d52;color:#fff;text-decoration:none;
+  font:750 13px/1.25 inherit;cursor:pointer;white-space:normal;text-align:center;
+}
+.oliverGamesAdmin .olieGamesPhaseLinks button:hover{background:#526c43}
+.oliverGamesAdmin .olieGamesPhaseLinks button:nth-child(2){
+  background:#fffefa;color:#557249;border-color:#bfd1b5;
+}
+.oliverGamesAdmin .olieGamesPhaseLinks a{
+  background:transparent;border-color:transparent;color:#57704c;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.oliverGamesAdmin .olieGamesPhaseLinks a:hover{background:#e7efe0}
+.oliverGamesAdmin .olieGamesPhaseLinks :is(button,a):focus-visible{
+  outline:3px solid #a8c396;outline-offset:2px;
+}
+@media(max-width:900px){
+ .oliverGamesAdmin .olieGamesPhaseGuide{padding:19px;gap:16px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol{gap:8px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol li{flex-wrap:wrap;gap:6px 9px;padding:11px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol li>small{margin-left:48px;flex:1 1 100%}
+}
+@media(max-width:620px){
+ .oliverGamesAdmin .olieGamesPhaseGuide{padding:16px;border-radius:16px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol{grid-template-columns:1fr;gap:8px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol li{flex-wrap:nowrap;gap:10px}
+ .oliverGamesAdmin .olieGamesPhaseGuide ol li>small{margin-left:auto;flex:0 1 auto}
+ .oliverGamesAdmin .olieGamesPhaseLinks{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ .oliverGamesAdmin .olieGamesPhaseLinks :is(button,a){width:100%;min-height:46px}
+}
