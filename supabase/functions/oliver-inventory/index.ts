@@ -1,9 +1,9 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import {createClient} from 'jsr:@supabase/supabase-js@2';
 
-// Admin code hash is identical to the existing planning-api authorization.
-// Never store a plaintext admin code in the source or browser bundle.
-const ADMIN_HASH='be8f2e0e71d2ed6fe381fda864a08fa0f10601188c492a1fc7659d8e114c1fec';
+// Admin code SHA-256 must be provided securely via Supabase function secrets.
+// Do not commit admin-code hashes or plaintext credentials to this repository.
+const configuredAdminHash=()=>Deno.env.get('OLIVER_INVENTORY_ADMIN_CODE_SHA256')||'';
 const DEFAULT_ORIGIN='https://cha-oliver-mvp.vercel.app';
 const allowedOrigin=()=>{
  const value=Deno.env.get('OLIVER_INVENTORY_ALLOWED_ORIGIN')||DEFAULT_ORIGIN;
@@ -71,7 +71,9 @@ Deno.serve(async request=>{
   body=JSON.parse(raw);
  } catch {return json({error:'invalid_json'},400,origin)}
  if(!body||typeof body!=='object'||!['get','save'].includes(body.action))return json({error:'unknown_action'},400,origin);
- if(typeof body.adminCode!=='string'||body.adminCode.length>128||(await hash(body.adminCode))!==ADMIN_HASH)return json({error:'unauthorized'},403,origin);
+ const adminHash=configuredAdminHash();
+ if(!/^[0-9a-f]{64}$/.test(adminHash))return json({error:'not_configured'},503,origin);
+ if(typeof body.adminCode!=='string'||body.adminCode.length>128||(await hash(body.adminCode))!==adminHash)return json({error:'unauthorized'},403,origin);
  const supabaseUrl=Deno.env.get('SUPABASE_URL');
  const adminKey=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
  if(!supabaseUrl||!adminKey)return json({error:'not_configured'},503,origin);
