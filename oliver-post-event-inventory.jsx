@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useState} from 'react';
+import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {Package,Gift,Download,Save,Trash2,FileUp,Plus,Wallet} from 'lucide-react';
 import {expenseTotals} from './planning-utils.mjs';
 import {POST_EVENT_SIZES,postEventSummary,postEventCsv,postEventBackup,parsePostEventBackup,validatePostEventItem} from './oliver-post-event-utils.mjs';
@@ -20,6 +20,7 @@ function initial(){
 
 export default function OliverPostEventInventory(){
  const [localRows,setLocalRows]=useState(initial);
+ const localRowsRef=useRef(localRows);localRowsRef.current=localRows;
  const endpoint=inventoryApiUrl(window.location.hostname,import.meta.env.VITE_SUPABASE_URL);
  const [remote,setRemote]=useState({status:endpoint?'checking':'unavailable',items:[],revision:0,updatedAt:null});
  const [mode,setMode]=useState('local'),[saving,setSaving]=useState(false);
@@ -36,7 +37,7 @@ export default function OliverPostEventInventory(){
   inventoryApiRequest(endpoint,code,{action:'get'})
    .then(x=>{if(!active)return;const state=inventoryStateResponse(x);
      setRemote({...state,status:'ready'});
-     if(localRows.length===0)setMode('shared');
+     if(localRowsRef.current.length===0)setMode('shared');
    })
    .catch(()=>{if(active)setRemote(r=>({...r,status:'offline'}))});
   return()=>{active=false};
