@@ -5,7 +5,7 @@ import {POST_EVENT_SIZES,postEventSummary,postEventCsv,postEventBackup,parsePost
 // Estilos do inventário carregados estaticamente pelo index.html.
 
 const KEY='oliver-post-event-local-draft-v1';
-const empty=()=>({type:'fralda',description:'Pacote de fraldas',size:'M',brand:'',quantity:1,unitValue:'',notes:''});
+const empty=()=>({type:'fralda',description:'Pacote de fraldas',size:'M',brand:'',quantity:1,unitsPerPackage:'',unitValue:'',notes:''});
 const currency=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 function download(name,text,type){
  const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -36,12 +36,12 @@ export default function OliverPostEventInventory(){
  const submit=e=>{
   e.preventDefault();setNotice('');
   try{
-   const clean=validatePostEventItem({...form,id:editing||crypto.randomUUID()});
+   const clean=validatePostEventItem({...form,id:editing||crypto.randomUUID()},{requireDiaperUnits:true});
    setRows(old=>editing?old.map(x=>x.id===editing?clean:x):[...old,clean]);
    setForm(empty());setEditing(null);setNotice(editing?'Item atualizado no rascunho local.':'Item adicionado ao rascunho local.');
   }catch(err){setNotice(err.message)}
  };
- const edit=item=>{setEditing(item.id);setForm({...item,unitValue:item.unitValue||''});document.querySelector('#olie-post-item-form')?.scrollIntoView({block:'center',behavior:'smooth'})};
+ const edit=item=>{setEditing(item.id);setForm({...item,unitsPerPackage:item.unitsPerPackage??'',unitValue:item.unitValue||''});document.querySelector('#olie-post-item-form')?.scrollIntoView({block:'center',behavior:'smooth'})};
  const remove=id=>{
   if(!window.confirm('Remover este registro do inventário local?'))return;
   setRows(a=>a.filter(x=>x.id!==id));if(editing===id){setEditing(null);setForm(empty())}
@@ -57,33 +57,38 @@ export default function OliverPostEventInventory(){
  };
  const amount=sum.estimate,net=cost!=null?Math.round((amount-cost)*100)/100:null;
  return <section id="oliver-post-event-inventory" className="oliePostInventory adminTabbedBlock" aria-label="Inventário pós-chá">
-  <div className="oliePostHeader"><div><span className="eyebrow">APÓS O CHÁ · INVENTÁRIO</span><h2>O que recebemos para o Oliver 💛</h2><p>Registre quantidades de fraldas e presentes por categoria, sem vincular itens aos convidados.</p></div><span className="oliePostTag">Rascunho local</span></div>
+  <div className="oliePostHeader"><div><span className="eyebrow">APÓS O CHÁ · INVENTÁRIO</span><h2>O que recebemos para o Oliver 💛</h2><p>Registre quantos pacotes recebeu e quantas fraldas há em cada pacote, sem vincular itens aos convidados.</p></div><span className="oliePostTag">Rascunho local</span></div>
   <div className="oliePostCaution" role="note"><strong>Este inventário ainda não sincroniza com o Supabase.</strong> Os registros ficam somente neste navegador. Exporte o backup JSON para não perder seus dados e o CSV para importar em outras plataformas. Não há controle de quem presenteou.</div>
   <div className="oliePostStats">
    <div><Package size={21}/><strong>{sum.diaperPacks}</strong><small>Pacotes de fraldas</small></div>
+   <div><Package size={21}/><strong>{sum.diaperUnits.toLocaleString('pt-BR')}</strong><small>Fraldas contabilizadas</small></div>
    <div><Gift size={21}/><strong>{sum.giftUnits}</strong><small>Outros presentes</small></div>
    <div><Wallet size={21}/><strong>{currency(sum.estimate)}</strong><small>Valor estimado informado</small></div>
   </div>
-  <div className="oliePostSizes">{POST_EVENT_SIZES.map(size=><span key={size}><b>{size}</b><strong>{sum.sizes[size]}</strong></span>)}</div>
+  <div className="oliePostSizes" aria-label="Fraldas por tamanho">{POST_EVENT_SIZES.map(size=><span key={size}><b>{size}</b><strong>{sum.sizes[size].toLocaleString('pt-BR')}</strong><small>fraldas</small><em>{sum.packsBySize[size]} pacote(s)</em>{sum.unknownPacksBySize[size]>0&&<small className="oliePostSizePending">+ {sum.unknownPacksBySize[size]} pacote(s) sem quantidade interna</small>}</span>)}</div>
+  {sum.uncountedPacks>0&&<p className="oliePostMissing" role="status"><strong>{sum.uncountedPacks} pacote(s) sem informação de fraldas por pacote.</strong> Eles já estão incluídos no total de pacotes, mas ainda não entram na contagem de fraldas. Edite os registros antigos para completar esse dado.</p>}
   <form id="olie-post-item-form" className="oliePostForm" onSubmit={submit}>
    <h3>{editing?'Editar item':'Adicionar item recebido'}</h3>
    <div className="oliePostFields">
-    <label>Categoria<select value={form.type} onChange={e=>{update('type',e.target.value);if(e.target.value==='presente')setForm(s=>({...s,type:'presente',size:'',description:''}));else setForm(s=>({...s,type:'fralda',size:'M',description:'Pacote de fraldas'}))}}><option value="fralda">Fraldas</option><option value="presente">Outro presente</option></select></label>
+    <label>Categoria<select value={form.type} onChange={e=>{update('type',e.target.value);if(e.target.value==='presente')setForm(s=>({...s,type:'presente',size:'',unitsPerPackage:'',description:''}));else setForm(s=>({...s,type:'fralda',size:'M',unitsPerPackage:'',description:'Pacote de fraldas'}))}}><option value="fralda">Fraldas</option><option value="presente">Outro presente</option></select></label>
     {form.type==='fralda'&&<label>Tamanho<select value={form.size} onChange={e=>update('size',e.target.value)}>{POST_EVENT_SIZES.map(size=><option key={size}>{size}</option>)}</select></label>}
     <label>Descrição<input required maxLength={120} value={form.description} onChange={e=>update('description',e.target.value)} placeholder={form.type==='fralda'?'Pacote de fraldas':'Ex.: manta, roupinha, toalha'}/></label>
     <label>Marca (opcional)<input maxLength={80} value={form.brand} onChange={e=>update('brand',e.target.value)} placeholder="Marca do item"/></label>
-    <label>Quantidade<input required type="number" min="1" max="100000" step="1" inputMode="numeric" value={form.quantity} onChange={e=>update('quantity',e.target.value)}/></label>
-    <label>Valor estimado por unidade (opcional)<input type="number" min="0" max="1000000" step="0.01" inputMode="decimal" value={form.unitValue} onChange={e=>update('unitValue',e.target.value)} placeholder="R$ 0,00"/></label>
+    <label>{form.type==='fralda'?'Quantidade de pacotes':'Quantidade de presentes'}<input required type="number" min="1" max="100000" step="1" inputMode="numeric" value={form.quantity} onChange={e=>update('quantity',e.target.value)}/></label>
+    {form.type==='fralda'&&<label>Fraldas por pacote<input required type="number" min="1" max="1000" step="1" inputMode="numeric" value={form.unitsPerPackage} onChange={e=>update('unitsPerPackage',e.target.value)} placeholder="Ex.: 32, 56..." /></label>}
+    <label>Valor estimado por {form.type==='fralda'?'pacote':'presente'} (opcional)<input type="number" min="0" max="1000000" step="0.01" inputMode="decimal" value={form.unitValue} onChange={e=>update('unitValue',e.target.value)} placeholder="R$ 0,00"/></label>
     <label className="oliePostWide">Observações (opcional)<input maxLength={240} value={form.notes} onChange={e=>update('notes',e.target.value)} placeholder="Observações sobre o produto, sem identificação de pessoas"/></label>
    </div>
+   {form.type==='fralda'&&Number.isSafeInteger(Number(form.quantity))&&Number(form.quantity)>0&&Number.isSafeInteger(Number(form.unitsPerPackage))&&Number(form.unitsPerPackage)>0&&<p className="oliePostCalculation" role="status"><strong>{Number(form.quantity)} pacote(s) × {Number(form.unitsPerPackage)} fraldas</strong> = {(Number(form.quantity)*Number(form.unitsPerPackage)).toLocaleString('pt-BR')} fraldas {form.size}</p>}
    <div className="oliePostButtons"><button type="submit" className="oliePostPrimary"><Plus size={17}/>{editing?'Salvar alterações locais':'Adicionar ao inventário'}</button>{editing&&<button type="button" onClick={()=>{setEditing(null);setForm(empty())}}>Cancelar edição</button>}</div>
   </form>
   {notice&&<p className="oliePostNotice" role="status">{notice}</p>}
   <div className="oliePostList">
    <div className="oliePostListHead"><h3>Inventário registrado <small>({rows.length} itens)</small></h3></div>
-   {rows.length===0?<p className="oliePostEmpty">Nenhum item registrado. Após o chá, preencha as quantidades reais recebidas.</p>:<div className="oliePostRows">{rows.map(item=><article key={item.id}><div><strong>{item.description}</strong><small>{item.type==='fralda'?'Fralda '+item.size:'Presente'}{item.brand?' · '+item.brand:''} · {item.quantity} unidade(s){item.unitValue>0?' · '+currency(item.unitValue*item.quantity):''}</small>{item.notes&&<small>{item.notes}</small>}</div><div className="oliePostRowActions"><button type="button" onClick={()=>edit(item)}>Editar</button><button type="button" onClick={()=>remove(item.id)} aria-label={'Remover '+item.description}><Trash2 size={16}/></button></div></article>)}</div>}
+   {rows.length===0?<p className="oliePostEmpty">Nenhum item registrado. Após o chá, preencha as quantidades reais recebidas.</p>:<div className="oliePostRows">{rows.map(item=><article key={item.id}><div><strong>{item.description}</strong><small>{item.type==='fralda'?'Fralda '+item.size:'Presente'}{item.brand?' · '+item.brand:''} · {item.type==='fralda'?item.quantity+' pacote(s)':item.quantity+' unidade(s)'}{item.unitValue>0?' · '+currency(item.unitValue*item.quantity):''}</small>
+    {item.type==='fralda'&&<small className={item.unitsPerPackage===null?'oliePostRowPending':'oliePostRowTotal'}>{item.unitsPerPackage===null?'Fraldas por pacote não informadas — editar para completar':item.quantity+' × '+item.unitsPerPackage+' = '+(item.quantity*item.unitsPerPackage).toLocaleString('pt-BR')+' fraldas '+item.size}</small>}{item.notes&&<small>{item.notes}</small>}</div><div className="oliePostRowActions"><button type="button" onClick={()=>edit(item)}>Editar</button><button type="button" onClick={()=>remove(item.id)} aria-label={'Remover '+item.description}><Trash2 size={16}/></button></div></article>)}</div>}
   </div>
-  <div className="oliePostExport"><div><h3>Exportação e recuperação</h3><p>CSV para Excel e Enxoval do Oliver; JSON como cópia de segurança completa.</p></div><div className="oliePostButtons"><button type="button" disabled={!rows.length} onClick={()=>download('inventario-oliver.csv',postEventCsv(rows),'text/csv;charset=utf-8')}><Download size={16}/>Exportar CSV</button><button type="button" onClick={()=>download('backup-inventario-oliver.json',postEventBackup(rows),'application/json;charset=utf-8')}><Save size={16}/>Backup JSON</button><label className="oliePostImport"><FileUp size={16}/>Importar backup<input type="file" accept=".json,application/json" onChange={importBackup} hidden/></label></div></div>
+  <div className="oliePostExport"><div><h3>Exportação e recuperação</h3><p>CSV com pacotes, fraldas por pacote e total por tamanho; JSON como cópia de segurança completa.</p></div><div className="oliePostButtons"><button type="button" disabled={!rows.length} onClick={()=>download('inventario-oliver.csv',postEventCsv(rows),'text/csv;charset=utf-8')}><Download size={16}/>Exportar CSV</button><button type="button" onClick={()=>download('backup-inventario-oliver.json',postEventBackup(rows),'application/json;charset=utf-8')}><Save size={16}/>Backup JSON</button><label className="oliePostImport"><FileUp size={16}/>Importar backup<input type="file" accept=".json,application/json" onChange={importBackup} hidden/></label></div></div>
   <div className="oliePostBalance"><h3>Balanço estimado do chá</h3><p>Comparativo de planejamento familiar, não representa lucro nem avalia individualmente os presentes.</p><div><span><small>Valor estimado dos itens recebidos</small><strong>{currency(amount)}</strong></span><span><small>Custo contratado no Financeiro</small><strong>{cost===null?'—':currency(cost)}</strong></span><span><small>Diferença estimada</small><strong>{net===null?'—':currency(net)}</strong></span></div><small>{costError?'Não foi possível consultar o Financeiro neste acesso.':'O valor do Financeiro reflete contratos cadastrados, não necessariamente o custo final efetivamente pago.'}</small></div>
  </section>;
 }
