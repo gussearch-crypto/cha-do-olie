@@ -709,7 +709,7 @@
   appearance:none;display:inline-flex;align-items:center;justify-content:center;
   min-height:44px;padding:11px 16px;border:1px solid #667e55;
   border-radius:11px;background:#647d52;color:#fff;text-decoration:none;
-  font:750 13px/1.25 inherit;cursor:pointer;white-space:normal;text-align:center;
+  font-family:inherit;font-size:13px;font-weight:750;line-height:1.25;cursor:pointer;white-space:normal;text-align:center;
 }
 .oliverGamesAdmin .olieGamesPhaseLinks button:hover{background:#526c43}
 .oliverGamesAdmin .olieGamesPhaseLinks button:nth-child(2){
