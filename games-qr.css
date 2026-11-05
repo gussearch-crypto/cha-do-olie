@@ -254,3 +254,74 @@ article.olieQrPoster {
   .olieQrImage { width: 90mm; }
   .olieQrPoster h1 { font-size: 31pt; }
 }
+
+
+/* Sprint 2 — placa editada antes de imprimir e tamanhos reais A4/A5. */
+.olieQrToolTag{font-size:10px;font-weight:850;letter-spacing:1.1px;color:#718864}
+.olieQrSettingsHeading h2{margin:0 0 5px;font-size:20px;line-height:1.2;color:#435f37}
+.olieQrSettingsHeading p{margin:0;font-size:12px;line-height:1.55;color:#74836a}
+.olieQrSettingsRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.olieQrGroup{box-sizing:border-box;min-width:0;margin:0;padding:0;border:0}
+.olieQrGroup legend{margin:0 0 8px;padding:0;color:#536a48;font-size:12px;font-weight:800}
+.olieQrGroup .olieQrTabs{width:100%;min-width:0}
+.olieQrGroup .olieQrTabs button{flex:1 1 0;min-width:0;padding:9px 8px;white-space:normal}
+.olieQrEnvironment{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.olieQrEnvironment>span{font-size:12px;color:#657857;font-weight:750}
+.olieQrEnvironment .olieQrTabs{min-width:0}
+.olieQrTargetLine{display:flex;align-items:flex-start;gap:10px;min-width:0;padding:13px;border-radius:12px;border:1px solid #cbdcc0;background:#f1f7ec;color:#547243}
+.olieQrTargetLine.is-temporary{border-color:#dcc59c;background:#fff8e8;color:#9a6b29}
+.olieQrTargetLine>svg{flex:none;margin-top:2px}
+.olieQrTargetLine>div{min-width:0;display:grid;gap:6px}
+.olieQrTargetLine strong{font-size:12px}
+.olieQrTargetLine a{display:inline-flex;align-items:center;gap:6px;min-width:0;color:#4b6740;font-size:12px;text-decoration:underline;text-decoration-thickness:1px;overflow-wrap:anywhere}
+.olieQrTargetLine.is-temporary a{color:#8e6229}
+.olieQrTargetLine a>svg{flex:none}
+.olieQrActions button.olieQrSecondary{background:#fffefa;color:#4f6943;border:1px solid #b4c7a5}
+.olieQrActions button.olieQrSecondary:hover{background:#f0f5eb}
+.olieQrPreviewLabel{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;max-width:625px;margin:0 auto 12px;color:#536c47}
+.olieQrPreviewLabel strong{font-size:13px;font-weight:850}
+.olieQrPreviewLabel span{font-size:11px;color:#7c8b72}
+.olieQrPosterTop{display:grid;justify-items:center;gap:0}
+.olieQrPage.is-a5 article.olieQrPoster{max-width:485px!important}
+.olieQrPage.is-a5 .olieQrMascots{font-size:28px}
+.olieQrPage.is-a5 .olieQrPoster h1{font-size:30px}
+.olieQrPage.is-a5 .olieQrMessage{font-size:13px;max-width:360px}
+.olieQrPage.is-a5 .olieQrImage{width:min(100%,272px)}
+.olieQrPage.is-a5 .olieQrPreviewLabel{max-width:485px}
+@media(max-width:600px){
+ .olieQrSettingsRows{grid-template-columns:minmax(0,1fr);gap:13px}
+ .olieQrSettings{gap:12px}
+ .olieQrToolTag{font-size:9px}
+ .olieQrEnvironment .olieQrTabs{width:100%;display:flex}
+ .olieQrEnvironment .olieQrTabs button{flex:1;min-width:0;white-space:normal}
+ .olieQrSettingsHeading h2{font-size:18px}
+ .olieQrPreviewLabel{padding:0 2px}
+ .olieQrTargetLine a{font-size:11px}
+ .olieQrPage.is-a5 .olieQrImage{width:min(100%,250px)}
+}
+@media print{
+ .olieQrPreviewLabel{display:none!important}
+ .olieQrPage.is-a4 article.olieQrPoster{
+   box-sizing:border-box!important;
+   width:100%!important;max-width:none!important;min-height:248mm!important;
+   padding:12mm!important;margin:0 auto!important;border-radius:7mm!important;
+   box-shadow:none!important;break-inside:avoid
+ }
+ .olieQrPage.is-a5 article.olieQrPoster{
+   box-sizing:border-box!important;
+   width:100%!important;max-width:none!important;min-height:173mm!important;
+   padding:9mm 7mm!important;margin:0 auto!important;border-radius:5mm!important;
+   box-shadow:none!important;break-inside:avoid;
+ }
+ .olieQrPage.is-a4 .olieQrImage{width:88mm!important;max-width:none!important}
+ .olieQrPage.is-a5 .olieQrImage{width:62mm!important;max-width:none!important}
+ .olieQrPage.is-a4 .olieQrMascots{font-size:23pt!important}
+ .olieQrPage.is-a5 .olieQrMascots{font-size:18pt!important;margin-bottom:2mm}
+ .olieQrPage.is-a4 .olieQrPoster h1{font-size:29pt!important}
+ .olieQrPage.is-a5 .olieQrPoster h1{font-size:20pt!important;margin:3mm 0 2mm}
+ .olieQrPage.is-a5 .olieQrEyebrow{font-size:7pt!important;letter-spacing:1px}
+ .olieQrPage.is-a5 .olieQrMessage{font-size:10pt!important;margin-bottom:4mm}
+ .olieQrPage.is-a5 .olieQrScan{font-size:9pt!important;margin:3mm 0 2mm}
+ .olieQrPage.is-a5 .olieQrAddress{font-size:7pt!important;margin-bottom:5mm}
+ .olieQrPage.is-a5 .olieQrPoster footer{font-size:8pt!important}
+}
