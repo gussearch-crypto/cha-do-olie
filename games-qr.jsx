@@ -2,9 +2,16 @@ import React,{useEffect,useMemo,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import QRCode from 'qrcode';
 import {ArrowLeft,Copy,Printer,Check} from 'lucide-react';
-import './games-qr.css';
+// A folha de estilos é carregada diretamente pelo index.html para garantir sua aplicação.
 
 function GamesQRCode(){
+ useEffect(()=>{
+   // Configuração A4 aplicada somente nesta rota, sem afetar impressão de outras páginas.
+   const style=document.createElement('style');
+   style.textContent='@page { size: A4; margin: 12mm; }';
+   document.head.appendChild(style);
+   return()=>style.remove();
+ },[]);
  const [channel,setChannel]=useState('presencial');
  const initial=useMemo(()=>window.location.origin+ (channel==='presencial'?'/games':'/games/online'),[channel]);
  const [manual,setManual]=useState('');
