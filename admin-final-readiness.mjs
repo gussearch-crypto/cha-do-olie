@@ -64,7 +64,7 @@ export function eventFinanceReadiness(data={},today='2026-11-05'){
   const unscheduled=payments.filter(p=>daysUntil(p.due,today)===null).reduce((n,p)=>n+Math.round(p.balance*100),0)/100;
   const forecast=financialClosingProjection(expenses,data?.quotes||[],data?.budgets||{});
   return {...totals,dated,unallocated,unscheduled,unplannedBalance:Math.round((unallocated+unscheduled)*100)/100,
-    goal:forecast.goal,projected:forecast.projected};
+    goal:forecast.goal,budgeted:forecast.budgeted,projected:forecast.projected,goalVariance:forecast.goalVariance};
 }
 
 export function eventPriorityReadiness(data={},rsvp={},today='2026-11-05'){
@@ -94,6 +94,12 @@ export function eventPriorityReadiness(data={},rsvp={},today='2026-11-05'){
     schedule.conflicts.length+' sobreposição(ões) de horário para o mesmo responsável','planning');
   if(schedule.missingOwners)add(1,'schedule','Responsáveis a definir no dia do chá',
     schedule.missingOwners+' atividade(s) do cronograma sem responsável','planning');
+  const expenses=Array.isArray(data?.expenses)?data.expenses:[];
+  const pendingQuotes=(Array.isArray(data?.quotes)?data.quotes:[]).filter(q=>!q.expenseId&&!expenses.some(e=>e.quoteId===q.id));
+  if(pendingQuotes.length)add(2,'finance','Cotações ainda em negociação',pendingQuotes.length+' orçamento(s) sem contratação registrada','finance');
+  const shopping=Array.isArray(data?.shopping)?data.shopping:[];
+  const toBuy=shopping.filter(item=>item.status==='pending').length;
+  if(toBuy)add(2,'planning','Compras a realizar',toBuy+' item(ns) pendente(s) na lista de compras','planning');
   rows.sort((a,b)=>a.priority-b.priority||a.label.localeCompare(b.label,'pt-BR'));
   return rows;
 }
