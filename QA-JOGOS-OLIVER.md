@@ -45,6 +45,13 @@
 - [ ] O comprovante PNG não contém telefone nem protocolo.
 - [ ] O QR Code de `/games/qr` leva ao endereço conferido e tem contraste suficiente no papel.
 - [ ] A impressão A4 não inclui ferramentas e botões de edição.
+- [ ] Placa A5 (mesa) ocupa uma folha A5 e contém QR Code legível a uma distância confortável.
+- [ ] Placa A4 (painel) ocupa uma folha A4 sem cortar título, QR Code, instruções ou rodapé.
+- [ ] Em Preview, o modo **Endereço oficial** mantém os links permanentes `https://cha-oliver-mvp.vercel.app/games` e `https://cha-oliver-mvp.vercel.app/games/online`.
+- [ ] Em Preview, o modo **Testar Preview** permite verificar a navegação, mas mantém a impressão desabilitada.
+- [ ] Testar os dois canais em QR físico, com câmera de outro celular e sem entrar pela URL no navegador.
+- [ ] No navegador mobile, testar larguras de 320, 375, 390 e 430 px, sem rolagem horizontal e com botões de pelo menos 44 px.
+
 - [ ] Os resumos de médias permanecem públicos somente de forma agregada.
 
 ## Registro de homologação
