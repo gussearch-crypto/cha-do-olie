@@ -1,0 +1,4 @@
+# Função autenticada pelo código administrativo existente e validação de origem.
+# Não disponibiliza credenciais privilegiadas no navegador.
+[functions.oliver-inventory]
+verify_jwt = false
