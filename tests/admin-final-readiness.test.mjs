@@ -79,3 +79,21 @@ test('prioridades alertam vencidos e ausência de responsável, sem modificar fo
  assert.equal(rows.some(x=>x.type==='guests'&&x.detail.includes('30/11 encerrado')),true);
  assert.deepEqual(data,prev);
 });
+
+test('reúne orçado, contratado e negociações sem duplicar despesas',()=>{
+ const data={
+  tasks:[],shopping:[{id:'s1',status:'pending'},{id:'s2',status:'bought'}],
+  expenses:[{id:'e1',description:'Buffet',category:'Alimentação',contracted:300,installments:[{id:'p',amount:300,paidAmount:0,due:'2026-11-25'}]}],
+  budgets:{Alimentação:450,__goal:650},
+  quotes:[{id:'q1',category:'Decoração',proposals:[{amount:100}]}]
+ };
+ const finance=eventFinanceReadiness(data,'2026-11-05');
+ assert.equal(finance.budgeted,450);
+ assert.equal(finance.planned,300);
+ assert.equal(finance.goal,650);
+ assert.equal(finance.projected,400);
+ assert.equal(finance.goalVariance,250);
+ const alerts=eventPriorityReadiness(data,{},'2026-11-05');
+ assert.equal(alerts.some(x=>x.label.includes('Cotações ainda em negociação')),true);
+ assert.equal(alerts.some(x=>x.label.includes('Compras a realizar')),true);
+});
