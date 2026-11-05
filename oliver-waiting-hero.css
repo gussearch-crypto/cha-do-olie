@@ -45,3 +45,39 @@ a.olieWaitingButton:focus-visible{outline:3px solid #9ebc8c;outline-offset:3px}
  .olieWaitingDate>strong{font-size:26px}
  a.olieWaitingButton{width:100%}
 }
+
+
+/* A página pública de espera utiliza uma área mais larga que os formulários dos jogos. */
+.gamesPage.gamesAfterPage .gamesWrap{
+  width:min(1080px,100%);
+  max-width:1080px;
+  box-sizing:border-box;
+  margin:0 auto;
+  padding:26px 18px 70px;
+}
+.gamesPage.gamesAfterPage .olieWaitingJourney{
+  margin:0 auto 22px;
+}
+.gamesPage.gamesAfterPage .olieWaitingIntro{
+  display:block;
+  min-width:0;
+}
+.gamesPage.gamesAfterPage .olieWaitingIntro h1{
+  color:#455f3c;
+}
+.gamesPage.gamesAfterPage .olieWaitingDate,
+.gamesPage.gamesAfterPage .olieWaitingStatus,
+.gamesPage.gamesAfterPage .olieWaitingCommunity{
+  min-width:0;
+}
+@media(max-width:740px){
+ .gamesPage.gamesAfterPage .gamesWrap{padding:14px 12px 50px}
+ .gamesPage.gamesAfterPage .olieWaitingJourney{margin-bottom:16px}
+ .gamesPage.gamesAfterPage .olieWaitingMain{gap:10px;margin:10px 0}
+}
+@media(max-width:390px){
+ .gamesPage.gamesAfterPage .gamesWrap{padding-left:9px;padding-right:9px}
+ .gamesPage.gamesAfterPage .olieWaitingIntro{border-radius:18px;padding:25px 12px 14px}
+ .gamesPage.gamesAfterPage .olieWaitingIntro h1{font-size:28px}
+ .gamesPage.gamesAfterPage .olieWaitingDate,.gamesPage.gamesAfterPage .olieWaitingStatus{padding:15px}
+}
