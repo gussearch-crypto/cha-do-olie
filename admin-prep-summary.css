@@ -64,3 +64,115 @@ body:has(.adminTabs [data-admin-tab="overview"].active) .adminWrap .dashboard{di
 .rsvpFollowRow small{font-size:11px;color:#75816b}
 .rsvpFollowEmpty{font-size:13px;color:#718169;margin:16px 0}
 @media(max-width:700px){.rsvpFollowStats{grid-template-columns:repeat(2,minmax(0,1fr))}.rsvpFollowRow{flex-wrap:wrap}.rsvpFollowHead{align-items:flex-start}.oliverRsvpFollowup{padding:12px}}
+
+
+/* Sprint 3 — Reta final e cronograma operacional, sem novas ações ou registros. */
+.oliverPrepHead .eyebrow,.oliverDayBlock .eyebrow,.oliverPriority .eyebrow{font-size:10px;letter-spacing:1.2px;color:#798e6c;font-weight:850}
+.oliverRetaStatus{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ border:1px solid #dce5cf;background:#f3f7ed;border-radius:14px;
+ padding:16px 18px;margin:16px 0 0;
+}
+.oliverRetaStatus.is-late{background:#fff8ed;border-color:#e9d6b9}
+.oliverRetaStatus>div{min-width:0}
+.oliverRetaStatus strong{display:block;color:#4c663f;font-size:15px}
+.oliverRetaStatus p{margin:6px 0 0;font-size:12px;line-height:1.55;color:#6a7b60}
+.oliverRetaStatus.is-late strong{color:#926733}
+.oliverRetaStatus button{
+ flex:none;background:#617747;color:white;border:1px solid #617747;border-radius:10px;
+ padding:11px 15px;min-height:44px;font:750 12px 'DM Sans',Arial,sans-serif;cursor:pointer
+}
+.oliverDayBlock{
+ margin-top:16px;border:1px solid #dce5d4;background:#f9fbf6;
+ border-radius:15px;padding:18px;min-width:0
+}
+.oliverDayBlock .oliverPrepListHead{align-items:flex-start;margin-bottom:14px}
+.oliverDayBlock .oliverPrepListHead h3{font-size:18px;margin:5px 0}
+.oliverDayBlock .oliverPrepListHead p{font-size:12px;line-height:1.5;color:#718166;margin:0}
+.oliverDayBlock .oliverPrepListHead button{
+ min-height:44px;max-width:200px;font-size:12px;
+}
+.oliverDaySummary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.oliverDaySummary span{
+ border:1px solid #d6e3cb;background:#eef4e8;color:#526b44;
+ padding:8px 11px;border-radius:999px;font-size:12px;font-weight:750
+}
+.oliverDaySummary span.is-warning{
+ border-color:#e4c8a4;background:#fff4e8;color:#9c6333
+}
+.oliverDayTimeline{border:1px solid #dce4d5;border-radius:13px;background:#fffefa;overflow:hidden}
+.oliverDayTimeline>summary{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ cursor:pointer;list-style:none;padding:15px 17px;min-height:50px;
+ font-size:13px;color:#49633c;font-weight:850
+}
+.oliverDayTimeline>summary::-webkit-details-marker{display:none}
+.oliverDayTimeline>summary:before{content:"▸";display:inline-block;margin-right:6px;color:#819770}
+.oliverDayTimeline[open]>summary:before{content:"▾"}
+.oliverDayTimeline>summary span{font-size:11px;font-weight:550;color:#7c8a70;text-align:right}
+.oliverDayTimeline[open]>summary{border-bottom:1px solid #e3e9dd}
+.oliverDayPeriods{display:grid;gap:13px;padding:14px}
+.oliverDayPeriod{min-width:0}
+.oliverDayPeriod h4{margin:0 0 8px;font-size:13px;font-weight:850;color:#4a613e}
+.oliverDayPeriod h4 small{color:#7c9070;font-weight:600}
+.oliverDayPeriod p{margin:7px 0;padding:7px 11px;font-size:12px;color:#84907c}
+.oliverDayPeriod ol{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.oliverDayPeriod li.oliverDayTask{
+ display:grid;grid-template-columns:90px minmax(0,1fr) auto;
+ gap:12px;align-items:center;margin:0;padding:12px 13px;
+ border:1px solid #e1e8da;border-radius:11px;background:#fff;
+}
+.oliverDayTask time{
+ font-size:12px;font-weight:850;font-variant-numeric:tabular-nums;color:#566e49;
+ white-space:nowrap
+}
+.oliverDayTask>div{display:grid;gap:4px;min-width:0}
+.oliverDayTask strong{font-size:13px;color:#4b5f3f;overflow-wrap:anywhere}
+.oliverDayTask small{font-size:11px;color:#78846f;overflow-wrap:anywhere}
+.oliverDayStatus{
+ display:inline-flex;border:1px solid #d5dfcc;background:#f1f5eb;
+ color:#60774f;border-radius:999px;padding:6px 9px;
+ font-size:10px;font-weight:750;text-align:center
+}
+.oliverDayTask-conflict .oliverDayStatus,.oliverDayTask-attention .oliverDayStatus{
+ background:#fff4e7;border-color:#e7cda7;color:#a16e34
+}
+.oliverDayTask-done{opacity:.75}
+.oliverDayTask-done .oliverDayStatus{background:#e5f1df;color:#4d7843}
+.oliverPrepLists .oliverPrepNotice{
+ border-top:1px solid #e6eadd;margin-top:12px;padding-top:12px;
+ color:#9c6634;font-size:12px;line-height:1.6
+}
+.oliverPrepGoal{margin:10px 0 0;color:#728267;font-size:11px;line-height:1.6}
+.oliverPriority .oliverPrepListHead>div h3{margin:5px 0 0}
+.oliverPrepSync button:focus-visible,.oliverRetaStatus button:focus-visible,.oliverDayBlock button:focus-visible{
+ outline:3px solid #a4be91;outline-offset:2px
+}
+@media(max-width:800px){
+ .oliverDayPeriod li.oliverDayTask{grid-template-columns:75px minmax(0,1fr);gap:8px}
+ .oliverDayStatus{grid-column:2;justify-self:start}
+ .oliverDayBlock .oliverPrepListHead{flex-wrap:wrap}
+}
+@media(max-width:560px){
+ .oliverPrepGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .oliverPrepGrid article{padding:12px}
+ .oliverPrepGrid small{font-size:9px;letter-spacing:0}
+ .oliverPrepGrid article>strong{font-size:clamp(17px,5.2vw,24px)}
+ .oliverPrepGrid article p{font-size:11px;min-height:0}
+ .oliverPrepHead>strong{font-size:13px}
+ .oliverRetaStatus{flex-direction:column;align-items:stretch;padding:13px}
+ .oliverRetaStatus button{width:100%}
+ .oliverDayBlock{padding:13px}
+ .oliverDayBlock .oliverPrepListHead button{width:100%;max-width:none}
+ .oliverDaySummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .oliverDaySummary span{font-size:11px;text-align:center;border-radius:10px;padding:10px 5px}
+ .oliverDayTimeline>summary{align-items:flex-start;flex-direction:column}
+ .oliverDayTimeline>summary span{text-align:left}
+ .oliverDayPeriods{padding:10px}
+ .oliverDayPeriod li.oliverDayTask{padding:10px;grid-template-columns:65px minmax(0,1fr)}
+ .oliverDayTask time{font-size:11px}
+ .oliverDayTask small{font-size:10px}
+ .oliverDayStatus{font-size:9px}
+ .oliverPrepLists li{gap:6px}
+ .oliverPrepLists li small{text-align:left;flex:1 1 100%}
+}
