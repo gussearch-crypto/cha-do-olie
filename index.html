@@ -19,6 +19,7 @@
   <div id="root"></div>
   <script type="module">
     const remoteGame = location.pathname.replace(/\/$/,'') === '/games/online';
+    const qrGame = location.pathname.replace(/\/$/,'') === '/games/qr';
     const lab = location.pathname.replace(/\/$/,'') === '/games/teste';
     const games = ['/games','/games/resultado','/a-espera-do-oliver'].includes(location.pathname.replace(/\/$/,''));
     const admin = new URLSearchParams(location.search).get('painel') === '1' || location.hash === '#painel';
@@ -26,7 +27,7 @@
       await import('/admin-login-fast.js').catch(console.error);
       await import('/admin-central.js').catch(console.error);
     }
-    await import(admin ? '/admin-entry.jsx' : lab ? '/games-lab.jsx' : remoteGame ? '/games-online.jsx' : games ? '/games.jsx' : '/src.jsx');
+    await import(admin ? '/admin-entry.jsx' : lab ? '/games-lab.jsx' : qrGame ? '/games-qr.jsx' : remoteGame ? '/games-online.jsx' : games ? '/games.jsx' : '/src.jsx');
     import('/mobile-ui.js').catch(console.error);
     if (!admin && !games && !remoteGame && !lab) {
       import('/gift-brands.js').catch(console.error);
