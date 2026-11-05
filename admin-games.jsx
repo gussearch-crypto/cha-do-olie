@@ -101,7 +101,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
       </div>
    </div>
    {missingTimes.length>0&&<div className="olieGamesAttention"><span><strong>{missingTimes.length} palpite(s) sem horário</strong> precisam de conferência antes do ranking.</span><button type="button" onClick={()=>setSection('audit')}>Revisar pendências</button></div>}
-   <div className="olieGamesShortcuts"><span>Acessar páginas</span><div className="olieGamesShortcutLinks"><a href="/games" target="_blank" rel="noopener noreferrer">Presencial ↗</a><a href="/games/online" target="_blank" rel="noopener noreferrer">Online ↗</a>{settings.results_published&&<a href="/games/resultado" target="_blank" rel="noopener noreferrer">Ver resultados ↗</a>}</div></div>
+   <div className="olieGamesShortcuts"><span>Acessar páginas</span><div className="olieGamesShortcutLinks"><a href="/games" target="_blank" rel="noopener noreferrer">Presencial ↗</a><a href="/games/online" target="_blank" rel="noopener noreferrer">Online ↗</a><a href="/games/qr" target="_blank" rel="noopener noreferrer">Imprimir QR Code ↗</a>{settings.results_published&&<a href="/games/resultado" target="_blank" rel="noopener noreferrer">Ver resultados ↗</a>}</div></div>
    <details className="olieGamesDisclosure olieGiftAdmin"><summary>🎁 Editar mensagem e link de presentes · página online</summary>
       <div className="olieGiftAdminBody">
         <p>Estas informações aparecem após o registro de um palpite online. Presentear é opcional e não altera a pontuação.</p>
