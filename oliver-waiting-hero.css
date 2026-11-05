@@ -1,0 +1,47 @@
+/* Sprint 4 — A Espera do Oliver: celebração sem antecipar notícia oficial. */
+.olieWaitingJourney{max-width:1120px;margin:0 auto 24px;padding:0 0 10px;color:#415437}
+.olieWaitingJourney *{box-sizing:border-box}
+.olieWaitingIntro{text-align:center;border-radius:24px 24px 8px 8px;background:radial-gradient(circle at 90% 0,#e6efdc 0,transparent 48%),linear-gradient(145deg,#f9f7ee,#eef4e8);padding:45px 24px 18px;border:1px solid #dfe7d5}
+.olieWaitingKicker{display:block;font-size:11px;letter-spacing:1.5px;color:#65794f;font-weight:850}
+.olieWaitingIntro h1{font:700 clamp(30px,4.5vw,49px)/1.15 Georgia,serif;letter-spacing:-.6px;max-width:680px;margin:16px auto;color:#455f3c}
+.olieWaitingIntro>p{margin:0 auto;color:#6c795f;line-height:1.65;font-size:15px;max-width:590px}
+.olieWaitingHeart{width:64px;height:64px;border-radius:99px;background:#fff9ed;display:grid;place-items:center;margin:24px auto 0;color:#9da96b;border:1px solid #e3e9d5}
+.olieWaitingMain{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin:14px 0}
+.olieWaitingDate,.olieWaitingStatus{padding:24px;border-radius:19px;background:#fffefa;border:1px solid #dce6d2;min-width:0}
+.olieWaitingDate>span{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.8px;font-weight:850;color:#6c825a}
+.olieWaitingDate>strong{font:700 clamp(25px,3.3vw,37px)/1.2 Georgia,serif;color:#4c663d;display:block;margin:16px 0 10px}
+.olieWaitingDate>p{font-size:14px;color:#566d46;font-weight:750;margin:0 0 13px}
+.olieWaitingDate>small{font-size:12px;line-height:1.6;color:#77866e}
+.olieWaitingStatus{background:#eef4e9;display:flex;flex-direction:column;align-items:flex-start}
+.olieWaitingStatusIcon{display:grid;place-items:center;border-radius:12px;width:47px;height:47px;background:#fffdf5;color:#607d4b}
+.olieWaitingStatus>strong{font-size:20px;margin:11px 0 3px;color:#465c38}
+.olieWaitingStatus>p{font-size:13px;color:#697a5f;line-height:1.6;margin:5px 0 14px}
+a.olieWaitingButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#627c4d;color:#fff!important;font-size:13px;text-decoration:none;font-weight:800;min-height:45px;border-radius:11px;padding:11px 17px;margin-top:auto}
+a.olieWaitingButton:focus-visible{outline:3px solid #9ebc8c;outline-offset:3px}
+.olieWaitingCommunity{padding:21px;background:#fffefa;border:1px solid #dce6d2;border-radius:19px}
+.olieWaitingCommunityHeading{text-align:center}
+.olieWaitingCommunityHeading>span{font-size:10px;font-weight:850;letter-spacing:1.2px;color:#7e966a}
+.olieWaitingCommunityHeading>h2{margin:8px 0;color:#4b643d;font:700 clamp(19px,2.6vw,27px)/1.25 Georgia,serif}
+.olieWaitingCommunityHeading>p{font-size:12px;color:#7d8973;margin:0}
+.olieWaitingStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:21px 0 0}
+.olieWaitingStats>div{min-width:0;display:grid;align-content:start;justify-items:center;gap:9px;border:1px solid #e2eadb;border-radius:13px;background:#f6f9f2;padding:16px 10px;text-align:center}
+.olieWaitingStats svg{color:#799363}
+.olieWaitingStats strong{font-size:clamp(20px,2.7vw,27px);color:#4b643d;overflow-wrap:anywhere}
+.olieWaitingStats small{font-size:11px;color:#7a8870}
+.olieWaitingFoot{text-align:center;font:italic 13px/1.7 Georgia,serif;color:#7d8b6e;padding:20px 15px}
+.olieWaitingFoot>span{font-style:normal;padding-right:6px}
+@media(max-width:740px){
+ .olieWaitingIntro{padding:30px 15px 17px}
+ .olieWaitingMain{grid-template-columns:minmax(0,1fr)}
+ .olieWaitingDate,.olieWaitingStatus{padding:19px}
+ .olieWaitingIntro h1{font-size:clamp(29px,7vw,40px)}
+}
+@media(max-width:440px){
+ .olieWaitingStats{gap:7px}
+ .olieWaitingStats>div{padding:12px 5px}
+ .olieWaitingStats strong{font-size:clamp(15px,4.8vw,22px)}
+ .olieWaitingStats small{font-size:10px}
+ .olieWaitingCommunity{padding:15px 10px}
+ .olieWaitingDate>strong{font-size:26px}
+ a.olieWaitingButton{width:100%}
+}
