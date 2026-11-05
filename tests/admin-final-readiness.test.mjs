@@ -76,7 +76,7 @@ test('prioridades alertam vencidos e ausência de responsável, sem modificar fo
  const rows=eventPriorityReadiness(data,rsvp,'2026-12-01');
  assert.equal(rows.some(x=>x.label==='Decoração'&&x.priority===0),true);
  assert.equal(rows.some(x=>x.label.includes('Responsáveis')),true);
- assert.equal(rows.some(x=>x.type==='guests'&&x.detail.includes('30/11 encerrado')),true);
+ assert.equal(rows.some(x=>x.type==='guests'&&x.detail.includes('Estimativa de produção de 30/11 fechada')),true);
  assert.deepEqual(data,prev);
 });
 
@@ -96,4 +96,21 @@ test('reúne orçado, contratado e negociações sem duplicar despesas',()=>{
  const alerts=eventPriorityReadiness(data,{},'2026-11-05');
  assert.equal(alerts.some(x=>x.label.includes('Cotações ainda em negociação')),true);
  assert.equal(alerts.some(x=>x.label.includes('Compras a realizar')),true);
+});
+
+test('30/11 é apenas a referência para produção; vagas seguem abertas até 04/12',()=>{
+ const before=eventRsvpReadiness(families,'2026-11-30');
+ const after=eventRsvpReadiness(families,'2026-12-01');
+ const event=eventRsvpReadiness(families,'2026-12-04');
+ const later=eventRsvpReadiness(families,'2026-12-05');
+ assert.equal(before.productionEstimateClosed,false);
+ assert.equal(after.productionEstimateClosed,true);
+ assert.equal(after.inviteWindowOpen,true);
+ assert.equal(after.canAddGuests,true);
+ assert.equal(event.inviteWindowOpen,true);
+ assert.equal(event.available,98);
+ assert.equal(later.inviteWindowOpen,false);
+ assert.equal(later.canAddGuests,false);
+ assert.equal(after.waiting,1);
+ assert.equal(after.substitutionCandidates,1);
 });
