@@ -1,0 +1,32 @@
+
+.olieMessageCenter{background:#fffdf7;border:1px solid #dfe2d5;border-radius:20px;padding:23px;margin:18px 0;box-shadow:0 12px 32px #2b3f2310;color:#34442f}
+.olieMessageIntro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.olieMessageIntro h2{display:flex;align-items:center;gap:10px;font-size:22px;line-height:1.2;margin:5px 0 9px;color:#39543a}
+.olieMessageIntro p{font-size:13px;line-height:1.65;color:#606c5a;max-width:780px}
+.olieMessageTag{white-space:nowrap;border:1px solid #c6d6b9;background:#edf5e8;border-radius:99px;padding:7px 12px;color:#52734b;font-size:11px;font-weight:750}
+.olieMessagePanel{background:#f9fbf6;border:1px solid #e5ebdf;border-radius:16px;padding:17px}
+.olieMessageLabel{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:750;color:#4c6446}
+.olieMessageLabel select,.olieMessageLabel textarea{display:block;width:100%;min-height:43px;border:1px solid #bccbb3;border-radius:10px;padding:10px 12px;box-sizing:border-box;background:#fff;color:#314b37;font:inherit;font-size:13px}
+.olieMessageLabel textarea{resize:vertical;min-height:270px;font:13px/1.6 'DM Sans',sans-serif}
+.olieMessageHelp{margin:8px 0 13px;font-size:12px;color:#7a8673;line-height:1.5}
+.olieMessageGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;align-items:start}
+.olieMessageGrid>div{min-width:0}
+.olieMessageVariables{display:flex;flex-wrap:wrap;gap:7px}
+.olieMessageVariables button{border:1px solid #c5d6ba;background:white;color:#527149;border-radius:9px;padding:7px 9px;font-size:11px;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+.olieMessageVariables button:hover{background:#edf5e8}
+.olieMessagePreview{border:1px solid #d9e7d3;background:#fff;border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:12px}
+.olieMessagePaper{font:13px/1.65 'DM Sans',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:11px;background:#f4f8f0;padding:15px;color:#2e4a30;min-height:200px;max-height:430px;overflow:auto;margin:0}
+.olieMessageCopy{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#516f48!important;color:#fff!important;border:0!important;border-radius:11px;padding:11px 13px;font-weight:750;cursor:pointer;min-height:44px}
+.olieMessagePreview small,.olieMessageFootnote{font-size:11px;line-height:1.6;color:#677564}
+.olieMessageStatus,.olieMessagePending,.olieMessageError{padding:10px 13px;border-radius:10px;font-size:12px;line-height:1.55;margin:12px 0}
+.olieMessageStatus{background:#edf6e8;color:#42623a}
+.olieMessagePending{background:#fff6df;color:#826020}
+.olieMessageError{background:#fff1ed;color:#8c4232}
+.olieMessageActions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:17px}
+.olieMessageActions button,.olieMessageImport{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:10px 13px;box-sizing:border-box;border:1px solid #c6d1ba;border-radius:10px;background:#fff;color:#49633d;font-size:12px;font-weight:750;cursor:pointer;text-align:center}
+.olieMessageActions .olieMessageSave{background:#516f48;color:#fff;border-color:#516f48}
+.olieMessageActions button:disabled,.olieMessageCopy:disabled{opacity:.55;cursor:not-allowed}
+.olieMessageFootnote{margin:15px 0 0}
+@media(max-width:760px){.olieMessageCenter{padding:15px}.olieMessageGrid{grid-template-columns:1fr}.olieMessageIntro{flex-direction:column}.olieMessageActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.olieMessageActions>*{min-width:0}}
+@media(max-width:430px){.olieMessageActions{grid-template-columns:1fr}.olieMessagePanel{padding:12px}.olieMessageIntro h2{font-size:19px}}
+@media print{.olieMessageCenter{display:none!important}}
