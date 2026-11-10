@@ -7,14 +7,14 @@ export const MESSAGE_TYPES=[
  {key:'lateInvitation',label:'Novo convite após 30/11',description:'Para novas inclusões conforme vagas até 04/12'},
  {key:'eventReminder',label:'Lembrete do evento',description:'Data, horário e local para quem já confirmou'}
 ];
-export const MESSAGE_VARIABLES=['nome_familia','codigo_acesso','link_convite','data_evento','horario_evento','endereco','prazo_confirmacao','dias_restantes'];
+export const MESSAGE_VARIABLES=['nome_familia','codigo_acesso','link_convite','data_evento','horario_evento','endereco','link_mapa','prazo_confirmacao','dias_restantes'];
 export const MESSAGE_DEFAULTS={
  invitation:[
   'Olá, {nome_familia}! 💛','',
   'Estamos preparando com muito carinho o Chá do Oliver e queremos celebrar esse momento com vocês.','',
   'Acesse o convite:','{link_convite}','',
   'Para confirmar a presença, procure pelo nome de um dos integrantes da família e utilize o código de acesso:','{codigo_acesso}','',
-  '📅 {data_evento}','🕕 {horario_evento}','📍 {endereco}','',
+  '📅 {data_evento}','🕕 {horario_evento}','📍 {endereco}','🗺️ Mapa: {link_mapa}','',
   '{prazo_confirmacao}','',
   'Traga o amor, o sorriso e a fralda: estamos em contagem regressiva. 💛'
  ].join('\n'),
@@ -23,7 +23,7 @@ export const MESSAGE_DEFAULTS={
   'Faltam {dias_restantes} dia(s) para o Chá do Oliver! 🎉',
   'Estamos preparando tudo com carinho e ainda aguardamos a confirmação de vocês.','',
   '{prazo_confirmacao}','',
-  '📅 {data_evento}','🕕 {horario_evento}','📍 {endereco}','',
+  '📅 {data_evento}','🕕 {horario_evento}','📍 {endereco}','🗺️ Mapa: {link_mapa}','',
   'Convite: {link_convite}','Código de acesso: {codigo_acesso}','',
   'Esperamos celebrar com vocês! 💛'
  ].join('\n'),
@@ -82,6 +82,7 @@ export function messageParameters(family={},date=eventToday()){
   data_evento:'04/12/2026 (sexta-feira)',
   horario_evento:'das 18h às 22h',
   endereco:'Salão Terra Mágica — Av. das Nações, 151, sobreloja, Parque Novo Oratório, Santo André - SP',
+  link_mapa:'https://www.google.com/maps/search/?api=1&query=Av.%20das%20Na%C3%A7%C3%B5es%2C%20151%20-%20Parque%20Novo%20Orat%C3%B3rio%2C%20Santo%20Andr%C3%A9%20-%20SP',
   prazo_confirmacao:date>'2026-11-30'?'Pedimos que confirmem a presença assim que possível. 💛':'Confirme a presença até 30/11/2026 para nos ajudar com a produção. 💛',
   dias_restantes:String(Math.max(0,days===null?0:days))
  };
