@@ -1,4 +1,4 @@
-# Sprint 5 — Ativação controlada do inventário compartilhado
+# Proposta futura — Inventário compartilhado (após o Chá do Oliver)
 
 ## Estado atual
 - Frontend, migração e Edge Function estão versionados na branch `dev-supabase`.
