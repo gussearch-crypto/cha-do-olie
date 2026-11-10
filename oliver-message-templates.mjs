@@ -42,10 +42,11 @@ export const MESSAGE_DEFAULTS={
   'Estamos ansiosos para celebrar com vocês. 💛'
  ].join('\n')
 };
-export function messageTemplateType(family={},kind='invitation'){
+export function messageTemplateType(family={},kind='invitation',date=eventToday()){
  if(kind!=='invitation')return kind;
  const stamp=family?.invite_sent_at;
- return stamp&&Date.parse(stamp)>=Date.parse('2026-12-01T00:00:00-03:00')?'lateInvitation':'invitation';
+ const issuedLate=stamp&&Date.parse(stamp)>=Date.parse('2026-12-01T00:00:00-03:00');
+ return issuedLate||date>'2026-11-30'?'lateInvitation':'invitation';
 }
 export function validateMessageTemplates(value){
  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Modelos inválidos.');
@@ -93,7 +94,7 @@ export function renderMessageTemplate(template,params={}){
 }
 export function familyMessage(family,kind='invitation',templates=MESSAGE_DEFAULTS,date=eventToday()){
  const safe=validateMessageTemplates(templates);
- const selected=messageTemplateType(family,kind);
+ const selected=messageTemplateType(family,kind,date);
  if(!Object.hasOwn(safe,selected))throw Error('Modelo de mensagem inválido.');
  return renderMessageTemplate(safe[selected],messageParameters(family,date));
 }
