@@ -1,5 +1,5 @@
 import React,{useEffect,useMemo,useState} from 'react';
-import {Copy,Download,FileUp,RotateCcw,Save,MessageCircle} from 'lucide-react';
+import {Copy,Download,FileUp,RotateCcw,Save,MessageCircle,ChevronDown} from 'lucide-react';
 import {MESSAGE_TYPES,MESSAGE_DEFAULTS,MESSAGE_VARIABLES,MESSAGE_STORE_KEY,
  validateMessageTemplates,readMessageTemplates,messageBackup,parseMessageBackup,
  renderMessageTemplate,messageParameters} from './oliver-message-templates.mjs';
@@ -54,12 +54,14 @@ export default function OliverMessageCenter({families=[]}){
   catch{setMessage('Falha ao copiar. Selecione o texto da prévia para copiá-lo manualmente.')}
  };
  return <section id="oliver-message-center" className="olieMessageCenter adminTabbedBlock" aria-label="Central de Mensagens do Oliver">
-  <div className="olieMessageIntro">
-   <div><span className="eyebrow">SPRINT 6 · COMUNICAÇÃO</span><h2><MessageCircle size={24}/> Central de Mensagens</h2>
-    <p>Personalize convites e lembretes por núcleo familiar. Os modelos são salvos <strong>neste navegador</strong>; para usar em outro aparelho, exporte e restaure um backup.</p></div>
-   <span className="olieMessageTag">Somente copiar e colar</span>
-  </div>
-  <div className="olieMessagePanel">
+  <details className="olieMessageDisclosure">
+   <summary className="olieMessageIntro olieMessageToggle">
+    <div><span className="eyebrow">SPRINT 6 · COMUNICAÇÃO</span><h2><MessageCircle size={24}/> Central de Mensagens</h2>
+     <p>Convites, lembretes e modelos personalizados. Abra somente quando precisar.</p></div>
+    <span className="olieMessageTag">Exibir / ocultar <ChevronDown size={17} aria-hidden="true"/></span>
+   </summary>
+   <p className="olieMessageStorageNote">Os modelos são salvos <strong>neste navegador</strong>. Para utilizá-los em outro aparelho, exporte e restaure um backup JSON. As mensagens são copiadas e enviadas manualmente.</p>
+   <div className="olieMessagePanel">
    <label className="olieMessageLabel">Tipo de mensagem<select value={selected} onChange={e=>{setSelected(e.target.value);setCopied(false);setMessage('')}}>
     {MESSAGE_TYPES.map(t=><option value={t.key} key={t.key}>{t.label}</option>)}
    </select></label>
@@ -94,6 +96,7 @@ export default function OliverMessageCenter({families=[]}){
     <button type="button" onClick={restore}><RotateCcw size={16}/> Restaurar padrões</button>
    </div>
   </div>
-  <p className="olieMessageFootnote">Importante: copiar não altera o histórico de envios. O status «Enviado» só deve ser marcado manualmente após o envio real. Alterações dos modelos não modificam mensagens já enviadas.</p>
+   <p className="olieMessageFootnote">Importante: copiar não altera o histórico de envios. O status «Enviado» só deve ser marcado manualmente após o envio real. Alterações dos modelos não modificam mensagens já enviadas.</p>
+  </details>
  </section>;
 }
