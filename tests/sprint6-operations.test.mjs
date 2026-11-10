@@ -105,3 +105,19 @@ test('Sprint 6 publica apenas UI de Preview sem novas rotas que gravem em Supaba
  assert.doesNotMatch(center,/action:'save',adminCode/);
  assert.doesNotMatch(admin,/wa\.me\/\?text/);
 });
+
+
+test('Central de Mensagens inicia recolhida e expande sem desmontar o editor',()=>{
+ const ui=source('oliver-message-center.jsx');
+ const css=source('oliver-message-center.css');
+ const match=ui.match(/<details className="olieMessageDisclosure"([^>]*)>/);
+ assert.ok(match,'Central deve usar details nativo');
+ assert.doesNotMatch(match[1],/\bopen(?:=|\s|$)/,'Central deve começar fechada');
+ assert.match(ui,/<summary className="olieMessageIntro olieMessageToggle">/);
+ assert.match(ui,/Exibir \/ ocultar/);
+ assert.match(ui,/<textarea rows=\{12\}/);
+ assert.match(ui,/<\/details>/);
+ assert.match(ui,/window\.localStorage\.setItem\(MESSAGE_STORE_KEY,messageBackup\(clean\)\)/);
+ assert.match(css,/\.olieMessageDisclosure\[open\]/);
+ assert.match(css,/:focus-visible/);
+});
