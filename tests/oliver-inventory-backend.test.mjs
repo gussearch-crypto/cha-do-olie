@@ -22,12 +22,12 @@ test('api requer PIN por hash não versionado e oferece controle otimista de rev
  assert.doesNotMatch(code,/const ADMIN_HASH='[a-f0-9]{64}'/);
  assert.doesNotMatch(code,/from\('guests'\)|from\('families'\)/);
 });
-test('Preview jamais aponta por padrão para o Supabase real',()=>{
+test('API futura permanece isolada e a interface atual não ativa sincronização',()=>{
  const code=file('oliver-inventory-sync.mjs');
  assert.match(code,/INVENTORY_PRODUCTION_HOST/);
  assert.match(code,/const official=String\(hostname\|\|''\)\.toLowerCase\(\)===INVENTORY_PRODUCTION_HOST/);
  assert.match(code,/test===main/);
  const ui=file('oliver-post-event-inventory.jsx');
- assert.match(ui,/Mesclar rascunho/);
- assert.match(ui,/Conflito/);
+ assert.match(ui,/Inventário salvo neste navegador/);
+ assert.doesNotMatch(ui,/Mesclar rascunho|inventoryApiRequest|inventoryApiUrl|expectedRevision|setRemote/);
 });
