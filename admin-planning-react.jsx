@@ -268,6 +268,22 @@ function Planning(){
   const taskFiltersActive=taskSearch||taskCat!=='all'||taskOwner!=='all'||taskPeriod!=='all'||taskStatus!=='all';
   const expenseFiltersActive=expenseSearch||expenseCat!=='all'||expensePeriod!=='all'||expenseStatus!=='all';
   const toggle=t=>setData(d=>togglePlanningTask(d,t.id,today()));
+  // Sprint 6: a Central do Dia reutiliza exatamente o mesmo estado, validações
+  // e sincronização das Ações. Nunca executa esta operação em Vercel Preview.
+  useEffect(()=>{
+   const listener=e=>{
+    if(window.location.hostname!=='cha-oliver-mvp.vercel.app')return;
+    const taskId=String(e.detail?.taskId||'');
+    const task=data.tasks.find(t=>t.id===taskId);
+    if(!task||task.status!==e.detail?.expectedStatus){alert('O status desta tarefa mudou. Atualize a Central do Dia.');return}
+    if(task.status!=='done'&&(taskDependencies(task,data.tasks).length||taskProgress(task).pending)){
+     alert('Conclua primeiro as etapas e dependências na aba Ações.');return;
+    }
+    setData(d=>togglePlanningTask(d,taskId,today()));
+   };
+   window.addEventListener('oliver-day-toggle-task',listener);
+   return()=>window.removeEventListener('oliver-day-toggle-task',listener);
+  },[data.tasks]);
   const toggleStep=(taskId,stepId)=>setData(d=>togglePlanningSubtask(d,taskId,stepId));
   const closeModal=()=>{const task=modal?.returnTaskId&&data.tasks.find(t=>t.id===modal.returnTaskId);setModal(task?{type:'task',item:task,returnPending:modal.returnPending}:modal?.returnPending?{type:'pending'}:null)};
   const saveTask=(f,{shoppingId,linkId,previousTaskId,unlinkId}={})=>{const saved=f.id?f:{...f,id:id(),status:'todo',completedAt:''};if(unlinkId){setData(unlinkPurchaseFromAction(data,saved,unlinkId));setModal({type:'task',item:saved,returnPending:modal?.returnPending,shoppingOpen:true,shoppingNotice:'Compra desvinculada. O item permanece na lista de compras.',session:id()});return}if(linkId){setData(linkExistingPurchase(data,saved,linkId,previousTaskId));setModal({type:'task',item:saved,returnPending:modal?.returnPending,shoppingOpen:true,session:id()});return}setData(d=>({...d,tasks:f.id?d.tasks.map(x=>x.id===f.id?saved:x):[saved,...d.tasks]}));if(shoppingId){const item=shoppingId==='__new__'?{taskId:saved.id}:data.shopping.find(i=>i.id===shoppingId);setModal(item?{type:'shopping',item,returnTaskId:saved.id,returnPending:modal?.returnPending}:modal?.returnPending?{type:'pending'}:null)}else closeModal()};
