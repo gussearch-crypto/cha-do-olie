@@ -21,8 +21,11 @@ test('lembretes preservam texto livre e exigem envio manual para atualizar o his
 });
 test('o texto do convite mantém emoji e quebras de linha na cópia sem URL intermediária',()=>{
  const admin=read('admin-entry.jsx');
- assert.match(admin,/Olá, \$\{f\.display_name\}! 💛\\n\\n/);
- assert.match(admin,/📅 04 de dezembro/);
- assert.match(admin,/🕕 Das 18h às 22h/);
+ const templates=read('oliver-message-templates.mjs');
+ assert.match(admin,/familyMessage\(f,'invitation',readMessageTemplates/);
+ assert.match(templates,/Olá, \{nome_familia\}! 💛/);
+ assert.match(templates,/📅 \{data_evento\}/);
+ assert.match(templates,/🕕 \{horario_evento\}/);
+ assert.match(templates,/\.join\('\\n'\)/);
  assert.doesNotMatch(admin,/wa\.me\/\?text=/);
 });
