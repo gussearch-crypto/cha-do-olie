@@ -61,6 +61,18 @@ export default function OliverDayOperations({families=[]}){
   try{window.localStorage.setItem(PRODUCTION_BASE_KEY,JSON.stringify(reference));setBase(safeProductionBaseline(reference));setNotice('Base registrada neste navegador em '+today+'. Ela não bloqueia a lista de convidados.')}
   catch{setError('Não foi possível guardar a base de produção. Exporte a versão atual em CSV.')}
  };
+ const importBase=async e=>{
+  const file=e.target.files?.[0];e.target.value='';if(!file)return;
+  if(file.size>30000){setError('Backup de produção maior que 30 KB.');return}
+  try{
+   const raw=JSON.parse(await file.text());
+   if(raw.format!=='olie-base-producao-v1')throw Error('Formato inválido.');
+   const parsed=safeProductionBaseline(raw.base);
+   if(!window.confirm('Restaurar a base registrada em '+parsed.captureDate+' neste navegador?'))return;
+   window.localStorage.setItem(PRODUCTION_BASE_KEY,JSON.stringify(parsed));setBase(parsed);
+   setNotice('Base de produção recuperada. A lista de convidados não foi alterada.');
+  }catch{setError('Não foi possível restaurar a base. Confira o arquivo JSON do Kit.')}
+ };
  const toggleCheck=id=>setChecks(old=>old.includes(id)?old.filter(x=>x!==id):safeDayChecks([...old,id]));
  const toggleTask=task=>{
   if(!canModifyOfficial()){setNotice('Em Preview, a conclusão das tarefas oficiais fica bloqueada para proteger os dados reais.');return}
@@ -115,6 +127,7 @@ export default function OliverDayOperations({families=[]}){
    <div className="olieDayActions">
     <button type="button" disabled={!reference} onClick={registerBase}><ClipboardList size={16}/>{base?'Atualizar base registrada':'Registrar base atual'}</button>
     <button type="button" disabled={!base} onClick={()=>download('base-producao-oliver-'+base.captureDate+'.json',JSON.stringify({format:'olie-base-producao-v1',base},null,2),'application/json;charset=utf-8')}><Download size={16}/>Backup da base</button>
+    <label><Download size={16}/>Restaurar base JSON<input type="file" accept=".json,application/json" hidden onChange={importBase}/></label>
     <button type="button" disabled={!reference} onClick={()=>download('producao-oliver-'+today+'.csv',productionReferenceCsv(reference),'text/csv;charset=utf-8')}><Download size={16}/>Exportar base atual CSV</button>
    </div>
    <small>Base de produção registrada localmente; faça backup se precisar consultá-la em outro dispositivo.</small>
@@ -153,6 +166,10 @@ export default function OliverDayOperations({families=[]}){
     <span><b>{kit?.payments.length??'—'}</b> parcelas com saldo</span>
     <span><b>{kit?money(kit.finance.open):'—'}</b> a quitar</span>
    </div>
+   {kit&&<div className="olieDayKitLists">
+    <div><strong>Compras pendentes ({kit.shopping.length})</strong>{kit.shopping.length?<ul>{kit.shopping.map((item,i)=><li key={i}>{item.title} · {item.quantity} {item.unit}{item.responsible?' · '+item.responsible:''}</li>)}</ul>:<p>Nenhuma compra pendente.</p>}</div>
+    <div><strong>Pagamentos a quitar ({kit.payments.length})</strong>{kit.payments.length?<ul>{kit.payments.map((item,i)=><li key={i}>{item.description} · {item.label} · {money(item.balance)}{item.due?' · '+item.due:''}</li>)}</ul>:<p>Não há parcelas em aberto.</p>}</div>
+   </div>}
    <div className="olieDayActions">
     <button type="button" disabled={!kit} onClick={()=>download('kit-organizador-oliver-'+today+'.csv',dayKitCsv(kit),'text/csv;charset=utf-8')}><Download size={16}/>Exportar kit CSV</button>
     <button type="button" onClick={()=>window.print()}><Printer size={16}/>Imprimir resumo / salvar PDF</button>
