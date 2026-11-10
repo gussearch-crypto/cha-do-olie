@@ -1,5 +1,5 @@
 
-.olieMessageCenter{background:#fffdf7;border:1px solid #dfe2d5;border-radius:20px;padding:23px;margin:18px 0;box-shadow:0 12px 32px #2b3f2310;color:#34442f}
+.olieMessageCenter{background:#fffdf7;border:1px solid #dfe2d5;border-radius:20px;padding:15px 18px;margin:18px 0;box-shadow:0 12px 32px #2b3f2310;color:#34442f}
 .olieMessageIntro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
 .olieMessageIntro h2{display:flex;align-items:center;gap:10px;font-size:22px;line-height:1.2;margin:5px 0 9px;color:#39543a}
 .olieMessageIntro p{font-size:13px;line-height:1.65;color:#606c5a;max-width:780px}
@@ -30,3 +30,32 @@
 @media(max-width:760px){.olieMessageCenter{padding:15px}.olieMessageGrid{grid-template-columns:1fr}.olieMessageIntro{flex-direction:column}.olieMessageActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.olieMessageActions>*{min-width:0}}
 @media(max-width:430px){.olieMessageActions{grid-template-columns:1fr}.olieMessagePanel{padding:12px}.olieMessageIntro h2{font-size:19px}}
 @media print{.olieMessageCenter{display:none!important}}
+
+/* Sprint 6: editor recolhível. O elemento details mantém o rascunho montado
+   ao fechar, sem salvar nem descartar alterações automaticamente. */
+.olieMessageDisclosure{width:100%}
+.olieMessageDisclosure>.olieMessageToggle{
+ list-style:none;display:flex;align-items:center;justify-content:space-between;
+ gap:14px;margin:0;padding:3px 0;cursor:pointer;min-height:56px;
+}
+.olieMessageDisclosure>.olieMessageToggle::-webkit-details-marker{display:none}
+.olieMessageDisclosure>.olieMessageToggle::marker{content:''}
+.olieMessageDisclosure>.olieMessageToggle:hover h2{color:#59794d}
+.olieMessageDisclosure>.olieMessageToggle:focus-visible{outline:3px solid #86ac76;outline-offset:5px;border-radius:9px}
+.olieMessageDisclosure>.olieMessageToggle h2{margin:2px 0 4px}
+.olieMessageDisclosure>.olieMessageToggle p{margin:0;color:#72806b;font-size:12px;line-height:1.45}
+.olieMessageDisclosure>.olieMessageToggle .olieMessageTag{display:flex;align-items:center;gap:8px;cursor:pointer}
+.olieMessageDisclosure>.olieMessageToggle .olieMessageTag svg{transition:transform .2s ease}
+.olieMessageDisclosure[open]>.olieMessageToggle{margin-bottom:13px}
+.olieMessageDisclosure[open]>.olieMessageToggle .olieMessageTag svg{transform:rotate(180deg)}
+.olieMessageStorageNote{font-size:12px;line-height:1.6;color:#64745d;margin:0 0 13px}
+@media(max-width:760px){
+ .olieMessageCenter{padding:13px 15px}
+ .olieMessageDisclosure>.olieMessageToggle{align-items:flex-start}
+ .olieMessageDisclosure>.olieMessageToggle .olieMessageTag{white-space:normal}
+}
+@media(max-width:430px){
+ .olieMessageDisclosure>.olieMessageToggle h2{font-size:18px}
+ .olieMessageDisclosure>.olieMessageToggle .olieMessageTag{font-size:11px;padding:7px 9px;flex-shrink:0}
+ .olieMessageDisclosure>.olieMessageToggle p{font-size:11px}
+}
