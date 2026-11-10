@@ -1,0 +1,67 @@
+
+.olieDayOps{color:#354730;background:#fffdf7;border:1px solid #e1e5d7;border-radius:20px;padding:22px;margin:16px 0 24px}
+.olieDayTop,.olieDaySectionHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.olieDayTop{margin:0 0 19px}
+.olieDayTop h2{display:flex;align-items:center;gap:10px;color:#3d603c;font-size:23px;line-height:1.2;margin:6px 0 9px}
+.olieDayTop p,.olieDaySectionHead p{color:#71806d;font-size:13px;line-height:1.6;margin:0}
+.olieDaySectionHead h3{font-size:18px;color:#405c3b;margin:0 0 6px}
+.olieDaySectionHead>div{flex:1;min-width:0}
+.olieDayTop button,.olieDaySectionHead button,.olieDayActions button,.olieDayActions a{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ background:#f1f6ed;color:#45643c;border:1px solid #bbd1b0;border-radius:10px;
+ font-size:12px;font-weight:750;padding:10px 13px;text-decoration:none;min-height:42px;box-sizing:border-box;cursor:pointer;
+}
+.olieDayTop button:hover,.olieDaySectionHead button:hover,.olieDayActions button:hover,.olieDayActions a:hover{background:#dcead6}
+.olieDayOps button:disabled{opacity:.58;cursor:not-allowed}
+.olieDayPreview,.olieDayNotice,.olieDayError{padding:11px 14px;border-radius:11px;line-height:1.6;font-size:12px;margin:12px 0}
+.olieDayPreview{background:#fff6e4;color:#7a6435;border:1px solid #ecd9b0}
+.olieDayNotice{background:#eaf5e9;color:#3e633a}
+.olieDayError{background:#fff0eb;color:#854a3b}
+.olieDayStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.olieDayStats article{background:#eef5e8;border:1px solid #dfebd7;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.olieDayStats svg{color:#729268}
+.olieDayStats strong{font-size:28px;color:#38583a;font-weight:850;font-variant-numeric:tabular-nums}
+.olieDayStats small{color:#697b62;font-size:11px;line-height:1.5}
+.olieDaySection{border:1px solid #e2e8d9;border-radius:14px;padding:18px;margin:13px 0;background:#fff}
+.olieDaySection>small{display:block;margin-top:12px;color:#718068;font-size:11px;line-height:1.55}
+.olieDayPills{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0}
+.olieDayPills span{background:#f5f8f1;border:1px solid #e3ebdc;border-radius:11px;padding:10px 12px;color:#70806b;font-size:12px;line-height:1.5}
+.olieDayPills b{font-size:15px;color:#365c37;margin-right:5px}
+.olieDayBase{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.olieDayBase>div{background:#edf5e8;border:1px solid #e0ebd8;padding:12px;border-radius:11px;display:flex;flex-direction:column;gap:5px}
+.olieDayBase strong{font-size:15px;color:#42643c}
+.olieDayBase small{font-size:11px;line-height:1.6;color:#687b65}
+.olieDayMuted{color:#7b8171;background:#f7f9f3;border-radius:10px;padding:12px;font-size:12px;line-height:1.6;margin:13px 0}
+.olieDayActions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.olieDayActions label{display:inline-flex;align-items:center;justify-content:center;min-height:42px;box-sizing:border-box;gap:8px;padding:10px 13px;background:#f1f6ed;color:#45643c;border:1px solid #bbd1b0;border-radius:10px;cursor:pointer;font-size:12px;font-weight:750}
+.olieDayFilters{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.olieDayFilters button{border:1px solid #c9d8c0;border-radius:99px;padding:8px 12px;background:#fff;color:#5c7055;font-weight:700;font-size:12px;cursor:pointer}
+.olieDayFilters button.active{background:#4e7043;color:#fff;border-color:#4e7043}
+.olieDayTimeline{display:flex;flex-direction:column;gap:7px}
+.olieDayTimeline article{display:grid;grid-template-columns:minmax(62px,95px) minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border:1px solid #e1e7dc;border-radius:11px}
+.olieDayTimeline time{font-weight:800;font-size:13px;color:#4d6448}
+.olieDayTimeline strong{font-size:13px;color:#344d34}
+.olieDayTimeline small{display:block;margin-top:5px;color:#798674;font-size:11px}
+.olieDayTimeline button{border:1px solid #bfd1b6;border-radius:9px;background:#f1f5ec;color:#43643d;cursor:pointer;padding:9px;font-size:11px;min-height:38px;font-weight:750}
+.olieDayTaskDone{opacity:.72}
+.olieDayTaskDone strong{text-decoration:line-through}
+.olieDayTaskFlags{color:#a16f35;font-size:11px;margin:4px 0 0}
+.olieDayProgress{font-size:12px;color:#667b5f;font-weight:750;margin:12px 0}
+.olieDayChecklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.olieDayChecklist label{display:flex;align-items:flex-start;gap:10px;border:1px solid #e3eade;background:#f7faf5;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;cursor:pointer}
+.olieDayChecklist input{accent-color:#557b50;margin-top:2px}
+.olieDayKit{background:#f7faf4}
+@media(max-width:810px){.olieDayStats{grid-template-columns:repeat(2,minmax(0,1fr))}.olieDayChecklist{grid-template-columns:1fr}.olieDayBase{grid-template-columns:1fr}}
+@media(max-width:550px){.olieDayOps{padding:14px}.olieDayTop,.olieDaySectionHead{flex-direction:column}.olieDayTop button,.olieDaySectionHead button{width:100%}.olieDaySection{padding:12px}.olieDayStats strong{font-size:24px}.olieDayTimeline article{grid-template-columns:1fr auto;gap:7px}.olieDayTimeline time{grid-column:1/-1}.olieDayActions{display:grid;grid-template-columns:1fr}.olieDayActions button,.olieDayActions a,.olieDayActions label{width:100%}}
+@media print{
+ body[data-oliver-tab="operation"] .adminSiteHeader,
+ body[data-oliver-tab="operation"] .adminWrap > :not(#oliver-day-operations){display:none!important}
+ body[data-oliver-tab="operation"] .adminWrap{max-width:100%!important;padding:0!important;margin:0!important}
+ body[data-oliver-tab="operation"] #oliver-day-operations{display:block!important;background:white;border:0;box-shadow:none;padding:0;margin:0}
+ .olieDayOps .olieDayRefresh,.olieDayOps .olieDayPreview,.olieDayOps .olieDayNotice,.olieDayOps .olieDayError,
+ .olieDayOps button,.olieDayOps .olieDayActions,.olieDayOps .olieDayFilters{display:none!important}
+ .olieDayOps .olieDaySection,.olieDayOps .olieDayStats article{break-inside:avoid;box-shadow:none!important}
+ .olieDayOps .olieDayTimeline article{break-inside:avoid}
+ .olieDayOps .olieDayTimeline{gap:4px}
+ .olieDayOps .olieDayChecklist label{border:0;padding:4px}
+}
