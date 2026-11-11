@@ -10,7 +10,17 @@ import{createRoot}from'react-dom/client';
 import{Baby,Users,Plus,Copy,RefreshCw,MessageCircle,ArrowLeft,Pencil,Gift,CheckCircle2,Clock3,XCircle,Mail}from'lucide-react';
 import'./style.css';import'./admin-panel.css';import'./admin-panel-fonts.css';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/invite-api',APP_URL='https://cha-oliver-mvp.vercel.app/';
-async function api(payload){if(!import.meta.env.VITE_SUPABASE_URL)throw new Error('Supabase não configurado');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),d=await r.json();if(!r.ok)throw new Error(d.error||'Erro');return d}const newPin=()=>String(Math.floor(1000+Math.random()*9000));
+const GUEST_READ_ACTIONS=new Set(['adminList','adminReminderHistory','adminAttendanceHistory','adminValidationAlerts']);
+async function api(payload){
+ if(!import.meta.env.VITE_SUPABASE_URL)throw new Error('Supabase não configurado');
+ // Preview compartilha o Supabase oficial: impede QUALQUER gravação administrativa
+ // do módulo Convidados, não apenas atualizações de presença.
+ if(window.location.hostname!=='cha-oliver-mvp.vercel.app'&&!GUEST_READ_ACTIONS.has(payload.action))
+  throw new Error('preview_read_only');
+ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ const d=await r.json();if(!r.ok)throw new Error(d.error||'Erro');return d;
+}
+const newPin=()=>String(Math.floor(1000+Math.random()*9000));
 const normalizeGuestName=v=>String(v||'').normalize('NFD').split('').filter(ch=>ch.charCodeAt(0)<768||ch.charCodeAt(0)>879).join('').trim().toLowerCase().split(' ').filter(Boolean).join(' ');
 function guestAlerts(families){const names=new Map();for(const family of families)for(const guest of family.guests||[]){const key=normalizeGuestName(guest.name);if(key)names.set(key,[...(names.get(key)||[]),family.id])}return families.map(f=>{const guests=f.guests||[],problems=[];const yes=guests.filter(g=>g.attendance==='yes'),no=guests.filter(g=>g.attendance==='no');const actual=no.length===guests.length&&guests.length?'declined':yes.length===guests.length&&guests.length?'confirmed':yes.length||no.length?'partial':'waiting';const stored=f.invite_status||'waiting';if(actual!==stored&&!(actual==='waiting'&&stored==='invited'))problems.push({key:'status',message:'Status do núcleo divergente das respostas individuais.'});const children=yes.filter(g=>g.person_type==='child'&&!['under_5','five_or_more'].includes(g.child_age_group));if(children.length)problems.push({key:'age',message:'Crianças confirmadas sem faixa etária: '+children.map(g=>g.name).join(', ')});const duplicated=[...new Set(guests.filter(g=>(names.get(normalizeGuestName(g.name))||[]).some(id=>id!==f.id)).map(g=>g.name))];if(duplicated.length)problems.push({key:'duplicate',message:'Possíveis nomes duplicados entre núcleos: '+duplicated.join(', ')});const expected=f.gift_mode==='per_adult'?yes.filter(g=>g.person_type==='adult').length:f.gift_mode==='family'?(yes.length?1:0):null;if(expected!==null&&(f.diapers||[]).length!==expected)problems.push({key:'diapers',message:'Sugestões de fraldas: '+(f.diapers||[]).length+' registradas; '+expected+' esperadas.'});return {family:f,problems}}).filter(x=>x.problems.length)}
 function AdminPanel(){const[exportStatus,setExportStatus]=useState('all'),[alertsOpen,setAlertsOpen]=useState(false),[code,setCode]=useState(sessionStorage.getItem('oliverAdmin')||''),[families,setFamilies]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(false),[filter,setFilter]=useState(''),[statusFilter,setStatusFilter]=useState('all'),[showAdd,setShowAdd]=useState(false),[editing,setEditing]=useState(null),[displayName,setDisplayName]=useState(''),[groupName,setGroupName]=useState(''),[newGuests,setNewGuests]=useState([{name:'',isChild:false}]),[saving,setSaving]=useState(false),[sentFilter,setSentFilter]=useState('all'),[attendanceHistory,setAttendanceHistory]=useState([]),[historyLoading,setHistoryLoading]=useState(false),[historyOpen,setHistoryOpen]=useState(false),[ignoredAlerts,setIgnoredAlerts]=useState([]),[showIgnored,setShowIgnored]=useState(false),[reminderFamily,setReminderFamily]=useState(null),[reminderText,setReminderText]=useState(''),[reminderHistory,setReminderHistory]=useState([]);
@@ -38,8 +48,8 @@ const saveEdit=async()=>{
  const changed=valid.filter(g=>(g.attendance||'pending')!==(g.expectedAttendance||'pending'));
  if(valid.some(g=>(g.attendance||'pending')==='yes'&&g.isChild&&!['under_5','five_or_more'].includes(g.childAgeGroup)))
   return setError('Informe a faixa etária de cada criança confirmada antes de salvar.');
- if(changed.length&&window.location.hostname!=='cha-oliver-mvp.vercel.app')
-  return setError('Na Preview, salve apenas alterações sem mudança de presença. As confirmações e reversões ficarão disponíveis após publicação do backend.');
+ if(window.location.hostname!=='cha-oliver-mvp.vercel.app')
+  return setError('Esta Preview é somente leitura. Nenhuma edição de núcleo ou alteração de presença pode ser gravada no Supabase oficial.');
  let confirmationCode;
  if(changed.length){
   const labels={yes:'Confirmado',no:'Não irá',pending:'A confirmar'};
