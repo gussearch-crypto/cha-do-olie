@@ -12,29 +12,58 @@ function download(name,content){
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 const demo={display_name:'Família de Exemplo',invite_pin_plain:'1234'};
-export default function OliverMessageCenter({families=[]}){
+export default function OliverMessageCenter({families=[],adminCode,messageApi}){
  const [templates,setTemplates]=useState(()=>readMessageTemplates(window.localStorage));
  const [selected,setSelected]=useState('invitation');
  const [familyId,setFamilyId]=useState('');
  const [saved,setSaved]=useState(()=>readMessageTemplates(window.localStorage));
  const [message,setMessage]=useState('');
  const [copied,setCopied]=useState(false);
+ const [revision,setRevision]=useState(null);
+ const [syncing,setSyncing]=useState(true);
+ const [saving,setSaving]=useState(false);
  const selectedFamily=families.find(f=>String(f.id)===familyId)||demo;
  const draft=templates[selected]||'';
  const invalid=[...draft.matchAll(/\{([^{}]+)\}/g)].map(m=>m[1]).filter(k=>!MESSAGE_VARIABLES.includes(k));
  const preview=useMemo(()=>renderMessageTemplate(draft,messageParameters(selectedFamily)),[draft,selectedFamily]);
  const dirty=JSON.stringify(templates)!==JSON.stringify(saved);
- useEffect(()=>{const listener=()=>{
-  const current=readMessageTemplates(window.localStorage);
-  setTemplates(current);setSaved(current);
- };window.addEventListener('storage',listener);return()=>window.removeEventListener('storage',listener)},[]);
- const save=()=>{
+ useEffect(()=>{
+  let active=true;
+  async function sync(){
+   if(!adminCode||!messageApi){if(active)setSyncing(false);return}
+   try{
+    const remote=await messageApi({action:'adminGetMessageTemplates',adminCode});
+    if(!active)return;
+    setRevision(remote.revision);
+    if(remote.templates){
+     const clean=validateMessageTemplates(remote.templates);
+     setTemplates(clean);setSaved(clean);
+     window.localStorage.setItem(MESSAGE_STORE_KEY,messageBackup(clean));
+    }else{
+     setMessage('Ainda não há modelos compartilhados. Seus textos deste navegador foram preservados: clique em Salvar modelos para disponibilizá-los aos convites.');
+    }
+   }catch{if(active)setMessage('Não foi possível consultar os modelos compartilhados. Verifique a conexão antes de salvar.')}
+   finally{if(active)setSyncing(false)}
+  }
+  sync();
+  const listener=()=>{const current=readMessageTemplates(window.localStorage);setTemplates(current);setSaved(current)};
+  window.addEventListener('storage',listener);
+  return()=>{active=false;window.removeEventListener('storage',listener)};
+ },[adminCode,messageApi]);
+ const save=async()=>{
+  if(syncing||revision===null||saving)return setMessage('Não foi possível validar a versão compartilhada dos modelos. Recarregue o painel.');
+  setSaving(true);setMessage('');
   try{
    const clean=validateMessageTemplates(templates);
+   const response=await messageApi({action:'adminSaveMessageTemplates',adminCode,templates:clean,expectedRevision:revision});
+   if(!response.ok||!Number.isInteger(response.revision))throw new Error('save_unconfirmed');
    window.localStorage.setItem(MESSAGE_STORE_KEY,messageBackup(clean));
-   setTemplates(clean);setSaved(clean);setMessage('Modelos salvos neste navegador. Convites copiados daqui em diante usarão estes textos.');
+   setRevision(response.revision);setTemplates(clean);setSaved(clean);
+   setMessage('Modelos salvos no Supabase. Os próximos convites e lembretes copiados usarão estas mensagens em qualquer acesso.');
    window.dispatchEvent(new CustomEvent('oliver-messages-changed'));
-  }catch(e){setMessage(e.message||'Não foi possível salvar os modelos.')}
+  }catch(e){
+   setMessage(e.message==='templates_conflict'?'Os modelos foram alterados em outro acesso. Recarregue o painel antes de salvar para não sobrescrever mudanças.':'Não foi possível salvar no Supabase. O texto continua no editor e não foi publicado.');
+  }finally{setSaving(false)}
  };
  const restore=()=>{
   if(!window.confirm('Restaurar os quatro modelos padrão? Seus textos atuais serão substituídos apenas depois de salvar.'))return;
@@ -60,7 +89,7 @@ export default function OliverMessageCenter({families=[]}){
      <p>Convites, lembretes e modelos personalizados. Abra somente quando precisar.</p></div>
     <span className="olieMessageTag">Exibir / ocultar <ChevronDown size={17} aria-hidden="true"/></span>
    </summary>
-   <p className="olieMessageStorageNote">Os modelos são salvos <strong>neste navegador</strong>. Para utilizá-los em outro aparelho, exporte e restaure um backup JSON. As mensagens são copiadas e enviadas manualmente.</p>
+   <p className="olieMessageStorageNote">Os modelos salvos são compartilhados via <strong>Supabase</strong> entre os acessos administrativos. O backup JSON continua disponível. As mensagens são copiadas e enviadas manualmente.</p>
    <div className="olieMessagePanel">
    <label className="olieMessageLabel">Tipo de mensagem<select value={selected} onChange={e=>{setSelected(e.target.value);setCopied(false);setMessage('')}}>
     {MESSAGE_TYPES.map(t=><option value={t.key} key={t.key}>{t.label}</option>)}
@@ -90,7 +119,7 @@ export default function OliverMessageCenter({families=[]}){
    {dirty&&<p className="olieMessagePending" role="status">Alterações no editor ainda não foram salvas.</p>}
    {message&&<p className="olieMessageStatus" role="status">{message}</p>}
    <div className="olieMessageActions">
-    <button type="button" className="olieMessageSave" onClick={save} disabled={!!invalid.length}><Save size={16}/> Salvar modelos</button>
+    <button type="button" className="olieMessageSave" onClick={save} disabled={!!invalid.length||syncing||saving||revision===null}><Save size={16}/>{saving?"Salvando…":syncing?"Carregando modelos…":"Salvar modelos"}</button>
     <button type="button" onClick={()=>download('modelos-mensagens-oliver.json',messageBackup(saved))}><Download size={16}/> Backup dos modelos salvos</button>
     <label className="olieMessageImport"><FileUp size={16}/> Importar backup<input type="file" hidden accept=".json,application/json" onChange={importBackup}/></label>
     <button type="button" onClick={restore}><RotateCcw size={16}/> Restaurar padrões</button>
