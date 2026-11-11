@@ -65,3 +65,16 @@ test('A Preview bloqueia salvar mudanças em presenças reais antes de publicar 
  assert.match(admin,/As confirmações e reversões ficarão disponíveis após publicação do backend/);
  assert.match(admin,/data-admin-tab|Editar núcleo familiar/);
 });
+
+test('seletor de presença mantém altura compacta no desktop e no celular',()=>{
+ const start=css.indexOf('.adminForm .guestTypeEditor>.guestAttendanceEditor{');
+ const end=css.indexOf('/* A senha é pedida somente no salvamento',start);
+ assert.ok(start>=0&&end>start,'regras específicas devem existir');
+ const block=css.slice(start,end);
+ assert.match(block,/display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(160px,230px\)/);
+ assert.match(block,/height:44px;min-height:44px;max-height:44px/);
+ assert.match(block,/box-sizing:border-box/);
+ assert.match(block,/@media\(max-width:690px\)/);
+ assert.match(block,/grid-template-columns:minmax\(0,1fr\)/);
+ assert.doesNotMatch(block,/flex:0 1 230px/);
+});
