@@ -69,7 +69,7 @@ test('A Preview bloqueia salvar mudanças em presenças reais antes de publicar 
 });
 
 test('edição compacta: status ocupa a mesma linha de nome, criança e remover no desktop',()=>{
- const editor=admin.slice(admin.indexOf('const guestEditor='),admin.indexOf('return <div className="adminPage">'));
+ const editor=admin.slice(admin.indexOf('const guestEditor='),admin.indexOf('return <div className="adminPage">',admin.indexOf('const guestEditor=')));
  assert.match(editor,/guestEditWithAttendance/);
  assert.match(editor,/guestEditChild/);
  assert.match(editor,/guestEditAdult/);
