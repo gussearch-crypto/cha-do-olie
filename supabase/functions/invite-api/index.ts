@@ -103,7 +103,147 @@ if(action==="adminRestoreAttendance"){
  }
  return json({ok:true,status,affected:targets.length});
 }
-if(action==="adminUpdateFamily"){if(!(await isAdmin(body.adminCode)))return json({error:"unauthorized"},401);const familyId=String(body.familyId||""),displayName=String(body.displayName||"").trim(),groupName=String(body.groupName||"").trim(),incoming=Array.isArray(body.guests)?body.guests:[];if(!familyId||!displayName||!incoming.length)return json({error:"invalid_family"},400);await supabase.from("families").update({display_name:displayName,group_name:groupName||null,updated_at:new Date().toISOString()}).eq("id",familyId);const {data:existing}=await supabase.from("guests").select("id").eq("family_id",familyId);const keep=new Set(incoming.filter((g:any)=>g.id).map((g:any)=>String(g.id)));for(const g of existing||[])if(!keep.has(String(g.id)))await supabase.from("guests").delete().eq("id",g.id);for(const g of incoming){const name=String(g.name||"").trim();if(!name)continue;const person_type=g.isChild?"child":"adult",child_age_group=g.isChild?(g.childAgeGroup||null):null;if(g.id)await supabase.from("guests").update({name,person_type,child_age_group,updated_at:new Date().toISOString()}).eq("id",g.id).eq("family_id",familyId);else await supabase.from("guests").insert({family_id:familyId,name,attendance:"pending",person_type,child_age_group})}return json({ok:true})}
+if(action==="adminUpdateFamily"){
+ if(!(await isAdmin(body.adminCode)))return json({error:"unauthorized"},401);
+ const familyId=String(body.familyId||""),displayName=String(body.displayName||"").trim(),
+  groupName=String(body.groupName||"").trim(),incoming=Array.isArray(body.guests)?body.guests:[];
+ if(!/^[0-9a-f-]{36}$/i.test(familyId)||!displayName||!incoming.length||incoming.length>120)
+  return json({error:"invalid_family"},400);
+ if(incoming.some((g:any)=>!String(g?.name||"").trim()||String(g.name).length>160
+  ||(g.id&&!/^[0-9a-f-]{36}$/i.test(String(g.id)))))
+  return json({error:"invalid_guest"},400);
+ const ids=incoming.filter((g:any)=>g.id).map((g:any)=>String(g.id));
+ if(new Set(ids).size!==ids.length)return json({error:"duplicate_guest"},400);
+ const [{data:family,error:familyError},{data:before,error:readError}]=await Promise.all([
+  supabase.from("families").select("id,is_test,group_name,gift_mode,responded_at").eq("id",familyId).maybeSingle(),
+  supabase.from("guests").select("id,name,attendance,person_type,child_age_group").eq("family_id",familyId)
+ ]);
+ if(familyError||!family||readError||!before?.length)return json({error:"family_not_found"},404);
+ const byId=new Map(before.map((g:any)=>[g.id,g]));
+ if(ids.some((id:string)=>!byId.has(id)))return json({error:"guest_not_found"},409);
+ const valid=["pending","yes","no"];
+ let invalidInput:string|null=null;
+ const desired=incoming.map((g:any)=>{
+  const prior=g.id?byId.get(String(g.id)):null;
+  const attendance=g.attendance===undefined?(prior?.attendance||"pending"):String(g.attendance);
+  const age=g.isChild?String(g.childAgeGroup||""):null;
+  const personType=g.isChild?"child":"adult";
+  if(!valid.includes(attendance))invalidInput="invalid_attendance";
+  if(g.isChild&&age&&!["under_5","five_or_more"].includes(age))invalidInput="invalid_age_group";
+  if(attendance==="yes"&&g.isChild&&!age)invalidInput="child_age_required";
+  return {
+   id:prior?.id||null,name:String(g.name).trim(),person_type:personType,child_age_group:age||null,
+   attendance,previous:prior?.attendance||"pending",expectedAttendance:g.expectedAttendance
+  };
+ });
+ if(invalidInput)return json({error:invalidInput},409);
+ const changedStatus=desired.some((g:any)=>g.attendance!==g.previous);
+ if(desired.some((g:any)=>g.id&&g.expectedAttendance!==undefined&&g.expectedAttendance!==g.previous))
+  return json({error:"attendance_changed_elsewhere"},409);
+ if(changedStatus&&!(await isAdmin(body.confirmationCode)))return json({error:"confirmation_password_invalid"},401);
+ const currentCounted=before.filter((g:any)=>g.attendance==="yes"
+  &&!(g.person_type==="child"&&g.child_age_group==="under_5")).length;
+ const projectedCounted=desired.filter((g:any)=>g.attendance==="yes"
+  &&!(g.person_type==="child"&&g.child_age_group==="under_5")).length;
+ if(projectedCounted!==currentCounted||changedStatus){
+  const [{data:settings,error:settingsError},{data:all,error:countError}]=await Promise.all([
+   supabase.from("event_settings").select("capacity_counted").limit(1).maybeSingle(),
+   supabase.from("guests").select("family_id,attendance,person_type,child_age_group,families!inner(is_test,group_name)")
+  ]);
+  if(settingsError||countError||!settings||!Array.isArray(all))return json({error:"capacity_check_failed"},503);
+  const capacity=Number(settings.capacity_counted);
+  if(!Number.isSafeInteger(capacity)||capacity<1)return json({error:"capacity_check_failed"},503);
+  const relevant=(g:any)=>!g.families?.is_test&&String(g.families?.group_name||"").trim().toLowerCase()!=="teste";
+  const occupies=(g:any)=>g.attendance==="yes"&&!(g.person_type==="child"&&g.child_age_group==="under_5");
+  const currentGlobal=all.filter((g:any)=>relevant(g)&&occupies(g)).length;
+  const formerlyRelevant=!family.is_test&&String(family.group_name||"").trim().toLowerCase()!=="teste";
+  const newlyRelevant=!family.is_test&&groupName.toLowerCase()!=="teste";
+  const projectedGlobal=currentGlobal-(formerlyRelevant?currentCounted:0)+(newlyRelevant?projectedCounted:0);
+  if(projectedGlobal>capacity&&projectedGlobal>currentGlobal)
+   return json({error:"event_capacity_reached",available:Math.max(0,capacity-currentGlobal)},409);
+ }
+ // Todos os requisitos são validados antes da primeira gravação. As alterações
+ // de presença continuam passando pelo RPC que alimenta o histórico de auditoria.
+ const now=new Date().toISOString();
+ const {error:familyUpdateError}=await supabase.from("families")
+  .update({display_name:displayName,group_name:groupName||null,updated_at:now}).eq("id",familyId);
+ if(familyUpdateError)return json({error:"family_update_failed"},500);
+ const keep=new Set(ids);
+ for(const g of before)if(!keep.has(g.id)){
+  const {error}=await supabase.from("guests").delete().eq("id",g.id).eq("family_id",familyId);
+  if(error)return json({error:"guest_update_partial"},500);
+ }
+ const groups:any={pending:[],no:[],yes:[]};
+ for(const g of desired){
+  let id=g.id;
+  if(id){
+   const {error}=await supabase.from("guests").update({
+    name:g.name,person_type:g.person_type,child_age_group:g.child_age_group,updated_at:now
+   }).eq("id",id).eq("family_id",familyId);
+   if(error)return json({error:"guest_update_partial"},500);
+  }else{
+   const {data:created,error}=await supabase.from("guests").insert({
+    family_id:familyId,name:g.name,person_type:g.person_type,
+    child_age_group:g.child_age_group,attendance:"pending"
+   }).select("id").single();
+   if(error||!created)return json({error:"guest_update_partial"},500);
+   id=created.id;
+  }
+  if(g.attendance!==g.previous)groups[g.attendance].push(id);
+ }
+ for(const kind of ["pending","no","yes"]){
+  if(!groups[kind].length)continue;
+  const {data:affected,error}=await supabase.rpc("update_guest_attendance_with_source",{
+   p_family_id:familyId,p_guest_ids:groups[kind],p_attendance:kind,p_source:"administrador"
+  });
+  if(error||Number(affected)!==groups[kind].length)return json({error:"attendance_update_partial"},409);
+ }
+ const {data:current,error:currentError}=await supabase.from("guests")
+  .select("attendance,person_type").eq("family_id",familyId);
+ if(currentError||!current?.length)return json({error:"status_read_failed"},500);
+ const yes=current.filter((g:any)=>g.attendance==="yes").length;
+ const no=current.filter((g:any)=>g.attendance==="no").length;
+ const status=no===current.length?"declined":yes===current.length?"confirmed":
+  yes===0&&no===0?"waiting":"partial";
+ const {error:statusError}=await supabase.from("families").update({
+  invite_status:status,
+  responded_at:changedStatus?(yes===0&&no===0?null:now):family.responded_at,
+  updated_at:now
+ }).eq("id",familyId);
+ if(statusError)return json({error:"family_status_partial"},500);
+ // Recalcula somente sugestões de fraldas, jamais itens efetivamente recebidos.
+ // Sem alteração de presença, preserva as atribuições atuais.
+ if(changedStatus){
+  const expected=family.gift_mode==="per_adult"?
+   current.filter((g:any)=>g.attendance==="yes"&&g.person_type!=="child").length:
+   family.gift_mode==="family"&&yes>0?1:family.gift_mode==="family"?0:null;
+  if(expected!==null||yes===0){
+   const slots=expected===null?0:expected;
+   const {data:assigned,error:slotError}=await supabase.from("diaper_assignments")
+    .select("slot_number").eq("family_id",familyId).order("slot_number");
+   if(slotError)return json({error:"diaper_update_partial"},500);
+   for(const slot of (assigned||[]).slice(slots)){
+    const {error}=await supabase.from("diaper_assignments").delete()
+     .eq("family_id",familyId).eq("slot_number",slot.slot_number);
+    if(error)return json({error:"diaper_update_partial"},500);
+   }
+   if((assigned||[]).length<slots){
+    const {data:all}=await supabase.from("diaper_assignments").select("diaper_size");
+    const count:any={P:0,M:0,G:0,XG:0},target:any={P:.20,M:.35,G:.30,XG:.15};
+    for(const x of all||[])if(x.diaper_size in count)count[x.diaper_size]++;
+    for(let i=(assigned||[]).length+1;i<=slots;i++){
+     const total=Object.values(count).reduce((a:any,b:any)=>a+b,0)+1;
+     const size=Object.keys(target).sort((a,b)=>(count[a]/total-target[a])-(count[b]/total-target[b]))[0];
+     count[size]++;
+     const {error}=await supabase.from("diaper_assignments")
+      .insert({family_id:familyId,slot_number:i,diaper_size:size});
+     if(error)return json({error:"diaper_update_partial"},500);
+    }
+   }
+  }
+ }
+ return json({ok:true,status,attendanceChanges:groups.yes.length+groups.no.length+groups.pending.length});
+}
 if(action==="search"){const q=String(body.q||"").trim();if(q.length<2)return json({families:[]});const {data,error}=await supabase.rpc("search_invite_families",{p_query:q});return error?json({error:"search_failed"},500):json({families:data})}
 if(action==="unlock"){const familyId=String(body.familyId||""),pin=String(body.pin||"");const {data,error}=await supabase.rpc("unlock_invite_family",{p_family_id:familyId,p_pin:pin});if(error||!data?.length)return json({error:"invalid_pin"},401);const family=data[0];const {data:guests}=await supabase.from("guests").select("id,name,attendance,person_type,child_age_group").eq("family_id",familyId).order("created_at");const {data:diapers}=await supabase.from("diaper_assignments").select("slot_number,diaper_size").eq("family_id",familyId).order("slot_number");const {data:deadlineFamily}=await supabase.from("families").select("invite_sent_at,responded_at").eq("id",familyId).single();const deadlineExpired=isLateLegacy(deadlineFamily);return json({family:{deadlineExpired,id:family.id,displayName:family.display_name,giftMode:family.gift_mode,status:family.invite_status,locked:family.invite_status==="declined"},guests:guests||[],diapers:diapers||[]})}
 if(action==="save"){const familyId=String(body.familyId||""),pin=String(body.pin||"");const {data:valid}=await supabase.rpc("unlock_invite_family",{p_family_id:familyId,p_pin:pin});if(!valid?.length)return json({error:"invalid_pin"},401);const guests=Array.isArray(body.guests)?body.guests:[];const {data:before}=await supabase.from("families").select("responded_at,invite_status,invite_sent_at").eq("id",familyId).single();const wasResponded=!!before?.responded_at;if(isLateLegacy(before))return json({error:"rsvp_deadline_expired"},409);if(before?.invite_status==="declined")return json({error:"declined_locked"},409);for(const g of guests){const attendance=["yes","no","pending"].includes(g.attendance)?g.attendance:"pending";let person_type=g.isChild||String(g.type||"").startsWith("child")?"child":"adult",child_age_group=null;if(person_type==="child"){child_age_group=g.childAgeGroup||(g.type==="child-under5"?"under_5":g.type==="child5"?"five_or_more":null);if(attendance==="yes"&&!child_age_group)return json({error:"child_age_required",guestId:g.id},400)}await supabase.from("guests").update({person_type,child_age_group,updated_at:new Date().toISOString()}).eq("id",g.id).eq("family_id",familyId);const {error:attendanceError}=await supabase.rpc("update_guest_attendance_with_source",{p_family_id:familyId,p_guest_ids:[g.id],p_attendance:attendance,p_source:"convidado"});if(attendanceError)return json({error:"attendance_save_failed"},500)}const attending=guests.filter((g:any)=>g.attendance==="yes").length,adults=guests.filter((g:any)=>g.attendance==="yes"&&!(g.isChild||String(g.type||"").startsWith("child"))).length,pending=guests.filter((g:any)=>g.attendance==="pending").length,no=guests.filter((g:any)=>g.attendance==="no").length,giftMode=["family","adult","unknown"].includes(body.giftMode)?body.giftMode:"unknown",dbGift=giftMode==="adult"?"per_adult":giftMode,status=pending===guests.length?"waiting":attending===0&&no>0&&pending===0?"declined":pending>0?"partial":no===0?"confirmed":"partial";await supabase.from("families").update({gift_mode:dbGift,invite_status:status,responded_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("id",familyId);const slots=giftMode==="adult"?adults:giftMode==="family"&&attending>0?1:0;await supabase.from("diaper_assignments").delete().eq("family_id",familyId);const {data:counts}=await supabase.from("diaper_assignments").select("diaper_size");const current:any={P:0,M:0,G:0,XG:0},targets:any={P:.20,M:.35,G:.30,XG:.15},assigned:any[]=[];for(const x of counts||[])current[x.diaper_size]++;for(let i=1;i<=slots;i++){const total=Object.values(current).reduce((a:any,b:any)=>a+b,0)+1;const size=Object.keys(targets).sort((a,b)=>(current[a]/total-targets[a])-(current[b]/total-targets[b]))[0];current[size]++;assigned.push({family_id:familyId,slot_number:i,diaper_size:size})}if(assigned.length)await supabase.from("diaper_assignments").insert(assigned);await sendRsvpAlert(supabase,familyId,status,assigned,wasResponded);return json({ok:true,status,diapers:assigned.map(x=>({slot_number:x.slot_number,diaper_size:x.diaper_size}))})}return json({error:"unknown_action"},400)});
