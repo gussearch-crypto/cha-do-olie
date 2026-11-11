@@ -120,6 +120,12 @@ if(action==="adminUpdateFamily"){
  ]);
  if(familyError||!family||readError||!before?.length)return json({error:"family_not_found"},404);
  const byId=new Map(before.map((g:any)=>[g.id,g]));
+ // Protege contra exclusão involuntária de convidados inseridos por outro administrador.
+ if(Array.isArray(body.expectedGuestIds)){
+  const lastSeen=new Set(body.expectedGuestIds.map((id:any)=>String(id)));
+  if(lastSeen.size!==body.expectedGuestIds.length||before.length!==lastSeen.size
+   ||before.some((g:any)=>!lastSeen.has(g.id)))return json({error:"guest_list_changed_elsewhere"},409);
+ }
  if(ids.some((id:string)=>!byId.has(id)))return json({error:"guest_not_found"},409);
  const valid=["pending","yes","no"];
  let invalidInput:string|null=null;
@@ -138,6 +144,7 @@ if(action==="adminUpdateFamily"){
  });
  if(invalidInput)return json({error:invalidInput},409);
  const changedStatus=desired.some((g:any)=>g.attendance!==g.previous);
+ const changedMembership=desired.length!==before.length||desired.some((g:any)=>!g.id);
  if(desired.some((g:any)=>g.id&&g.expectedAttendance!==undefined&&g.expectedAttendance!==g.previous))
   return json({error:"attendance_changed_elsewhere"},409);
  if(changedStatus&&!(await isAdmin(body.confirmationCode)))return json({error:"confirmation_password_invalid"},401);
@@ -145,7 +152,9 @@ if(action==="adminUpdateFamily"){
   &&!(g.person_type==="child"&&g.child_age_group==="under_5")).length;
  const projectedCounted=desired.filter((g:any)=>g.attendance==="yes"
   &&!(g.person_type==="child"&&g.child_age_group==="under_5")).length;
- if(projectedCounted!==currentCounted||changedStatus){
+ const priorCountedFamily=!family.is_test&&String(family.group_name||"").trim().toLowerCase()!=="teste";
+ const nextCountedFamily=!family.is_test&&groupName.toLowerCase()!=="teste";
+ if(projectedCounted!==currentCounted||changedStatus||priorCountedFamily!==nextCountedFamily){
   const [{data:settings,error:settingsError},{data:all,error:countError}]=await Promise.all([
    supabase.from("event_settings").select("capacity_counted").limit(1).maybeSingle(),
    supabase.from("guests").select("family_id,attendance,person_type,child_age_group,families!inner(is_test,group_name)")
@@ -207,13 +216,13 @@ if(action==="adminUpdateFamily"){
   yes===0&&no===0?"waiting":"partial";
  const {error:statusError}=await supabase.from("families").update({
   invite_status:status,
-  responded_at:changedStatus?(yes===0&&no===0?null:now):family.responded_at,
+  responded_at:changedStatus||changedMembership?(yes===0&&no===0?null:now):family.responded_at,
   updated_at:now
  }).eq("id",familyId);
  if(statusError)return json({error:"family_status_partial"},500);
  // Recalcula somente sugestões de fraldas, jamais itens efetivamente recebidos.
  // Sem alteração de presença, preserva as atribuições atuais.
- if(changedStatus){
+ if(changedStatus||changedMembership){
   const expected=family.gift_mode==="per_adult"?
    current.filter((g:any)=>g.attendance==="yes"&&g.person_type!=="child").length:
    family.gift_mode==="family"&&yes>0?1:family.gift_mode==="family"?0:null;
