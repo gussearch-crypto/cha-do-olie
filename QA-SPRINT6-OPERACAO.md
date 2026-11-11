@@ -88,3 +88,24 @@
 ## Situação de Production consultada em 11/11/2026
 - SHA em Production: 72fe4225926ec29a311283338342fb05a758518f.
 - A nova confirmação administrativa de pendentes não está ativa nesse commit.
+
+## Validação funcional sem gravações oficiais — 11/11/2026
+
+### Testes automatizados
+- [x] Regras de capacidade isoladas em `supabase/functions/_shared/guest-attendance-rules.mjs`, reutilizadas pela Edge Function.
+- [x] Testados 10 cenários de regras: adultos, menores de 5 anos, limite de 100, troca de participantes, reversão, mudança da idade, núcleos de teste, estados agregados, modalidades de fraldas e preservação de recebimentos.
+- [x] Fluxo de edição continua com somente uma solicitação de senha no clique em **Salvar alterações** quando há mudança de status.
+- [x] Histórico individual utiliza a função existente `update_guest_attendance_with_source` e o trigger `guest_attendance_history_trigger` (confirmados por consulta somente leitura ao Supabase).
+- [x] Ajuste de sugestões de fraldas preserva registros que tenham data de recebimento ou fonte diferente de `planned`.
+- [x] Mudar o tipo de um convidado confirmado entre adulto e criança atualiza a quantidade sugerida de fraldas quando aplicável.
+- [x] A Preview bloqueia **todas as ações de gravação** do módulo de Convidados; somente operações de leitura são permitidas. A edição de nomes/grupos também não grava no banco oficial.
+
+### Testes e dependências ainda pendentes
+- [ ] Teste de integração real da Edge Function com gravação, revisão de histórico e rollback, somente mediante autorização específica e plano de backup.
+- [ ] Revisão de salvamento **transacional**: múltiplas operações de edição são atualmente feitas em chamadas sucessivas do Supabase. Uma falha intermediária pode produzir atualização parcial de um núcleo.
+- [ ] Revisão de concorrência: a capacidade é verificada antes da atualização; duas confirmações simultâneas da última vaga ainda não são impedidas por trava de banco. Evitar alterações simultâneas antes de resolver isso.
+- [ ] Aprovar explicitamente a versão final e a ordem da implantação: revisão/backup do banco → Edge Function `invite-api` → frontend Vercel Production → validação real de um cenário controlado.
+- [ ] Depois da implantação, confirmar histórico, totais, reversão, sugestões de fraldas e funcionamento da confirmação pública.
+- [ ] Restaurar ou manter o bloqueio de publicação automática após liberação manual.
+
+**Importante:** os testes unitários e a Preview READY são necessários, mas não substituem a homologação integrada de escrita. Não implantar automaticamente a Edge Function ou o frontend em Production.
