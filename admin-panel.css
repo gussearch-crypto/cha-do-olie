@@ -64,16 +64,20 @@
 
 
 /* Presença na edição do núcleo — controles recolhidos fora da lista principal. */
+/* Grade própria evita a regra global ".adminForm label { flex-direction: column }".
+   Ela fazia o flex-basis de 230px aumentar a ALTURA do seletor. */
 .adminForm .guestTypeEditor>.guestAttendanceEditor{
  grid-column:1/-1;
- display:flex;align-items:center;justify-content:space-between;
- gap:12px;min-width:0;border-top:1px solid #e7e0d1;
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,230px);
+ align-items:center;column-gap:12px;row-gap:7px;
+ min-width:0;border-top:1px solid #e7e0d1;
  padding:11px 2px 0;
  color:#536346;font-size:12px;font-weight:750;
 }
 .adminForm .guestTypeEditor>.guestAttendanceEditor select{
- flex:0 1 230px;min-width:160px;max-width:100%;
- height:44px;min-height:44px;
+ display:block;width:100%;min-width:0;max-width:100%;
+ height:44px;min-height:44px;max-height:44px;box-sizing:border-box;
+ margin:0;flex:none;align-self:center;
  background:#fff;border:1px solid #b8c9ad;border-radius:11px;
  padding:9px 12px;color:#385331;font-weight:750;font-size:13px;
 }
@@ -83,10 +87,11 @@
 .adminForm .guestTypeEditor>.guestAttendanceEditor select option{color:#34442e}
 @media(max-width:690px){
  .adminForm .guestTypeEditor>.guestAttendanceEditor{
-  grid-column:1/-1;flex-wrap:wrap;gap:7px;padding-top:10px;
+  grid-column:1/-1;grid-template-columns:minmax(0,1fr);
+  gap:7px;padding-top:10px;
  }
  .adminForm .guestTypeEditor>.guestAttendanceEditor select{
-  flex:1 1 100%;min-width:0;width:100%;
+  width:100%;min-width:0;max-width:100%;
  }
 }
 
