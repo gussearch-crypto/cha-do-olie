@@ -18,10 +18,12 @@ test('Convidados: a lista principal mostra apenas situações, sem botões de al
 test('Editar núcleo oferece A confirmar, Confirmado e Não irá para todos os integrantes',()=>{
  assert.match(admin,/const guestEditor=\(guests,setter,withAttendance=false\)/);
  assert.match(admin,/\{guestEditor\(editing\.guests,g=>setEditing\(\{\.\.\.editing,guests:g\}\),true\)\}/);
- assert.match(admin,/className="guestAttendanceEditor">Status de presença/);
+ assert.match(admin,/className="guestAttendanceSelect"/);
+ assert.match(admin,/aria-label=\{`Status de presença de \$\{g\.name\|\|'novo convidado'\}`\}/);
+ assert.doesNotMatch(admin,/className="guestAttendanceEditor"/);
  assert.match(admin,/<option value="pending">A confirmar<\/option><option value="yes">Confirmado<\/option><option value="no">Não irá<\/option>/);
  assert.match(admin,/expectedAttendance:g\.attendance\|\|'pending'/);
- assert.match(css,/\.guestTypeEditor>\.guestAttendanceEditor/);
+ assert.match(css,/\.guestTypeEditor\.guestEditWithAttendance>\.guestAttendanceSelect/);
 });
 
 test('O botão Salvar alterações é o único salvamento de presença e exige senha quando houver mudanças',()=>{
@@ -66,15 +68,29 @@ test('A Preview bloqueia salvar mudanças em presenças reais antes de publicar 
  assert.match(admin,/data-admin-tab|Editar núcleo familiar/);
 });
 
-test('seletor de presença mantém altura compacta no desktop e no celular',()=>{
- const start=css.indexOf('.adminForm .guestTypeEditor>.guestAttendanceEditor{');
- const end=css.indexOf('/* A senha é pedida somente no salvamento',start);
- assert.ok(start>=0&&end>start,'regras específicas devem existir');
- const block=css.slice(start,end);
- assert.match(block,/display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(160px,230px\)/);
+test('edição compacta: status ocupa a mesma linha de nome, criança e remover no desktop',()=>{
+ const editor=admin.slice(admin.indexOf('const guestEditor='),admin.indexOf('return <div className="adminPage">'));
+ assert.match(editor,/guestEditWithAttendance/);
+ assert.match(editor,/guestEditChild/);
+ assert.match(editor,/guestEditAdult/);
+ assert.match(editor,/<select className="guestAttendanceSelect"/);
+ assert.match(editor,/g\.isChild&&<select className="guestAgeSelect"/);
+ assert.match(editor,/!g\.isChild&&!withAttendance/,'adulto em edição não reserva campo etário invisível');
+ assert.doesNotMatch(editor,/guestAttendanceEditor|Status de presença\s*<select/,'não repetir título por pessoa');
+ const block=css.slice(css.indexOf('/* Edição compacta do núcleo:'),css.indexOf('/* A senha é pedida somente no salvamento'));
+ assert.match(block,/\.guestEditWithAttendance\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 112px minmax\(160px,190px\) 96px/);
+ assert.match(block,/\.guestEditWithAttendance\.guestEditChild\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 108px minmax\(135px,165px\) minmax\(155px,175px\) 94px/);
+ assert.match(block,/grid-column:3;grid-row:1/);
+ assert.match(block,/\.guestEditChild>\.guestAttendanceSelect\{[\s\S]*?grid-column:4/);
  assert.match(block,/height:44px;min-height:44px;max-height:44px/);
- assert.match(block,/box-sizing:border-box/);
- assert.match(block,/@media\(max-width:690px\)/);
- assert.match(block,/grid-template-columns:minmax\(0,1fr\)/);
+});
+
+test('layout responsivo reorganiza os campos sem largura fixa no mobile',()=>{
+ const block=css.slice(css.indexOf('/* Edição compacta do núcleo:'),css.indexOf('/* A senha é pedida somente no salvamento'));
+ assert.match(block,/@media\(max-width:930px\)/);
+ assert.match(block,/@media\(max-width:740px\)/);
+ assert.match(block,/@media\(max-width:500px\)/);
+ assert.match(block,/\.guestEditChild>\.guestAttendanceSelect\{[\s\S]*?grid-column:1\/4;grid-row:3/);
+ assert.match(block,/\.guestEditWithAttendance>select\{[\s\S]*?min-width:0/);
  assert.doesNotMatch(block,/flex:0 1 230px/);
 });
