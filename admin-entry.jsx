@@ -43,8 +43,8 @@ const saveEdit=async()=>{
  let confirmationCode;
  if(changed.length){
   const labels={yes:'Confirmado',no:'Não irá',pending:'A confirmar'};
-  const summary=changed.map(g=>g.name+': '+(labels[g.expectedAttendance]||'A confirmar')+' → '+labels[g.attendance||'pending']).join('\\n');
-  if(!window.confirm('Confirmar as mudanças de presença em '+editing.displayName+'?\\n\\n'+summary+'\\n\\nAs alterações serão registradas no histórico.'))return;
+  const summary=changed.map(g=>g.name+': '+(labels[g.expectedAttendance]||'A confirmar')+' → '+labels[g.attendance||'pending']).join('\n');
+  if(!window.confirm('Confirmar as mudanças de presença em '+editing.displayName+'?\n\n'+summary+'\n\nAs alterações serão registradas no histórico.'))return;
   confirmationCode=window.prompt('Informe a senha administrativa para confirmar as alterações de presença:');
   if(confirmationCode===null)return;
   if(!confirmationCode.trim())return setError('A senha administrativa é necessária para alterar presenças.');
