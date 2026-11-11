@@ -63,9 +63,11 @@ test('O servidor suporta reversões nas três direções e controla capacidade e
  assert.doesNotMatch(familyAction,/isLateLegacy|RSVP_CUTOFF/);
 });
 
-test('A Preview bloqueia salvar mudanças em presenças reais antes de publicar o backend',()=>{
- assert.match(admin,/changed\.length&&window\.location\.hostname!=='cha-oliver-mvp\.vercel\.app'/);
- assert.match(admin,/As confirmações e reversões ficarão disponíveis após publicação do backend/);
+test('A Preview é somente leitura para todas as operações de Convidados',()=>{
+ assert.match(admin,/const GUEST_READ_ACTIONS=new Set\(\['adminList','adminReminderHistory','adminAttendanceHistory','adminValidationAlerts'\]\)/);
+ assert.match(admin,/window\.location\.hostname!=='cha-oliver-mvp\.vercel\.app'&&!GUEST_READ_ACTIONS\.has\(payload\.action\)/);
+ assert.match(admin,/throw new Error\('preview_read_only'\)/);
+ assert.match(admin,/Esta Preview é somente leitura/);
  assert.match(admin,/data-admin-tab|Editar núcleo familiar/);
 });
 
