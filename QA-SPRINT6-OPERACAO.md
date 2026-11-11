@@ -109,3 +109,19 @@
 - [ ] Restaurar ou manter o bloqueio de publicação automática após liberação manual.
 
 **Importante:** os testes unitários e a Preview READY são necessários, mas não substituem a homologação integrada de escrita. Não implantar automaticamente a Edge Function ou o frontend em Production.
+
+## Incidente de compatibilidade — status não persistido (11/11/2026)
+
+**Causa confirmada:** a Edge Function publicada `invite-api` v26 executa `adminUpdateFamily` salvando apenas nome, grupo, tipo de pessoa e idade. Ela ignora os campos `attendance` e `confirmationCode` e retorna `{ok:true}` mesmo sem atualizar a presença. O frontend mais recente não deve interpretar esse `ok` como confirmação.
+
+**Correção preparada no Git, ainda não publicada:**
+- [x] O backend anuncia `adminCapabilities.capabilities.batchAttendanceUpdate=true` somente quando implementa o processamento de presenças.
+- [x] Ao clicar em Salvar alterações com status modificados, o frontend consulta essa capacidade **antes de solicitar a senha e antes de enviar qualquer escrita**.
+- [x] Se o backend for antigo, mostra mensagem de incompatibilidade, mantém o editor aberto e não tenta salvar parcialmente a edição.
+- [x] Depois de uma gravação aceita, exige a contagem `attendanceChanges` e consulta `adminList` para conferir os status efetivos antes de fechar a edição.
+- [x] Se o servidor disser sucesso mas os status diferirem, não exibe salvamento concluído: mostra erro e mantém a edição aberta.
+- [x] Testes de regressão impedem remoção acidental dessa proteção.
+- [ ] **Publicação pendente:** liberar backend e frontend juntos, de maneira controlada e com autorização explícita, após plano de backup e revisão dos riscos de transação parcial e concorrência.
+- [ ] Fazer um teste integrado de gravação/reversão e conferência de histórico em núcleo de teste autorizado **depois** da implantação.
+
+**Até a publicação conjunta:** não usar o formulário novo para mudar presença na Production. A Preview continua sem permissão para gravações oficiais. O convite público segue seu fluxo já existente.
