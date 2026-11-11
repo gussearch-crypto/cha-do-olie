@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import {projectedFamilyCapacity,familyAttendanceStatus,expectedGiftSlots,plannedDiaperChanges} from "../_shared/guest-attendance-rules.mjs";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
 const json=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json"}});
 const ADMIN_HASH="be8f2e0e71d2ed6fe381fda864a08fa0f10601188c492a1fc7659d8e114c1fec";
@@ -145,6 +146,7 @@ if(action==="adminUpdateFamily"){
  if(invalidInput)return json({error:invalidInput},409);
  const changedStatus=desired.some((g:any)=>g.attendance!==g.previous);
  const changedMembership=desired.length!==before.length||desired.some((g:any)=>!g.id);
+ const changedPersonType=desired.some((g:any)=>g.id&&g.person_type!==byId.get(g.id)?.person_type);
  if(desired.some((g:any)=>g.id&&g.expectedAttendance!==undefined&&g.expectedAttendance!==g.previous))
   return json({error:"attendance_changed_elsewhere"},409);
  if(changedStatus&&!(await isAdmin(body.confirmationCode)))return json({error:"confirmation_password_invalid"},401);
@@ -162,14 +164,12 @@ if(action==="adminUpdateFamily"){
   if(settingsError||countError||!settings||!Array.isArray(all))return json({error:"capacity_check_failed"},503);
   const capacity=Number(settings.capacity_counted);
   if(!Number.isSafeInteger(capacity)||capacity<1)return json({error:"capacity_check_failed"},503);
-  const relevant=(g:any)=>!g.families?.is_test&&String(g.families?.group_name||"").trim().toLowerCase()!=="teste";
-  const occupies=(g:any)=>g.attendance==="yes"&&!(g.person_type==="child"&&g.child_age_group==="under_5");
-  const currentGlobal=all.filter((g:any)=>relevant(g)&&occupies(g)).length;
-  const formerlyRelevant=!family.is_test&&String(family.group_name||"").trim().toLowerCase()!=="teste";
-  const newlyRelevant=!family.is_test&&groupName.toLowerCase()!=="teste";
-  const projectedGlobal=currentGlobal-(formerlyRelevant?currentCounted:0)+(newlyRelevant?projectedCounted:0);
-  if(projectedGlobal>capacity&&projectedGlobal>currentGlobal)
-   return json({error:"event_capacity_reached",available:Math.max(0,capacity-currentGlobal)},409);
+  const projection=projectedFamilyCapacity({
+   before,after:desired,all,oldFamily:family,
+   newFamily:{...family,group_name:groupName},capacity
+  });
+  if(!projection.allowed)
+   return json({error:"event_capacity_reached",available:projection.available},409);
  }
  // Todos os requisitos são validados antes da primeira gravação. As alterações
  // de presença continuam passando pelo RPC que alimenta o histórico de auditoria.
@@ -212,8 +212,7 @@ if(action==="adminUpdateFamily"){
  if(currentError||!current?.length)return json({error:"status_read_failed"},500);
  const yes=current.filter((g:any)=>g.attendance==="yes").length;
  const no=current.filter((g:any)=>g.attendance==="no").length;
- const status=no===current.length?"declined":yes===current.length?"confirmed":
-  yes===0&&no===0?"waiting":"partial";
+ const status=familyAttendanceStatus(current);
  // Alterar nome, grupo ou idade não deve transformar um convite ainda
  // "invited" em "waiting" nem mexer na data da resposta anterior.
  if(changedStatus||changedMembership){
@@ -224,32 +223,31 @@ if(action==="adminUpdateFamily"){
   }).eq("id",familyId);
   if(statusError)return json({error:"family_status_partial"},500);
  }
- // Recalcula somente sugestões de fraldas, jamais itens efetivamente recebidos.
- // Sem alteração de presença, preserva as atribuições atuais.
- if(changedStatus||changedMembership){
-  const expected=family.gift_mode==="per_adult"?
-   current.filter((g:any)=>g.attendance==="yes"&&g.person_type!=="child").length:
-   family.gift_mode==="family"&&yes>0?1:family.gift_mode==="family"?0:null;
-  if(expected!==null||yes===0){
-   const slots=expected===null?0:expected;
+ // As sugestões nunca removem comprovantes ou fraldas já recebidas.
+ // Atualiza o número previsto também se um confirmado muda entre adulto e criança.
+ if(changedStatus||changedMembership||changedPersonType){
+  const expected=expectedGiftSlots(family.gift_mode,current);
+  if(expected!==null){
    const {data:assigned,error:slotError}=await supabase.from("diaper_assignments")
-    .select("slot_number").eq("family_id",familyId).order("slot_number");
+    .select("id,slot_number,source,received_at").eq("family_id",familyId).order("slot_number");
    if(slotError)return json({error:"diaper_update_partial"},500);
-   for(const slot of (assigned||[]).slice(slots)){
+   const rebalance=plannedDiaperChanges(assigned||[],expected);
+   for(const slotId of rebalance.removeIds){
     const {error}=await supabase.from("diaper_assignments").delete()
-     .eq("family_id",familyId).eq("slot_number",slot.slot_number);
+     .eq("family_id",familyId).eq("id",slotId).eq("source","planned").is("received_at",null);
     if(error)return json({error:"diaper_update_partial"},500);
    }
-   if((assigned||[]).length<slots){
-    const {data:all}=await supabase.from("diaper_assignments").select("diaper_size");
-    const count:any={P:0,M:0,G:0,XG:0},target:any={P:.20,M:.35,G:.30,XG:.15};
+   if(rebalance.newSlots.length){
+    const {data:all,error:allError}=await supabase.from("diaper_assignments").select("diaper_size");
+    if(allError)return json({error:"diaper_update_partial"},500);
+    const count:any={P:0,M:0,G:0,XG:0},target:any={P:.2,M:.35,G:.3,XG:.15};
     for(const x of all||[])if(x.diaper_size in count)count[x.diaper_size]++;
-    for(let i=(assigned||[]).length+1;i<=slots;i++){
+    for(const slotNumber of rebalance.newSlots){
      const total=Object.values(count).reduce((a:any,b:any)=>a+b,0)+1;
      const size=Object.keys(target).sort((a,b)=>(count[a]/total-target[a])-(count[b]/total-target[b]))[0];
      count[size]++;
      const {error}=await supabase.from("diaper_assignments")
-      .insert({family_id:familyId,slot_number:i,diaper_size:size});
+      .insert({family_id:familyId,slot_number:slotNumber,diaper_size:size});
      if(error)return json({error:"diaper_update_partial"},500);
     }
    }
