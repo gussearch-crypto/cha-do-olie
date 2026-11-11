@@ -89,3 +89,17 @@
   flex:1 1 100%;min-width:0;width:100%;
  }
 }
+
+
+/* A senha é pedida somente no salvamento da edição do núcleo. */
+.adminForm .guestAttendanceSaveHint{
+  grid-column:1/-1;
+  margin:2px 0 0;
+  padding:10px 13px;
+  border:1px solid #d4dfca;
+  border-radius:10px;
+  background:#f4f8ed;
+  color:#486443;
+  font-size:12px;
+  line-height:1.5;
+}
