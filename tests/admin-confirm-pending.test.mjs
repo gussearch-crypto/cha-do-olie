@@ -27,7 +27,13 @@ test('Editar núcleo oferece A confirmar, Confirmado e Não irá para todos os i
 test('O botão Salvar alterações é o único salvamento de presença e exige senha quando houver mudanças',()=>{
  assert.match(admin,/const changed=valid\.filter\(g=>\(g\.attendance\|\|'pending'\)!==\(g\.expectedAttendance\|\|'pending'\)\)/);
  assert.match(admin,/const summary=changed\.map/);
- assert.match(admin,/confirmationCode=window\.prompt\('Informe a senha administrativa/);
+ assert.match(admin,/confirmationCode=window\.prompt\('Salvar '\+changed\.length/);
+ const saveEdit=admin.slice(admin.indexOf('const saveEdit=async()=>{'),admin.indexOf('const message=f=>'));
+ assert.equal((saveEdit.match(/confirmationCode=window\.prompt/g)||[]).length,1,'senha solicitada uma única vez no salvamento');
+ assert.doesNotMatch(saveEdit,/window\.confirm/,'sem confirmação modal extra antes da senha');
+ assert.match(admin,/uma única senha será solicitada apenas ao salvar/);
+ assert.match(admin,/mudança\(s\) de presença aguardando salvamento/);
+ assert.match(css,/\.guestAttendanceSaveHint/);
  assert.match(admin,/action:'adminUpdateFamily'/);
  assert.match(admin,/attendance:g\.attendance\|\|'pending'/);
  assert.match(admin,/expectedAttendance:g\.expectedAttendance/);
