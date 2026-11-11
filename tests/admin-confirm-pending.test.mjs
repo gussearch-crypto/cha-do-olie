@@ -56,8 +56,9 @@ test('O servidor suporta reversões nas três direções e controla capacidade e
  assert.match(familyAction,/groups:any=\{pending:\[\],no:\[\],yes:\[\]\}/);
  assert.match(familyAction,/for\(const kind of \["pending","no","yes"\]\)/);
  assert.match(familyAction,/child_age_required/);
- assert.match(familyAction,/g\.child_age_group==="under_5"/);
- assert.match(familyAction,/projectedGlobal>capacity/);
+ assert.match(familyAction,/projectedFamilyCapacity\(\{/);
+ assert.match(familyAction,/child_age_required/);
+ assert.match(familyAction,/!projection.allowed/);
  assert.match(familyAction,/event_capacity_reached/);
  assert.doesNotMatch(familyAction,/isLateLegacy|RSVP_CUTOFF/);
 });
