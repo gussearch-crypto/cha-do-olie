@@ -28,7 +28,7 @@ const addFamily=async()=>{const guests=newGuests.filter(g=>g.name.trim()).map(g=
 const scrollToPanel=(selector,offset=18)=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const el=document.querySelector(selector);if(!el)return;const y=el.getBoundingClientRect().top+window.scrollY-offset;window.scrollTo({top:y,behavior:'smooth'})}));
 const beginEdit=f=>{
  setEditing({id:f.id,displayName:f.display_name,groupName:f.group_name||'',
-  guests:(f.guests||[]).map(g=>({id:g.id,name:g.name,isChild:g.person_type==='child',
+  expectedGuestIds:(f.guests||[]).map(g=>g.id),guests:(f.guests||[]).map(g=>({id:g.id,name:g.name,isChild:g.person_type==='child',
    childAgeGroup:g.child_age_group||null,attendance:g.attendance||'pending',expectedAttendance:g.attendance||'pending'}))});
  setError('');setShowAdd(false);scrollToPanel('.editBox');
 };
@@ -54,6 +54,7 @@ const saveEdit=async()=>{
   await api({action:'adminUpdateFamily',adminCode:code,
    ...(changed.length?{confirmationCode}:{}),
    familyId:editing.id,displayName:editing.displayName.trim(),groupName:editing.groupName.trim(),
+   expectedGuestIds:editing.expectedGuestIds,
    guests:valid.map(g=>({id:g.id,name:g.name,isChild:!!g.isChild,
     childAgeGroup:g.isChild?g.childAgeGroup||null:null,
     attendance:g.attendance||'pending',...(g.id?{expectedAttendance:g.expectedAttendance}:{} )}))});
@@ -66,6 +67,7 @@ const saveEdit=async()=>{
    capacity_check_failed:'Não foi possível conferir a capacidade. Tente novamente.',
    child_age_required:'Informe a faixa etária da criança antes de confirmar a presença.',
    attendance_changed_elsewhere:'A situação de um convidado mudou em outro acesso. Atualize a lista antes de editar novamente.',
+   guest_list_changed_elsewhere:'O núcleo foi alterado em outro acesso. Atualize a lista antes de salvar novamente.',
    attendance_update_partial:'Algumas alterações podem ter sido salvas. Atualize os dados antes de tentar novamente.',
    family_status_partial:'Algumas alterações podem ter sido salvas. Atualize os dados antes de tentar novamente.',
    diaper_update_partial:'As presenças foram salvas, mas houve falha ao ajustar as sugestões de fraldas. Atualize e confira.',
