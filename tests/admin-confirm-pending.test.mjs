@@ -11,7 +11,7 @@ const familyAction=api.slice(api.indexOf('if(action==="adminUpdateFamily"){'),ap
 test('Convidados: a lista principal mostra apenas situações, sem botões de alteração por pessoa',()=>{
  const list=admin.slice(admin.indexOf('<div className="guestList">'),admin.indexOf('<section className="guestHistoryPanel"'));
  assert.match(list,/g\.attendance==='yes'\?'Confirmado':g\.attendance==='no'\?'Ausência registrada':'A confirmar'/);
- assert.match(list,/>Editar<\/button>/);
+ assert.match(list,/<Pencil\/> Editar<\/button>/);
  assert.doesNotMatch(list,/restoreAttendance|markAbsent|guestPendingActions|Reabrir ausências do núcleo|Ausência do núcleo/);
 });
 
@@ -56,6 +56,6 @@ test('O servidor suporta reversões nas três direções e controla capacidade e
 
 test('A Preview bloqueia salvar mudanças em presenças reais antes de publicar o backend',()=>{
  assert.match(admin,/changed\.length&&window\.location\.hostname!=='cha-oliver-mvp\.vercel\.app'/);
- assert.match(admin,/as confirmações e reversões ficarão disponíveis após publicação do backend/);
+ assert.match(admin,/As confirmações e reversões ficarão disponíveis após publicação do backend/);
  assert.match(admin,/data-admin-tab|Editar núcleo familiar/);
 });
