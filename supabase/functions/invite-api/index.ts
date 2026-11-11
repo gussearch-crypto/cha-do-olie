@@ -214,12 +214,16 @@ if(action==="adminUpdateFamily"){
  const no=current.filter((g:any)=>g.attendance==="no").length;
  const status=no===current.length?"declined":yes===current.length?"confirmed":
   yes===0&&no===0?"waiting":"partial";
- const {error:statusError}=await supabase.from("families").update({
-  invite_status:status,
-  responded_at:changedStatus||changedMembership?(yes===0&&no===0?null:now):family.responded_at,
-  updated_at:now
- }).eq("id",familyId);
- if(statusError)return json({error:"family_status_partial"},500);
+ // Alterar nome, grupo ou idade não deve transformar um convite ainda
+ // "invited" em "waiting" nem mexer na data da resposta anterior.
+ if(changedStatus||changedMembership){
+  const {error:statusError}=await supabase.from("families").update({
+   invite_status:status,
+   responded_at:yes===0&&no===0?null:now,
+   updated_at:now
+  }).eq("id",familyId);
+  if(statusError)return json({error:"family_status_partial"},500);
+ }
  // Recalcula somente sugestões de fraldas, jamais itens efetivamente recebidos.
  // Sem alteração de presença, preserva as atribuições atuais.
  if(changedStatus||changedMembership){
