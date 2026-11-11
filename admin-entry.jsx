@@ -50,17 +50,31 @@ const saveEdit=async()=>{
  }
  setSaving(true);setError('');
  try{
-  await api({action:'adminUpdateFamily',adminCode:code,
+  const saved=await api({action:'adminUpdateFamily',adminCode:code,
    ...(changed.length?{confirmationCode}:{}),
    familyId:editing.id,displayName:editing.displayName.trim(),groupName:editing.groupName.trim(),
    expectedGuestIds:editing.expectedGuestIds,
    guests:valid.map(g=>({id:g.id,name:g.name,isChild:!!g.isChild,
     childAgeGroup:g.isChild?g.childAgeGroup||null:null,
     attendance:g.attendance||'pending',...(g.id?{expectedAttendance:g.expectedAttendance}:{} )}))});
-  setEditing(null);await load(code);
+  if(changed.length&&saved.attendanceChanges!==changed.length)throw new Error('attendance_not_persisted');
+  // Atualiza o estado React a partir da leitura oficial, antes de fechar o editor.
+  // Não depende de novo login, do observador de DOM nem de recarregamentos concorrentes.
+  const refreshed=await api({action:'adminList',adminCode:code});
+  const updatedFamily=(refreshed.families||[]).find(f=>f.id===editing.id);
+  if(!updatedFamily)throw new Error('attendance_verification_failed');
+  const mismatch=valid.filter(g=>g.id).some(g=>updatedFamily.guests?.find(row=>row.id===g.id)?.attendance!==(g.attendance||'pending'));
+  if(mismatch)throw new Error('attendance_not_persisted');
+  setFamilies(refreshed.families||[]);
+  setEditing(null);
+  loadReminders(code);
   if(historyOpen)loadAttendanceHistory();
  }catch(e){
   const errors={
+   attendance_not_persisted:'A atualização não foi confirmada na nova leitura. Recarregue os dados antes de tentar novamente.',
+   attendance_verification_failed:'Não foi possível verificar o núcleo atualizado. Recarregue os dados antes de tentar novamente.',
+   attendance_changed_since_edit:'O status foi alterado em outro acesso. Atualize o núcleo e tente novamente.',
+   guest_list_changed_since_edit:'A lista do núcleo mudou em outro acesso. Atualize os dados antes de salvar.',
    confirmation_password_invalid:'Senha administrativa incorreta. Nenhum status foi alterado.',
    event_capacity_reached:'Não há vagas contabilizadas suficientes. Revise as confirmações antes de salvar.',
    capacity_check_failed:'Não foi possível conferir a capacidade. Tente novamente.',
