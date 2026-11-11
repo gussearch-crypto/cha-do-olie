@@ -97,3 +97,20 @@ test('layout responsivo reorganiza os campos sem largura fixa no mobile',()=>{
  assert.match(block,/\.guestEditWithAttendance>select\{[\s\S]*?min-width:0/);
  assert.doesNotMatch(block,/flex:0 1 230px/);
 });
+
+test('versão antiga do invite-api não pode aparentar sucesso ao ignorar mudanças de status',()=>{
+ const check=admin.indexOf("const capability=await api({action:'adminCapabilities',adminCode:code})");
+ const change=admin.indexOf("const saved=await api({action:'adminUpdateFamily',adminCode:code");
+ assert.ok(check>0&&change>check,'verificação antes da escrita');
+ assert.match(admin,/capability\?\.capabilities\?\.batchAttendanceUpdate!==true/);
+ assert.match(admin,/A versão do servidor de convites não reconhece a confirmação manual/);
+ assert.match(api,/if\(action==="adminCapabilities"\)\{/);
+ assert.match(api,/batchAttendanceUpdate:true/);
+ assert.match(api,/version:"attendance_batch_v1"/);
+ assert.match(admin,/saved\?\.attendanceChanges!==changed\.length/);
+ assert.match(admin,/throw new Error\('attendance_not_persisted'\)/);
+ assert.match(admin,/const refreshed=await api\(\{action:'adminList',adminCode:code\}\)/);
+ assert.match(admin,/family\.guests\?\.find\(x=>x\.id===g\.id\)\?\.attendance/);
+ assert.match(admin,/O servidor respondeu, mas o status não foi atualizado/);
+ assert.match(admin,/setEditing\(null\)/);
+});
