@@ -63,38 +63,125 @@
 
 
 
-/* Presença na edição do núcleo — controles recolhidos fora da lista principal. */
-/* Grade própria evita a regra global ".adminForm label { flex-direction: column }".
-   Ela fazia o flex-basis de 230px aumentar a ALTURA do seletor. */
-.adminForm .guestTypeEditor>.guestAttendanceEditor{
- grid-column:1/-1;
- display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,230px);
- align-items:center;column-gap:12px;row-gap:7px;
- min-width:0;border-top:1px solid #e7e0d1;
- padding:11px 2px 0;
- color:#536346;font-size:12px;font-weight:750;
+/* Edição compacta do núcleo: status e dados lado a lado no desktop.
+   Mantém a edição de cadastro simples (Novo núcleo) com o layout original. */
+.adminForm .editGuests>.guestEditorHeading{
+ display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
+ color:#485333;font-size:12px;font-weight:750;margin:0 0 2px;
 }
-.adminForm .guestTypeEditor>.guestAttendanceEditor select{
- display:block;width:100%;min-width:0;max-width:100%;
- height:44px;min-height:44px;max-height:44px;box-sizing:border-box;
- margin:0;flex:none;align-self:center;
- background:#fff;border:1px solid #b8c9ad;border-radius:11px;
- padding:9px 12px;color:#385331;font-weight:750;font-size:13px;
+.adminForm .guestEditorHeading small{
+ color:#7b816e;font-weight:500;font-size:11px;line-height:1.45;
 }
-.adminForm .guestTypeEditor>.guestAttendanceEditor select:focus-visible{
+.adminForm .editGuest.guestTypeEditor.guestEditWithAttendance{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 112px minmax(160px,190px) 96px;
+ align-items:center;gap:9px;
+ padding:10px 11px;
+ border-radius:13px;
+}
+.adminForm .editGuest.guestTypeEditor.guestEditWithAttendance.guestEditChild{
+ grid-template-columns:minmax(0,1fr) 108px minmax(135px,165px) minmax(155px,175px) 94px;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>input{
+ grid-column:1;grid-row:1;min-width:0;height:44px;margin:0;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>.childToggle{
+ grid-column:2;grid-row:1;min-width:0;width:100%;height:44px;
+ padding:0 7px;gap:6px;justify-self:stretch;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>.guestAgeSelect{
+ grid-column:3;grid-row:1;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>.guestAttendanceSelect{
+ grid-column:3;grid-row:1;
+ border-color:#b9cbaa;color:#3f5938;
+}
+.adminForm .guestTypeEditor.guestEditChild>.guestAttendanceSelect{
+ grid-column:4;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>select{
+ box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;
+ height:44px;min-height:44px;max-height:44px;
+ margin:0;padding:0 9px;font:650 12px 'DM Sans',sans-serif;
+ border:1px solid #d8cfb5;border-radius:11px;
+ background:#fffdf8;appearance:auto;align-self:center;
+}
+.adminForm .guestTypeEditor.guestEditWithAttendance>.guestRemoveButton{
+ grid-column:4;grid-row:1;min-width:0;width:100%;height:44px;min-height:44px;
+ padding:0 9px;font-size:12px;border-radius:11px;
+}
+.adminForm .guestTypeEditor.guestEditChild>.guestRemoveButton{grid-column:5}
+.adminForm .guestTypeEditor.guestEditWithAttendance>select:focus-visible{
  outline:3px solid #a6bd93;outline-offset:2px;
 }
-.adminForm .guestTypeEditor>.guestAttendanceEditor select option{color:#34442e}
-@media(max-width:690px){
- .adminForm .guestTypeEditor>.guestAttendanceEditor{
-  grid-column:1/-1;grid-template-columns:minmax(0,1fr);
-  gap:7px;padding-top:10px;
+@media(max-width:930px){
+ .adminForm .editGuest.guestTypeEditor.guestEditWithAttendance.guestEditChild{
+  grid-template-columns:minmax(0,1fr) 110px minmax(140px,180px) 94px;
  }
- .adminForm .guestTypeEditor>.guestAttendanceEditor select{
-  width:100%;min-width:0;max-width:100%;
+ .adminForm .guestTypeEditor.guestEditChild>input{grid-column:1;grid-row:1}
+ .adminForm .guestTypeEditor.guestEditChild>.childToggle{grid-column:2;grid-row:1}
+ .adminForm .guestTypeEditor.guestEditChild>.guestAgeSelect{grid-column:3;grid-row:1}
+ .adminForm .guestTypeEditor.guestEditChild>.guestRemoveButton{grid-column:4;grid-row:1}
+ .adminForm .guestTypeEditor.guestEditChild>.guestAttendanceSelect{
+  grid-column:3/5;grid-row:2;
  }
 }
-
+@media(max-width:740px){
+ .adminForm .editGuest.guestTypeEditor.guestEditWithAttendance,
+ .adminForm .editGuest.guestTypeEditor.guestEditWithAttendance.guestEditChild{
+  grid-template-columns:minmax(0,1fr) 104px minmax(0,1fr) 91px;
+  gap:8px;padding:10px;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>input{
+  grid-column:1/3;grid-row:1;width:100%;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.childToggle{
+  grid-column:3;grid-row:1;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.guestRemoveButton,
+ .adminForm .guestTypeEditor.guestEditChild>.guestRemoveButton{
+  grid-column:4;grid-row:1;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.guestAttendanceSelect{
+  grid-column:1/5;grid-row:2;
+ }
+ .adminForm .guestTypeEditor.guestEditChild>.guestAgeSelect{
+  grid-column:1/3;grid-row:2;
+ }
+ .adminForm .guestTypeEditor.guestEditChild>.guestAttendanceSelect{
+  grid-column:3/5;grid-row:2;
+ }
+ .adminForm .editGuests>.guestEditorHeading{align-items:start}
+}
+@media(max-width:500px){
+ .adminForm .editGuest.guestTypeEditor.guestEditWithAttendance,
+ .adminForm .editGuest.guestTypeEditor.guestEditWithAttendance.guestEditChild{
+  grid-template-columns:100px minmax(0,1fr) 91px;
+  padding:9px;gap:8px;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>input{
+  grid-column:1/3;grid-row:1;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.guestRemoveButton,
+ .adminForm .guestTypeEditor.guestEditChild>.guestRemoveButton{
+  grid-column:3;grid-row:1;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.childToggle{
+  grid-column:1;grid-row:2;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.guestAttendanceSelect{
+  grid-column:2/4;grid-row:2;
+ }
+ .adminForm .guestTypeEditor.guestEditChild>.guestAgeSelect{
+  grid-column:2/4;grid-row:2;
+ }
+ .adminForm .guestTypeEditor.guestEditChild>.guestAttendanceSelect{
+  grid-column:1/4;grid-row:3;
+ }
+ .adminForm .guestTypeEditor.guestEditWithAttendance>.childToggle span{
+  font-size:11px;
+ }
+}
 
 /* A senha é pedida somente no salvamento da edição do núcleo. */
 .adminForm .guestAttendanceSaveHint{
