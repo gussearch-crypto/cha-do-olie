@@ -52,6 +52,16 @@ const saveEdit=async()=>{
   return setError('Esta Preview é somente leitura. Nenhuma edição de núcleo ou alteração de presença pode ser gravada no Supabase oficial.');
  let confirmationCode;
  if(changed.length){
+  // O backend antigo aceitava adminUpdateFamily, retornava ok:true e ignorava
+  // attendance. Validar explicitamente suporte ANTES de pedir a senha ou gravar.
+  setSaving(true);setError('');
+  try{
+   const capability=await api({action:'adminCapabilities',adminCode:code});
+   if(capability?.capabilities?.batchAttendanceUpdate!==true)
+    return setError('O servidor de convites ainda não suporta alteração manual de presença. Nenhuma alteração foi enviada. Atualize o backend antes de confirmar.');
+  }catch{
+   return setError('A versão do servidor de convites não reconhece a confirmação manual. Nenhuma alteração foi enviada. Atualize o backend antes de confirmar.');
+  }finally{setSaving(false)}
   const labels={yes:'Confirmado',no:'Não irá',pending:'A confirmar'};
   const summary=changed.map(g=>g.name+': '+(labels[g.expectedAttendance]||'A confirmar')+' → '+labels[g.attendance||'pending']).join('\n');
   confirmationCode=window.prompt('Salvar '+changed.length+' alteração(ões) de presença em '+editing.displayName+'?\n\n'+summary+'\n\nDigite a senha administrativa UMA VEZ para confirmar e salvar todas as alterações. Elas serão registradas individualmente no histórico:');
@@ -60,17 +70,29 @@ const saveEdit=async()=>{
  }
  setSaving(true);setError('');
  try{
-  await api({action:'adminUpdateFamily',adminCode:code,
+  const saved=await api({action:'adminUpdateFamily',adminCode:code,
    ...(changed.length?{confirmationCode}:{}),
    familyId:editing.id,displayName:editing.displayName.trim(),groupName:editing.groupName.trim(),
    expectedGuestIds:editing.expectedGuestIds,
    guests:valid.map(g=>({id:g.id,name:g.name,isChild:!!g.isChild,
     childAgeGroup:g.isChild?g.childAgeGroup||null:null,
     attendance:g.attendance||'pending',...(g.id?{expectedAttendance:g.expectedAttendance}:{} )}))});
-  setEditing(null);await load(code);
+  // Nunca afirmar sucesso se o servidor ignorou o status.
+  if(changed.length&&saved?.attendanceChanges!==changed.length)throw new Error('attendance_not_persisted');
+  const refreshed=await api({action:'adminList',adminCode:code});
+  const family=refreshed.families?.find(f=>f.id===editing.id);
+  if(!family)throw new Error('attendance_verification_failed');
+  const mismatch=valid.filter(g=>g.id).some(g=>family.guests?.find(x=>x.id===g.id)?.attendance!==(g.attendance||'pending'));
+  if(mismatch)throw new Error('attendance_not_persisted');
+  // A confirmação só fecha o editor depois da conferência feita no banco.
+  setFamilies(refreshed.families||[]);
+  setEditing(null);
+  loadReminders(code);
   if(historyOpen)loadAttendanceHistory();
  }catch(e){
   const errors={
+   attendance_not_persisted:'O servidor respondeu, mas o status não foi atualizado. O editor foi mantido aberto. Atualize o painel e confira o histórico antes de tentar novamente.',
+   attendance_verification_failed:'Não foi possível conferir se as alterações foram gravadas. Atualize a lista antes de tentar novamente.',
    confirmation_password_invalid:'Senha administrativa incorreta. Nenhum status foi alterado.',
    event_capacity_reached:'Não há vagas contabilizadas suficientes. Revise as confirmações antes de salvar.',
    capacity_check_failed:'Não foi possível conferir a capacidade. Tente novamente.',
