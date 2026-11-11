@@ -62,29 +62,30 @@
 .guestExportBar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;margin:14px 0;border:1px solid #ded2ad;border-radius:16px;background:#fffaf0}.guestExportBar>div:first-child{display:grid;gap:4px}.guestExportBar strong{color:#425a35;font-size:14px}.guestExportBar small{font-size:12px;color:#77816b}.guestExportControls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.guestExportControls label{font-size:12px;font-weight:700;color:#576e4a}.guestExportControls select{min-height:40px;padding:8px 12px;border:1px solid #d8cfb5;border-radius:10px;background:#fffdf9;color:#435a36}.guestExportControls button{min-height:40px;padding:9px 15px;border:0;border-radius:10px;background:#647747;color:#fff;font-weight:750;cursor:pointer}.guestExportControls button:hover{background:#52663b}@media(max-width:650px){.guestExportBar{flex-direction:column;align-items:stretch}.guestExportControls{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px}.guestExportControls button{grid-column:1/-1}}
 
 
-/* Confirmação administrativa individual — Sprint 6 (sem impacto no público). */
-.guestPendingActions{
-  display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;
-  margin-left:5px;
+
+/* Presença na edição do núcleo — controles recolhidos fora da lista principal. */
+.adminForm .guestTypeEditor>.guestAttendanceEditor{
+ grid-column:1/-1;
+ display:flex;align-items:center;justify-content:space-between;
+ gap:12px;min-width:0;border-top:1px solid #e7e0d1;
+ padding:11px 2px 0;
+ color:#536346;font-size:12px;font-weight:750;
 }
-.guestPendingActions button{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-height:34px;padding:6px 10px;border-radius:8px;
-  cursor:pointer;font-size:11px;font-weight:750;
-  line-height:1.2;white-space:normal;
+.adminForm .guestTypeEditor>.guestAttendanceEditor select{
+ flex:0 1 230px;min-width:160px;max-width:100%;
+ height:44px;min-height:44px;
+ background:#fff;border:1px solid #b8c9ad;border-radius:11px;
+ padding:9px 12px;color:#385331;font-weight:750;font-size:13px;
 }
-.guestPendingActions .guestConfirmButton{
-  background:#e6f1df;color:#385d2d;border:1px solid #9cbe89;
+.adminForm .guestTypeEditor>.guestAttendanceEditor select:focus-visible{
+ outline:3px solid #a6bd93;outline-offset:2px;
 }
-.guestPendingActions .guestConfirmButton:hover{background:#d8eacb}
-.guestPendingActions .guestAbsentButton{
-  background:#f7ece6;color:#804c3c;border:1px solid #d7b8ac;
-}
-.guestPendingActions .guestAbsentButton:hover{background:#f1ded5}
-.guestPendingActions button:disabled{opacity:.5;cursor:not-allowed}
-.guestPendingActions button:focus-visible{outline:2px solid #61794d;outline-offset:2px}
-@media(max-width:530px){
- .personStatus.waiting{flex-wrap:wrap}
- .guestPendingActions{width:100%;margin:3px 0 0}
- .guestPendingActions button{flex:1 1 110px;min-height:38px}
+.adminForm .guestTypeEditor>.guestAttendanceEditor select option{color:#34442e}
+@media(max-width:690px){
+ .adminForm .guestTypeEditor>.guestAttendanceEditor{
+  grid-column:1/-1;flex-wrap:wrap;gap:7px;padding-top:10px;
+ }
+ .adminForm .guestTypeEditor>.guestAttendanceEditor select{
+  flex:1 1 100%;min-width:0;width:100%;
+ }
 }
