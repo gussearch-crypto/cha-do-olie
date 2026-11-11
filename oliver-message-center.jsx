@@ -52,6 +52,7 @@ export default function OliverMessageCenter({families=[],adminCode,messageApi}){
  },[adminCode,messageApi]);
  const save=async()=>{
   if(syncing||revision===null||saving)return setMessage('Não foi possível validar a versão compartilhada dos modelos. Recarregue o painel.');
+  if(window.location.hostname!=='cha-oliver-mvp.vercel.app'&&!window.confirm('Esta Preview usa o Supabase oficial. Salvar os modelos aqui alterará os textos compartilhados da produção. Deseja continuar?'))return;
   setSaving(true);setMessage('');
   try{
    const clean=validateMessageTemplates(templates);
