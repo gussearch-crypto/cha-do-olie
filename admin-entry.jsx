@@ -8,7 +8,7 @@ import{RSVP_DEADLINE_LABEL}from'./guest-review-utils.mjs';
 import React,{useEffect,useMemo,useState}from'react';
 import{createRoot}from'react-dom/client';
 import{Baby,Users,Plus,Copy,RefreshCw,MessageCircle,ArrowLeft,Pencil,Gift,CheckCircle2,Clock3,XCircle,Mail}from'lucide-react';
-import'./style.css';import'./admin-panel.css';import'./admin-panel-fonts.css';
+import'./style.css';import'./admin-panel.css';
 const API=(import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/invite-api',APP_URL='https://cha-oliver-mvp.vercel.app/';
 async function api(payload){if(!import.meta.env.VITE_SUPABASE_URL)throw new Error('Supabase não configurado');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),d=await r.json();if(!r.ok)throw new Error(d.error||'Erro');return d}const newPin=()=>String(Math.floor(1000+Math.random()*9000));
 const normalizeGuestName=v=>String(v||'').normalize('NFD').split('').filter(ch=>ch.charCodeAt(0)<768||ch.charCodeAt(0)>879).join('').trim().toLowerCase().split(' ').filter(Boolean).join(' ');
