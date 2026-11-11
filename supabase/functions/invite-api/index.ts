@@ -104,6 +104,12 @@ if(action==="adminRestoreAttendance"){
  }
  return json({ok:true,status,affected:targets.length});
 }
+if(action==="adminCapabilities"){
+ if(!(await isAdmin(body.adminCode)))return json({error:"unauthorized"},401);
+ // Contrato explícito para evitar que um painel novo salve presença num backend antigo
+ // que responde ok:true mas ignora os campos attendance/confirmationCode.
+ return json({ok:true,capabilities:{batchAttendanceUpdate:true,historySource:"administrador",version:"attendance_batch_v1"}});
+}
 if(action==="adminUpdateFamily"){
  if(!(await isAdmin(body.adminCode)))return json({error:"unauthorized"},401);
  const familyId=String(body.familyId||""),displayName=String(body.displayName||"").trim(),
