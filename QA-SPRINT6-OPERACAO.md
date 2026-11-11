@@ -63,4 +63,22 @@
 - [ ] Validar layout em celular estreito e desktop (idealmente 320, 375, 390 e 430 px).
 - [ ] Testar editor de mensagens sem salvar códigos de acesso reais em capturas.
 - [ ] Testar exportações e impressão com dados lidos, sem criar convidados, sem enviar lembretes e sem alterar o Supabase real.
-- [ ] Verificar que Production continua na Sprint 4 até autorização manual separada.
+- [ ] Conferir o SHA atual de Production antes da publicação; nunca presumir que permanece na Sprint 4.
+
+## Ajuste adicional — Confirmar presença pelo Painel de Convidados (11/11/2026)
+- [ ] Pendente exibe **Confirmar presença** e **Marcar ausência** lado a lado.
+- [ ] Confirmado não recebe botão para confirmar novamente.
+- [ ] Ausente mantém **Voltar a confirmar** e **Confirmar presença**.
+- [ ] Administração confirma uma pessoa por vez, mediante senha administrativa e confirmação.
+- [ ] Verificar limite de 100 participantes contabilizados, excluindo menores de 5 anos.
+- [ ] Criança sem faixa etária definida exige atualização do cadastro antes de confirmar.
+- [ ] 30/11 não bloqueia confirmações administrativas até 04/12.
+- [ ] Atualizar status individual, status do núcleo, histórico com origem administrativa e quantidade sugerida de fraldas, conforme modalidade familiar.
+- [ ] Falhas de senha, capacidade ou status não devem confirmar convidado.
+- [ ] **Preview:** confirmação bloqueada para proteger o Supabase real; validar layout e testes simulados.
+- [ ] **Backend Supabase:** Edge Function invite-api alterada somente no Git; implantação depende de autorização específica.
+- [ ] **Concorrência:** verificação de capacidade é imediatamente anterior à alteração. Uma eventual concorrência pela última vaga deve ser tratada por transação SQL/RPC no futuro; evitar operações simultâneas neste ponto.
+
+## Situação de Production consultada em 11/11/2026
+- SHA em Production: 72fe4225926ec29a311283338342fb05a758518f.
+- A nova confirmação administrativa de pendentes não está ativa nesse commit.
