@@ -65,19 +65,25 @@
 - [ ] Testar exportações e impressão com dados lidos, sem criar convidados, sem enviar lembretes e sem alterar o Supabase real.
 - [ ] Conferir o SHA atual de Production antes da publicação; nunca presumir que permanece na Sprint 4.
 
-## Ajuste adicional — Confirmar presença pelo Painel de Convidados (11/11/2026)
-- [ ] Pendente exibe **Confirmar presença** e **Marcar ausência** lado a lado.
-- [ ] Confirmado não recebe botão para confirmar novamente.
-- [ ] Ausente mantém **Voltar a confirmar** e **Confirmar presença**.
-- [ ] Administração confirma uma pessoa por vez, mediante senha administrativa e confirmação.
-- [ ] Verificar limite de 100 participantes contabilizados, excluindo menores de 5 anos.
-- [ ] Criança sem faixa etária definida exige atualização do cadastro antes de confirmar.
-- [ ] 30/11 não bloqueia confirmações administrativas até 04/12.
-- [ ] Atualizar status individual, status do núcleo, histórico com origem administrativa e quantidade sugerida de fraldas, conforme modalidade familiar.
-- [ ] Falhas de senha, capacidade ou status não devem confirmar convidado.
-- [ ] **Preview:** confirmação bloqueada para proteger o Supabase real; validar layout e testes simulados.
-- [ ] **Backend Supabase:** Edge Function invite-api alterada somente no Git; implantação depende de autorização específica.
-- [ ] **Concorrência:** verificação de capacidade é imediatamente anterior à alteração. Uma eventual concorrência pela última vaga deve ser tratada por transação SQL/RPC no futuro; evitar operações simultâneas neste ponto.
+## Ajuste adicional — Presenças na edição do núcleo (11/11/2026)
+
+- [ ] Na aba **Convidados**, a listagem apresenta nome e status de cada pessoa, mas não apresenta botões individuais de confirmação, ausência ou reversão.
+- [ ] Clique em **Editar** do núcleo familiar para abrir a edição.
+- [ ] Cada integrante tem seletor **Status de presença** com **A confirmar / Confirmado / Não irá**. Isso vale também para adicionar novos integrantes durante a edição.
+- [ ] Uma única ação **Salvar alterações** atualiza os dados do núcleo e as situações selecionadas.
+- [ ] A senha administrativa adicional só é solicitada quando houver mudança de presença, com resumo prévio das transições.
+- [ ] São permitidas as transições *A confirmar → Confirmado*, *A confirmar → Não irá*, *Não irá → Confirmado*, *Não irá → A confirmar*, *Confirmado → A confirmar* e *Confirmado → Não irá*.
+- [ ] Validar que não há mudança de status se a senha for incorreta.
+- [ ] Atualizar apenas integrantes modificados; registros de histórico individuais têm origem administrativa.
+- [ ] Conferir status agregado do núcleo e recomendações de fraldas conforme modalidade, sem rastrear presentes recebidos por convidado.
+- [ ] Capacidade segue limitada a 100 contabilizados; menores de 5 anos não ocupam vagas.
+- [ ] Criança confirmada precisa ter faixa etária definida. Ajustar a idade e o status na mesma edição deve funcionar.
+- [ ] 30/11 não encerra confirmações administrativas; novos integrantes e alterações seguem permitidos até 04/12 conforme vagas.
+- [ ] Tentar salvar com dados desatualizados de outro administrador deve gerar alerta, sem excluir convidados cadastrados no outro acesso.
+- [ ] Na **Preview**, alterações de presença não são enviadas ao Supabase oficial. Testar a apresentação do formulário e validações locais; homologar persistência somente após publicação autorizada da função e do frontend.
+- [ ] As atualizações de cadastro e de presença são operações distintas dentro da mesma chamada de API. Existe risco residual de persistência parcial em falhas intermediárias; em caso de aviso, atualizar a lista antes de tentar novamente.
+- [ ] **Concorrência:** a verificação atual de vagas é anterior à gravação, não transacional. Para evitar corrida na última vaga, não executar confirmações simultâneas por administradores diferentes.
+- [ ] **Supabase:** o código atualizado da Edge Function `invite-api` segue na branch, sem implantação automática no banco oficial. A publicação do backend depende de aprovação específica.
 
 ## Situação de Production consultada em 11/11/2026
 - SHA em Production: 72fe4225926ec29a311283338342fb05a758518f.
