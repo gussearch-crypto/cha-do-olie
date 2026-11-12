@@ -8,7 +8,8 @@ test('convites não abrem WhatsApp com mensagem codificada automaticamente',()=>
  assert.doesNotMatch(publicEntry,/wa\.me\/\?text=|api\.whatsapp\.com\/send|encodeURIComponent\(message\(f\)\)/);
  assert.match(publicEntry,/Copiar convite/);
  const admin=read('admin-entry.jsx');
- assert.match(admin,/navigator\.clipboard\.writeText\(message\(f\)\)/);
+ assert.match(admin,/navigator\.clipboard\.writeText\(text\)/);
+ assert.match(admin,/action:'adminGetMessageTemplates'/);
  assert.match(admin,/Copiar convite/);
 });
 test('lembretes preservam texto livre e exigem envio manual para atualizar o histórico',()=>{
@@ -22,7 +23,7 @@ test('lembretes preservam texto livre e exigem envio manual para atualizar o his
 test('o texto do convite mantém emoji e quebras de linha na cópia sem URL intermediária',()=>{
  const admin=read('admin-entry.jsx');
  const templates=read('oliver-message-templates.mjs');
- assert.match(admin,/familyMessage\(f,'invitation',readMessageTemplates/);
+ assert.match(admin,/familyMessage\(f,kind,data\.templates\)/);
  assert.match(templates,/Olá, \{nome_familia\}! 💛/);
  assert.match(templates,/📅 \{data_evento\}/);
  assert.match(templates,/🕕 \{horario_evento\}/);

@@ -19,7 +19,7 @@ function render(){
 const anchor=document.querySelector('.adminTools'),list=document.querySelector('.guestList');
 if(!anchor||!list)return;
 let root=document.querySelector('#oliver-rsvp-followup');
-if(!root){root=document.createElement('section');root.id='oliver-rsvp-followup';root.className='oliverRsvpFollowup adminTabbedBlock';anchor.insertAdjacentElement('beforebegin',root)}
+if(!root){root=document.createElement('section');root.id='oliver-rsvp-followup';root.className='oliverRsvpFollowup adminTabbedBlock';list.insertAdjacentElement('afterend',root)}
 root.classList.toggle('adminTabHidden',(sessionStorage.getItem('oliverAdminTab')||'overview')!=='guests');
 const counts={unsent:0,pending:0,partial:0,reminded:0};families.forEach(f=>{const x=state(f);if(counts[x]!==undefined)counts[x]++;if(reminders.some(h=>h.family_id===f.id))counts.reminded++});
 const rows=families.map(f=>{const status=state(f),history=reminders.filter(h=>h.family_id===f.id).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))),last=history[0];return{f,status,last}}).filter(x=>filter==='all'?x.status!=='complete':filter==='reminded'?!!x.last:filter==='attention'?['unsent','partial','pending'].includes(x.status):x.status===filter).sort((a,b)=>({unsent:0,partial:1,pending:2,complete:3}[a.status]??4)-({unsent:0,partial:1,pending:2,complete:3}[b.status]??4));

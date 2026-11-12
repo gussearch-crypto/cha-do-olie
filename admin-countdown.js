@@ -52,5 +52,5 @@ function mountReminder(row){
  button.textContent=label;
  button.setAttribute('aria-label',label);
 }
-function enhance(){addStyles();mountCountdown();document.querySelectorAll('.guestRow').forEach(mountReminder)}
+function enhance(){addStyles();mountCountdown()}
 document.addEventListener('admin-sections-ready',enhance);document.addEventListener('admin-data-updated',enhance);enhance();setInterval(enhance,60000);

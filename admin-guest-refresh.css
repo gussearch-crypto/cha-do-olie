@@ -1,0 +1,53 @@
+/* Convidados: apresentação compacta e filtros controlados pelo React. */
+.adminPage .confirmationFilter.guestFilterPanel{display:block;padding:20px 22px;margin:0 0 12px}
+.guestFilterHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.guestFilterHead h2{font-size:1.25rem;margin:4px 0}.guestFilterHead p{font-size:.82rem;margin:0;color:#727660}
+.guestFilterClear,.guestDetailsToggle,.guestShowMore{border:1px solid #c8d4bb;border-radius:10px;background:#edf2e6;color:#50673e;min-height:35px;padding:8px 12px;font:700 .8rem 'DM Sans',sans-serif;cursor:pointer}
+.guestFilterClear:disabled{opacity:.45;cursor:default}
+.adminPage .guestFilterPanel .adminTools{display:flex;align-items:center;gap:12px;padding:0;margin:0 0 13px;border:0;background:transparent}
+.adminPage .guestFilterPanel .adminTools .guestSearchField{flex:1 1 300px}
+.adminPage .guestFilterPanel .adminTools input{height:45px}
+.adminPage .guestFilterPanel .adminTools>span{font-size:.78rem;font-weight:700;color:#677358}
+.adminPage .guestFilterPanel .statusFilters{justify-content:flex-start;gap:7px}
+.adminPage .guestFilterPanel .statusFilters button{min-height:38px;border-radius:10px;font-size:.78rem}
+.guestAdvancedFilters{border-top:1px solid #e5ddc8;margin-top:13px;padding-top:13px}
+.guestAdvancedFilters>summary{cursor:pointer;list-style:none;font-size:.82rem;font-weight:750;color:#52643f}
+.guestAdvancedFilters>summary::-webkit-details-marker{display:none}
+.guestAdvancedFilters>summary::after{content:' ▾'}.guestAdvancedFilters[open]>summary::after{content:' ▴'}
+.guestAdvancedGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:13px}
+.guestAdvancedGrid label{display:flex;flex-direction:column;min-width:0;gap:5px;color:#50623c;font-size:.76rem;font-weight:700}
+.guestAdvancedGrid select{min-height:42px;border:1px solid #d6cbb1;border-radius:10px;background:#fffdf8;padding:7px;min-width:0;color:#425734;font:600 .8rem 'DM Sans',sans-serif}
+.adminPage .guestFilterPanel .guestActiveFilters{margin:12px 0 0}
+.adminPage .guestExportBar.guestExportDisclosure{display:block;margin:0 0 13px;padding:0}
+.guestExportDisclosure>summary{padding:13px 17px;cursor:pointer;color:#485d3b;font-size:.83rem;font-weight:800;list-style:none}
+.guestExportDisclosure>summary::-webkit-details-marker{display:none}
+.guestExportDisclosure>summary::after{content:' ▾'}.guestExportDisclosure[open]>summary::after{content:' ▴'}
+.guestExportDisclosure .guestExportControls{border-top:1px solid #e9e0cc;padding:14px 17px}
+.guestExportDisclosure .guestExportControls label{display:flex;align-items:center;gap:8px}
+.adminPage .guestRow.guestRowCompact{display:grid;grid-template-columns:44px minmax(0,1fr) 194px;align-items:start;gap:12px;padding:15px 17px}
+.adminPage .guestRowCompact .guestNumber{text-align:left;font-size:.81rem;margin-top:5px}
+.adminPage .guestRowCompact .guestMain{min-width:0}
+.adminPage .guestRowCompact .guestTitle{flex-wrap:wrap;gap:8px}
+.adminPage .guestRowCompact .guestTitle h3{font-size:1.03rem;overflow-wrap:anywhere}
+.adminPage .guestRowCompact .guestSummary{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:.78rem;color:#728068;margin:8px 0}
+.adminPage .guestRowCompact .guestDetailsToggle{border-color:transparent;background:#f0f3ea}
+.adminPage .guestRowCompact .guestDetails{padding-top:11px;margin-top:12px;border-top:1px solid #e6ddc7}
+.adminPage .guestRowCompact .guestPeople{margin:4px 0 12px}
+.adminPage .guestRowCompact .guestMeta{font-size:.76rem}
+.adminPage .guestRowCompact .guestActions{display:flex;flex-direction:column;gap:7px;max-width:none;width:100%}
+.adminPage .guestRowCompact .guestActions>button{min-height:38px;border-radius:10px;padding:7px 9px;font-size:.8rem;width:100%;grid-column:auto}
+.adminPage .guestRowCompact .guestActions>.primary{background:#667641;border-color:#667641;color:#fff}
+.adminPage .guestMoreActions{width:100%}
+.adminPage .guestMoreActions>summary{cursor:pointer;list-style:none;border:1px solid #dfd5bd;border-radius:10px;min-height:38px;display:flex;align-items:center;justify-content:center;font-size:.79rem;font-weight:700;background:#fffaf0}
+.adminPage .guestMoreActions>summary::-webkit-details-marker{display:none}
+.adminPage .guestMoreActions>summary::after{content:' ▾'}.adminPage .guestMoreActions[open]>summary::after{content:' ▴'}
+.adminPage .guestMoreMenu{display:grid;gap:7px;background:#fcfbf5;border:1px solid #e7dfcd;border-radius:11px;padding:9px;margin-top:7px}
+.adminPage .guestMoreMenu button{width:100%;min-height:36px;white-space:normal;font-size:.77rem;padding:6px 9px}
+.adminPage .guestMoreMenu .inviteSentControl{border-radius:10px;width:100%;box-sizing:border-box}
+.guestShowMoreWrap{text-align:center;padding:14px 0 20px}
+.guestShowMore{min-height:44px;padding:11px 20px}
+.guestShowMoreHint{display:block;font-size:.74rem;color:#77816d;margin-top:5px}
+.guestFilterPanel :is(button,summary,select,input):focus-visible,.guestRowCompact :is(button,summary):focus-visible,.guestExportDisclosure :is(button,summary,select):focus-visible{outline:3px solid #b2c69c;outline-offset:2px}
+@media(max-width:920px){.guestAdvancedGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.adminPage .guestRow.guestRowCompact{grid-template-columns:40px minmax(0,1fr) 165px}}
+@media(max-width:690px){.adminPage .guestFilterPanel .adminTools{flex-direction:column;align-items:stretch}.guestAdvancedGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.adminPage .guestRow.guestRowCompact{grid-template-columns:35px minmax(0,1fr);gap:10px;padding:13px}.adminPage .guestRowCompact .guestActions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.adminPage .guestRowCompact .guestMoreActions{grid-column:1/-1}.guestExportDisclosure .guestExportControls{display:grid;grid-template-columns:1fr}.guestExportDisclosure .guestExportControls button{grid-column:1}}
+@media(max-width:420px){.guestAdvancedGrid{grid-template-columns:1fr}.adminPage .guestRowCompact .guestActions{grid-template-columns:1fr}.adminPage .guestRowCompact .guestMoreActions{grid-column:1}.adminPage .guestFilterPanel{padding:14px}}
