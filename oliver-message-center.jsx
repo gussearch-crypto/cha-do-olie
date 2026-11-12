@@ -96,6 +96,7 @@ export default function OliverMessageCenter({families=[],adminCode,messageApi}){
     {MESSAGE_TYPES.map(t=><option value={t.key} key={t.key}>{t.label}</option>)}
    </select></label>
    <p className="olieMessageHelp">{MESSAGE_TYPES.find(t=>t.key===selected)?.description}</p>
+   <p className="olieMessageHelp" role="note">{selected==='reminder'?'Este texto é utilizado nos botões Preparar lembrete de confirmação e Copiar lembrete de confirmação.':selected==='eventReminder'?'Este texto é utilizado no botão Copiar lembrete do evento.':selected==='invitation'?'Este texto é utilizado em Copiar convite até o prazo inicial.':'Este texto é utilizado em Copiar convite para novos convites após 30/11.'}</p>
    <div className="olieMessageGrid">
     <div className="olieMessageEditor">
      <label className="olieMessageLabel">Texto do modelo
