@@ -88,7 +88,11 @@
     height: auto !important;
     flex: 0 0 auto !important;
     align-self: center !important;
-    margin: 0 auto !important;
+    /* A arte vertical tem uma faixa vazia interna: aproximá-la do texto sem
+       cortar os mascotes nem alterar a proporção do arquivo original. */
+    margin: clamp(-168px, -30vw, -85px) auto 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
     padding: 0 !important;
     object-fit: contain !important;
     object-position: 50% 50% !important;
