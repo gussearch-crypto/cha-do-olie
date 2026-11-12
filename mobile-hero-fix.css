@@ -90,12 +90,16 @@
     align-self: center !important;
     /* A arte vertical tem uma faixa vazia interna: aproximá-la do texto sem
        cortar os mascotes nem alterar a proporção do arquivo original. */
-    margin: clamp(-168px, -30vw, -85px) auto 0 !important;
+    /* Sobe discretamente os mascotes; a faixa superior da própria arte é suavizada abaixo. */
+    margin: clamp(-205px, -38vw, -112px) auto 0 !important;
     position: relative !important;
     z-index: 1 !important;
     padding: 0 !important;
     object-fit: contain !important;
     object-position: 50% 50% !important;
+    /* Evita que as folhas do alto da arte invadam o título e o botão. */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 18%, #000 34%) !important;
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 18%, #000 34%) !important;
     transform: none !important;
     translate: none !important;
     left: auto !important;
