@@ -61,7 +61,7 @@ export default function OliverMessageCenter({families=[],adminCode,messageApi}){
    window.localStorage.setItem(MESSAGE_STORE_KEY,messageBackup(clean));
    setRevision(response.revision);setTemplates(clean);setSaved(clean);
    setMessage('Modelos salvos no Supabase. Os próximos convites e lembretes copiados usarão estas mensagens em qualquer acesso.');
-   window.dispatchEvent(new CustomEvent('oliver-messages-changed'));
+   window.dispatchEvent(new CustomEvent('oliver-messages-changed',{detail:{templates:clean,revision:response.revision}}));
   }catch(e){
    setMessage(e.message==='templates_conflict'?'Os modelos foram alterados em outro acesso. Recarregue o painel antes de salvar para não sobrescrever mudanças.':'Não foi possível salvar no Supabase. O texto continua no editor e não foi publicado.');
   }finally{setSaving(false)}
