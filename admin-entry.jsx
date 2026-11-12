@@ -127,7 +127,12 @@ useEffect(()=>{
  const onCountdownReminder=e=>{
   const family=families.find(f=>String(f.id)===String(e.detail?.familyId||''));
   if(!family){setError('Não foi possível identificar o núcleo deste lembrete. Atualize o painel.');return}
-  showOfficialMessage(family,'reminder','Lembrete de confirmação');
+  const guests=family.guests||[];
+  const hasPending=guests.some(g=>!['yes','no'].includes(g.attendance));
+  const hasConfirmed=guests.some(g=>g.attendance==='yes');
+  if(hasPending)showOfficialMessage(family,'reminder','Lembrete de confirmação');
+  else if(hasConfirmed)showOfficialMessage(family,'eventReminder','Lembrete do evento');
+  else setError('Este núcleo não possui participantes confirmados nem confirmações pendentes. Não há lembrete para copiar.');
  };
  window.addEventListener('oliver-copy-official-reminder',onCountdownReminder);
  return()=>window.removeEventListener('oliver-copy-official-reminder',onCountdownReminder);
