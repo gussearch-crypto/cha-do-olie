@@ -13,20 +13,44 @@ function addStyles(){if(document.getElementById('admin-countdown-style'))return;
 function mountCountdown(){const central=document.querySelector('.eventCentral');if(!central)return;let card=document.querySelector('.countdownCard');const c=countdown();if(!card){card=document.createElement('section');card.className='countdownCard';card.innerHTML=`<div><small>CONTAGEM REGRESSIVA</small><strong>${c.label}</strong><span>Chá do Oliver · 04/12/2026 às 18h</span></div><div>💛 🦁 🐼 🦒 🐓</div>`}else{const strong=card.querySelector('strong');if(strong)strong.textContent=c.label}if(card.nextElementSibling!==central)central.insertAdjacentElement('beforebegin',card)}
 function getFamilyStatus(row){const status=row.querySelector('.guestTitle .status');if(!status)return'other';if(status.classList.contains('confirmed'))return'confirmed';if(status.classList.contains('declined'))return'declined';if(status.classList.contains('partial'))return'partial';return'pending'}
 function getToken(row){const meta=row.querySelector('.guestMeta');if(!meta)return'';const tokenSpan=[...meta.querySelectorAll('span')].find(el=>el.textContent.trim().startsWith('Token:'));return tokenSpan?.querySelector('b')?.textContent.trim()||''}
+function reminderKind(row){
+ const guests=[...row.querySelectorAll('.guestPeople .personStatus')];
+ const hasPending=guests.some(el=>el.classList.contains('waiting'));
+ const hasConfirmed=guests.some(el=>el.classList.contains('yes'));
+ if(hasPending)return 'reminder';
+ if(hasConfirmed)return 'eventReminder';
+ return null;
+}
 function mountReminder(row){
- if(row.querySelector('.reminderAction'))return;
  const actions=row.querySelector('.guestActions');
  if(!actions)return;
  const familyId=row.dataset.familyId;
  if(!familyId)return;
- const c=countdown(),bar=document.createElement('div');
- row.classList.add('hasReminder');
- bar.className='reminderAction';
- bar.innerHTML=`<span class="reminderInfo">${c.today?'Lembrete · É hoje!':`Lembrete · ${c.label}`}</span><button type="button" aria-label="Copiar lembrete oficial">Copiar lembrete</button>`;
- bar.querySelector('button').addEventListener('click',()=>{
-  window.dispatchEvent(new CustomEvent('oliver-copy-official-reminder',{detail:{familyId}}));
- });
- actions.insertAdjacentElement('afterend',bar);
+ const kind=reminderKind(row);
+ let bar=row.querySelector('.reminderAction');
+ if(!kind){
+  bar?.remove();
+  row.classList.remove('hasReminder');
+  return;
+ }
+ if(!bar){
+  row.classList.add('hasReminder');
+  bar=document.createElement('div');
+  bar.className='reminderAction';
+  const span=document.createElement('span');span.className='reminderInfo';
+  const button=document.createElement('button');button.type='button';
+  bar.append(span,button);
+  button.addEventListener('click',()=>{
+   window.dispatchEvent(new CustomEvent('oliver-copy-official-reminder',{detail:{familyId}}));
+  });
+  actions.insertAdjacentElement('afterend',bar);
+ }
+ const c=countdown();
+ bar.querySelector('.reminderInfo').textContent=c.today?'Lembrete · É hoje!':'Lembrete · '+c.label;
+ const label=kind==='reminder'?'Copiar lembrete de confirmação':'Copiar lembrete do evento';
+ const button=bar.querySelector('button');
+ button.textContent=label;
+ button.setAttribute('aria-label',label);
 }
 function enhance(){addStyles();mountCountdown();document.querySelectorAll('.guestRow').forEach(mountReminder)}
 document.addEventListener('admin-sections-ready',enhance);document.addEventListener('admin-data-updated',enhance);enhance();setInterval(enhance,60000);
