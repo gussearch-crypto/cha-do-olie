@@ -51,3 +51,41 @@
 @media(max-width:920px){.guestAdvancedGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.adminPage .guestRow.guestRowCompact{grid-template-columns:40px minmax(0,1fr) 165px}}
 @media(max-width:690px){.adminPage .guestFilterPanel .adminTools{flex-direction:column;align-items:stretch}.guestAdvancedGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.adminPage .guestRow.guestRowCompact{grid-template-columns:35px minmax(0,1fr);gap:10px;padding:13px}.adminPage .guestRowCompact .guestActions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.adminPage .guestRowCompact .guestMoreActions{grid-column:1/-1}.guestExportDisclosure .guestExportControls{display:grid;grid-template-columns:1fr}.guestExportDisclosure .guestExportControls button{grid-column:1}}
 @media(max-width:420px){.guestAdvancedGrid{grid-template-columns:1fr}.adminPage .guestRowCompact .guestActions{grid-template-columns:1fr}.adminPage .guestRowCompact .guestMoreActions{grid-column:1}.adminPage .guestFilterPanel{padding:14px}}
+
+/* Sprint 7 — resumo compacto e interativo de convidados. */
+.adminPage .guestConsolidated{
+  border:1px solid #ded5bd;border-radius:19px;padding:20px 22px;
+  background:#fffaf0;margin:16px 0 14px;color:#405333;
+}
+.guestConsolidatedHeader{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.guestConsolidatedHeader h2{font-size:1.32rem;line-height:1.3;margin:5px 0 7px;color:#405333}
+.guestConsolidatedHeader p{font-size:.83rem;color:#69715a;line-height:1.5;margin:0;max-width:650px}
+.guestConsolidatedClear{border:1px solid #c8d4bb;background:#eef2e7;color:#53673c;border-radius:10px;padding:9px 13px;min-height:40px;font-weight:700;cursor:pointer}
+.guestConsolidatedCards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.guestConsolidatedCard{box-sizing:border-box;text-align:left;min-width:0;min-height:138px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:#f5f7f0;border:1px solid #dce4d4;border-radius:14px;padding:15px;color:#425b35;font:inherit}
+button.guestConsolidatedCard{cursor:pointer}
+button.guestConsolidatedCard:hover{background:#ecf2e4;border-color:#adc4a1}
+.guestConsolidatedCard>span{font-size:.76rem;line-height:1.35;font-weight:800}
+.guestConsolidatedCard>strong{font-size:clamp(26px,3vw,35px);line-height:1;font-weight:800}
+.guestConsolidatedCard>strong small{font-size:.47em;font-weight:700;color:#78896e}
+.guestConsolidatedCard>em{font-size:.72rem;font-style:normal;color:#6d7c61;line-height:1.4}
+.guestConsolidatedDetails{display:flex;gap:8px 16px;flex-wrap:wrap;border-bottom:1px solid #e7dfcc;padding:15px 0;font-size:.8rem;color:#66745a}
+.guestConsolidatedDetails strong{color:#405631}
+.guestConsolidatedFamily{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:13px 0}
+.guestConsolidatedFamily>span{font-weight:800;font-size:.78rem;margin-right:5px}
+.guestConsolidatedFamily button{display:inline-flex;gap:8px;align-items:center;min-height:35px;border:1px solid #dce1d1;border-radius:10px;background:#fffef9;color:#506244;font:700 .74rem 'DM Sans',sans-serif;padding:6px 10px;cursor:pointer}
+.guestConsolidatedFamily button:hover{border-color:#a9bb97;background:#eef2e7}
+.guestConsolidatedWarning{border-radius:10px;background:#fff4e0;color:#7b5b28;padding:10px 12px;font-size:.79rem;line-height:1.4}
+.guestConsolidated>small{display:block;color:#79816d;font-size:.72rem;line-height:1.5}
+.guestConsolidated :is(button):focus-visible{outline:3px solid #a6bc92;outline-offset:2px}
+@media(max-width:1000px){.guestConsolidatedCards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){
+ .adminPage .guestConsolidated{padding:15px;margin:12px 0}
+ .guestConsolidatedCards{gap:8px}
+ .guestConsolidatedCard{min-height:130px;padding:12px}
+ .guestConsolidatedCard>strong{font-size:29px}
+ .guestConsolidatedHeader h2{font-size:1.2rem}
+ .guestConsolidatedClear{width:100%}
+ .guestConsolidatedDetails{gap:8px 14px}
+}
+@media(max-width:340px){.guestConsolidatedCards{grid-template-columns:1fr}.guestConsolidatedCard{min-height:auto}}
