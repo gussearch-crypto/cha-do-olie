@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs && vite build",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
