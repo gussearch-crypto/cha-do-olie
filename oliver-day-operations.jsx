@@ -160,7 +160,7 @@ export default function OliverDayOperations({families=[]}){
   </div>
 
   <div className="olieDaySection olieDayKit">
-   <div className="olieDaySectionHead"><div><h3>6.5 · Kit do Organizador</h3><p>Consulte pagamentos e compras pendentes, exporte o resumo ou imprima como apoio durante o evento.</p></div></div>
+   <div className="olieDaySectionHead"><div><h3>Kit do Organizador</h3><p>Consulte pagamentos e compras pendentes, exporte o resumo ou imprima como apoio durante o evento.</p></div></div>
    <div className="olieDayPills">
     <span><b>{kit?.shopping.length??'—'}</b> compras a concluir</span>
     <span><b>{kit?.payments.length??'—'}</b> parcelas com saldo</span>
