@@ -86,7 +86,7 @@ export default function OliverDayOperations({families=[]}){
  const checkCount=DAY_CHECKS.filter(t=>checks.includes(t.id)).length;
  return <section id="oliver-day-operations" className="olieDayOps adminTabbedBlock" aria-label="Operação do Chá do Oliver">
   <div className="olieDayTop">
-   <div><span className="eyebrow">SPRINT 6 · RETA FINAL</span><h2><CalendarDays size={25}/> Operação do Chá do Oliver</h2>
+   <div><span className="eyebrow">PAINEL OPERACIONAL</span><h2><CalendarDays size={25}/> Operação do Chá do Oliver</h2>
     <p>Sexta-feira, 04/12/2026 · 18h às 22h. Resumo do evento, cronograma, jogos e materiais em um só lugar.</p></div>
    <button type="button" className="olieDayRefresh" disabled={fetching} onClick={readPlanning}><RefreshCw size={16}/>{fetching?'Atualizando...':'Atualizar dados'}</button>
   </div>
@@ -101,7 +101,7 @@ export default function OliverDayOperations({families=[]}){
   </div>
 
   <div className="olieDaySection">
-   <div className="olieDaySectionHead"><div><h3>6.1 · Convidados e vagas</h3><p>30/11 é somente a referência de produção; novas inclusões e confirmações podem continuar até 04/12, respeitando a capacidade.</p></div><button type="button" onClick={()=>navigate('guests')}>Abrir convidados</button></div>
+   <div className="olieDaySectionHead"><div><h3>Convidados e vagas</h3><p>30/11 é somente a referência de produção; novas inclusões e confirmações podem continuar até 04/12, respeitando a capacidade.</p></div><button type="button" onClick={()=>navigate('guests')}>Abrir convidados</button></div>
    <div className="olieDayPills">
     <span><b>{kit?.rsvp.confirmedUnderFive??'—'}</b> menores de 5 anos (não ocupam vaga)</span>
     <span><b>{kit?.rsvp.waiting??'—'}</b> aguardando resposta</span>
@@ -112,7 +112,7 @@ export default function OliverDayOperations({families=[]}){
   </div>
 
   <div className="olieDaySection">
-   <div className="olieDaySectionHead"><div><h3>6.2 · Base de produção</h3><p>Guarde uma fotografia agregada de custos e convidados. Compare as mudanças após 30/11, sem congelar o RSVP.</p></div></div>
+   <div className="olieDaySectionHead"><div><h3>Base de produção</h3><p>Guarde uma fotografia agregada de custos e convidados. Compare as mudanças após 30/11, sem congelar o RSVP.</p></div></div>
    <div className="olieDayPills">
     <span><b>{reference?.confirmedCounted??'—'}</b> na lista atual</span>
     <span><b>{reference?.childrenUnderFive??'—'}</b> crianças menores de 5</span>
@@ -134,7 +134,7 @@ export default function OliverDayOperations({families=[]}){
   </div>
 
   <div className="olieDaySection">
-   <div className="olieDaySectionHead"><div><h3>6.3 · Cronograma de 04/12</h3><p>Atividades reais da aba Ações, com responsáveis, horários e situação. Conclua cada atividade somente quando executada.</p></div><button type="button" onClick={()=>navigate('planning')}>Abrir Ações</button></div>
+   <div className="olieDaySectionHead"><div><h3>Cronograma de 04/12</h3><p>Atividades reais da aba Ações, com responsáveis, horários e situação. Conclua cada atividade somente quando executada.</p></div><button type="button" onClick={()=>navigate('planning')}>Abrir Ações</button></div>
    <div className="olieDayPills"><span><b>{day?.scheduled??'—'}</b> no cronograma</span><span><b>{day?.missingOwners??'—'}</b> sem responsável</span><span><b>{day?.conflicts?.length??'—'}</b> conflito(s) de horário</span></div>
    <div className="olieDayFilters">{[['all','Todos'],['before','Montagem'],['during','18h–22h'],['after','Encerramento']].map(([k,label])=><button key={k} type="button" aria-pressed={section===k} className={section===k?'active':''} onClick={()=>setSection(k)}>{label}</button>)}</div>
    {!day?<p>Carregando cronograma...</p>:byPhase(section).length===0?<p className="olieDayMuted">Nenhuma atividade cadastrada nesse período. Acrescente horários na aba Ações.</p>:<div className="olieDayTimeline">{byPhase(section).map(task=><article key={task.id} className={task.status==='done'?'olieDayTaskDone':''}>
@@ -149,7 +149,7 @@ export default function OliverDayOperations({families=[]}){
   </div>
 
   <div className="olieDaySection">
-   <div className="olieDaySectionHead"><div><h3>6.4 · Jogos e checklist do dia</h3><p>Checklist de apoio independente do estado real dos jogos. Marcar uma etapa aqui não abre, fecha nem revela resultados.</p></div><button type="button" onClick={()=>navigate('games')}>Abrir Jogos</button></div>
+   <div className="olieDaySectionHead"><div><h3>Jogos e checklist do dia</h3><p>Checklist de apoio independente do estado real dos jogos. Marcar uma etapa aqui não abre, fecha nem revela resultados.</p></div><button type="button" onClick={()=>navigate('games')}>Abrir Jogos</button></div>
    <p className="olieDayProgress">{checkCount} de {DAY_CHECKS.length} verificações realizadas neste navegador</p>
    <div className="olieDayChecklist">{DAY_CHECKS.map(c=><label key={c.id}><input type="checkbox" checked={checks.includes(c.id)} onChange={()=>toggleCheck(c.id)}/><span>{c.label}</span></label>)}</div>
    <div className="olieDayActions">
