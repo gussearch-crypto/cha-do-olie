@@ -20,6 +20,7 @@
 body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .giftDashboard,
 body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .diaperManagement,
 body[data-oliver-tab]:not([data-oliver-tab="diapers"]) .adminWrap .eventReceipts{display:none!important}
+body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestConsolidated,
 body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .confirmationFilter,
 body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .adminTools,
 body[data-oliver-tab]:not([data-oliver-tab="guests"]) .adminWrap .guestList,
