@@ -91,77 +91,96 @@ button.guestConsolidatedCard:hover{background:#ecf2e4;border-color:#adc4a1}
 @media(max-width:340px){.guestConsolidatedCards{grid-template-columns:1fr}.guestConsolidatedCard{min-height:auto}}
 
 
-/* Convidados: menu secundário flutuante, sem aumentar altura do núcleo. */
+/* Ações adicionais: uma faixa recolhível dentro do cartão, sem sobrepor núcleos. */
 .adminPage .guestRow.guestRowCompact{
-  position:relative;
   overflow:visible;
-}
-.adminPage .guestRow.guestRowCompact:has(.guestMoreActions[open]){
-  z-index:12;
+  align-items:start;
 }
 .adminPage .guestRowCompact .guestActions{
   align-self:start;
 }
-.adminPage .guestRowCompact .guestMoreActions{
-  position:relative;
-  min-width:0;
-}
-.adminPage .guestRowCompact .guestMoreActions>summary{
-  min-height:42px;
-  box-sizing:border-box;
-  padding:8px 12px;
+.adminPage .guestRowCompact .guestActions>.guestExtraToggle{
+  display:flex;
+  align-items:center;
   justify-content:center;
-}
-.adminPage .guestRowCompact .guestMoreActions[open]>summary{
-  border-color:#b6c6a3;
-  background:#eef2e6;
-}
-.adminPage .guestRowCompact .guestMoreMenu{
-  position:absolute;
-  z-index:15;
-  top:calc(100% + 7px);
-  right:0;
-  width:clamp(225px, 21vw, 295px);
-  max-width:calc(100vw - 40px);
-  box-sizing:border-box;
-  margin:0;
-  padding:10px;
-  border:1px solid #d8d1bc;
-  border-radius:13px;
-  background:#fffdf7;
-  box-shadow:0 12px 30px rgba(54,66,39,.16);
-  display:grid;
-  gap:7px;
-}
-.adminPage .guestRowCompact .guestMoreMenu button{
+  gap:8px;
   width:100%;
   min-height:40px;
-  padding:9px 11px;
+  padding:7px 12px;
+  border:1px solid #d8d1bc;
+  border-radius:10px;
+  background:#fffaf0;
+  color:#4c603c;
+  font-size:.79rem;
+  font-weight:750;
+  cursor:pointer;
+}
+.adminPage .guestRowCompact .guestExtraToggle[aria-expanded="true"]{
+  background:#edf2e8;
+  border-color:#b8c9aa;
+}
+.adminPage .guestRowCompact .guestSecondaryPanel{
+  grid-column:1/-1;
+  min-width:0;
+  padding:14px 0 2px;
+  margin-top:2px;
+  border-top:1px solid #e4decf;
+}
+.adminPage .guestRowCompact .guestExtraHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+  color:#526242;
+  font-size:.8rem;
+}
+.adminPage .guestRowCompact .guestExtraHeader>button{
+  border:0;
+  padding:6px 10px;
+  color:#637353;
+  background:transparent;
+  cursor:pointer;
+  font-weight:700;
+}
+.adminPage .guestRowCompact .guestMoreMenu{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  border:0;
+  padding:0;
+  margin:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.adminPage .guestRowCompact .guestMoreMenu>button,
+.adminPage .guestRowCompact .guestMoreMenu>.inviteSentControl{
+  min-height:43px;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  border-radius:10px;
+  padding:9px 13px;
+  font-size:.8rem;
+  line-height:1.35;
   white-space:normal;
-  line-height:1.3;
   justify-content:center;
   text-align:center;
 }
-.adminPage .guestRowCompact .guestMoreMenu .inviteSentControl{
+.adminPage .guestRowCompact .guestMoreMenu>.inviteSentControl{
   display:flex!important;
-  min-height:42px;
-  width:100%;
-  border-radius:10px;
-  box-sizing:border-box;
   justify-content:flex-start;
-  white-space:normal;
-  line-height:1.3;
+  text-align:left;
+  gap:9px;
 }
-.adminPage .guestRowCompact .guestMoreMenu .reminderMeta{
-  overflow-wrap:anywhere;
+.adminPage .guestRowCompact .guestMoreMenu>.reminderMeta{
+  grid-column:1/-1;
+  color:#718067;
   line-height:1.4;
 }
 @media(max-width:690px){
-  .adminPage .guestRowCompact .guestMoreActions{
-    grid-column:1/-1;
-  }
-  .adminPage .guestRowCompact .guestMoreMenu{
-    width:min(310px, calc(100vw - 48px));
-    right:0;
-  }
+  .adminPage .guestRowCompact .guestExtraToggle{grid-column:1/-1}
+  .adminPage .guestRowCompact .guestMoreMenu{grid-template-columns:1fr}
+  .adminPage .guestRowCompact .guestSecondaryPanel{padding-top:12px}
 }
