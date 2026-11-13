@@ -3,7 +3,7 @@ import OliverPostEventInventory from './oliver-post-event-inventory.jsx';
 import OliverMessageCenter from './oliver-message-center.jsx';
 import OliverDayOperations from './oliver-day-operations.jsx';
 import {familyMessage,readMessageTemplates} from './oliver-message-templates.mjs';
-import {guestFamilyStatus,guestFilterCounts,guestGroups,filterGuestFamilies} from './guest-filters.mjs';
+import {guestFamilyStatus,guestFilterCounts,guestGroups,filterGuestFamilies,guestOverview} from './guest-filters.mjs';
 import './admin-guest-refresh.css';
 import {isPreviewGamesHost} from './game-environment.mjs';
 import{RSVP_DEADLINE_LABEL}from'./guest-review-utils.mjs';
@@ -174,6 +174,8 @@ const familyStatusLabel=f=>{const status=getFamilyStatus(f);return status==='dec
 const clearGuestFilters=()=>{setFilter('');setStatusFilter('all');setSentFilter('all');setGuestGroup('all');setPersonFilter('all');setSortOrder('number');setVisibleCount(12);window.dispatchEvent(new Event('oliver-clear-advanced'))};
 const exportGuests=()=>{const value=v=>{let x=String(v??'').replace(/^\s*([=+@-])/,'\u0027$1');return '"'+x.replace(/"/g,'""')+'"'};const lines=[['Nome convidado','Núcleo','Grupo','Status de Confirmação']];for(const family of (exportScope==='filtered'?shown:families)){if(family.is_test===true||String(family.group_name||'').trim().toLowerCase()==='teste')continue;for(const guest of family.guests||[]){const status=guest.attendance==='yes'?'Confirmado':guest.attendance==='no'?'Não irá':'Aguardando';if(exportStatus!=='all'&&status!==({confirmed:'Confirmado',pending:'Aguardando',declined:'Não irá'}[exportStatus]))continue;lines.push([guest.name||'',family.display_name||'',family.group_name||'',status])}}const csv='\uFEFF'+lines.map(line=>line.map(value).join(';')).join(String.fromCharCode(13,10));const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));const a=document.createElement('a');a.href=url;a.download='convidados-oliver-'+exportStatus+'-'+new Date().toISOString().slice(0,10)+'.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 const shown=filterGuestFamilies(families,{search:filter,status:statusFilter,sent:sentFilter,group:guestGroup,person:personFilter,sort:sortOrder});
+const guestSummary=useMemo(()=>guestOverview(families),[families]);
+const jumpToGuestStatus=(status='all')=>{setFilter('');setStatusFilter(status);setSentFilter('all');setGuestGroup('all');setPersonFilter('all');setSortOrder('number');setVisibleCount(12);window.dispatchEvent(new Event('oliver-clear-advanced'));document.querySelector('.guestFilterPanel')?.scrollIntoView({behavior:'smooth',block:'start'})};
 const stats=useMemo(()=>{const guests=families.flatMap(f=>f.guests||[]),confirmed=guests.filter(g=>g.attendance==='yes').length,declined=guests.filter(g=>g.attendance==='no').length,pending=guests.length-confirmed-declined,countedConfirmed=guests.filter(g=>g.attendance==='yes'&&!(g.person_type==='child'&&g.child_age_group==='under_5')).length,children=guests.filter(g=>g.person_type==='child').length,diapers=families.flatMap(f=>f.diapers||[]),sizes={P:0,M:0,G:0,XG:0};diapers.forEach(d=>sizes[d.diaper_size]!==undefined&&sizes[d.diaper_size]++);return{invites:families.length,total:guests.length,confirmed,declined,pending,countedConfirmed,children,diapers:diapers.length,mimos:diapers.length,sizes}},[families]);const validations=useMemo(()=>guestAlerts(families),[families]);const activeValidations=validations.map(v=>({...v,problems:v.problems.filter(p=>!ignoredAlerts.some(x=>x.family_id===v.family.id&&x.alert_key===p.key))})).filter(v=>v.problems.length);const ignoredCount=validations.reduce((n,v)=>n+v.problems.filter(p=>ignoredAlerts.some(x=>x.family_id===v.family.id&&x.alert_key===p.key)).length,0);const statusCounts=useMemo(()=>guestFilterCounts(families),[families]);const groups=useMemo(()=>guestGroups(families),[families]);const hasGuestFilters=!!filter.trim()||statusFilter!=='all'||sentFilter!=='all'||guestGroup!=='all'||personFilter!=='all'||sortOrder!=='number';
 if(!families.length)return <div className="adminPage"><div className="adminLogin"><Baby/><h1>Painel do Chá do Oliver</h1><p>Acesso reservado aos organizadores.</p><input type="password" value={code} onChange={e=>setCode(e.target.value)} placeholder="Código administrativo" onKeyDown={e=>e.key==='Enter'&&load()}/><button className="primary" onClick={()=>load()} disabled={!code||loading}>{loading?'Entrando...':'Acessar painel'}</button>{error&&<div className="error">{error}</div>}<a href="/"><ArrowLeft/> Voltar ao convite</a></div></div>;
 const guestEditor=(guests,setter,withAttendance=false)=><div className="full editGuests">
@@ -218,6 +220,39 @@ return <div className="adminPage"><header className="adminSiteHeader"><a classNa
 </div><small>Prévia e cópia não registram envio. O texto exibido vem do modelo oficial, não do cache do navegador.</small>
 </section></div>}
 {reminderFamily&&<div className="reminderOverlay" onClick={()=>setReminderFamily(null)}><section className="reminderDialog" role="dialog" aria-modal="true" aria-label="Lembrete de confirmação" onClick={e=>e.stopPropagation()}><h3>Lembrete para {reminderFamily.display_name}</h3><p>Modelo de confirmação — revisão {reminderRevision||'indisponível'}. Revise o texto e copie manualmente. Um lembrete já aberto não muda automaticamente quando o modelo é editado.</p><textarea value={reminderText} onChange={e=>setReminderText(e.target.value)} rows={14} aria-label="Texto do lembrete"/><div className="reminderDialogActions"><button type="button" onClick={()=>setReminderFamily(null)}>Fechar</button><button type="button" onClick={async()=>{try{await navigator.clipboard.writeText(reminderText);alert('Lembrete copiado! Cole e envie manualmente.')}catch{alert('Não foi possível copiar a mensagem. Selecione o texto e copie manualmente.')}}}>Copiar mensagem</button><button type="button" className="primary" onClick={confirmReminder}>Marcar como enviado</button></div><small>Copiar não registra envio. Marque como enviado somente depois de encaminhar a mensagem ao destinatário.</small></section></div>}
+<section className="guestConsolidated" aria-label="Visão consolidada de convidados">
+  <div className="guestConsolidatedHeader">
+    <div><span className="eyebrow">VISÃO CONSOLIDADA</span><h2>Resumo de convidados</h2><p>Dados oficiais por pessoa e por núcleo · meta de {guestSummary.capacity} vagas para adultos e crianças a partir de 5 anos.</p></div>
+    <button type="button" className="guestConsolidatedClear" onClick={()=>jumpToGuestStatus('all')}>Ver todos os núcleos</button>
+  </div>
+  <div className="guestConsolidatedCards">
+    <button type="button" className="guestConsolidatedCard" onClick={()=>jumpToGuestStatus('confirmed')} title="Filtrar núcleos totalmente confirmados">
+      <span>Confirmados contabilizados</span><strong>{guestSummary.counted} <small>/ {guestSummary.capacity}</small></strong><em>{guestSummary.confirmed} pessoas confirmadas · {guestSummary.confirmedUnderFive} menor(es) de 5</em>
+    </button>
+    <div className="guestConsolidatedCard" aria-label={'Vagas disponíveis: '+guestSummary.available}>
+      <span>Vagas disponíveis</span><strong>{guestSummary.available}</strong><em>{guestSummary.overCapacity?guestSummary.overCapacity+' acima da capacidade':'Apenas presenças confirmadas ocupam vagas'}</em>
+    </div>
+    <button type="button" className="guestConsolidatedCard" onClick={()=>jumpToGuestStatus('pending')} title="Filtrar núcleos aguardando resposta">
+      <span>Aguardando resposta</span><strong>{guestSummary.pending}</strong><em>Pessoas com confirmação pendente</em>
+    </button>
+    <button type="button" className="guestConsolidatedCard" onClick={()=>jumpToGuestStatus('declined')} title="Filtrar núcleos que não irão">
+      <span>Ausências registradas</span><strong>{guestSummary.declined}</strong><em>Pessoas que informaram ausência</em>
+    </button>
+  </div>
+  <div className="guestConsolidatedDetails">
+    <span><strong>{guestSummary.families}</strong> núcleos</span>
+    <span><strong>{guestSummary.people}</strong> pessoas cadastradas</span>
+    <span><strong>{guestSummary.adults}</strong> adultos</span>
+    <span><strong>{guestSummary.olderChildren}</strong> crianças 5+</span>
+    <span><strong>{guestSummary.underFive}</strong> crianças menores de 5</span>
+  </div>
+  <div className="guestConsolidatedFamily">
+    <span>Situação dos núcleos</span>
+    {[['confirmed','Confirmados'],['pending','Aguardando'],['partial','Parciais'],['declined','Não irão']].map(([key,label])=><button type="button" key={key} onClick={()=>jumpToGuestStatus(key)} aria-label={label+': '+guestSummary.states[key]+' núcleos. Filtrar lista.'}>{label} <strong>{guestSummary.states[key]}</strong></button>)}
+  </div>
+  {guestSummary.unknownChildAge>0&&<p className="guestConsolidatedWarning">Atenção: {guestSummary.unknownChildAge} criança(s) confirmada(s) sem faixa etária definida. Contabilizadas provisoriamente nas vagas até a classificação.</p>}
+  <small>Cartões de status aplicam filtros por núcleo; indicadores de pessoas e capacidade mostram totais gerais. Núcleos marcados como teste não entram neste resumo.</small>
+</section>
 <section className="confirmationFilter guestFilterPanel"><div className="guestFilterHead"><div><span className="eyebrow">CONVIDADOS</span><h2>Buscar e filtrar núcleos</h2><p>Busque por nome, grupo ou integrante e encontre rapidamente quem precisa de atenção.</p></div><button type="button" className="guestFilterClear" disabled={!hasGuestFilters} onClick={clearGuestFilters}>Limpar filtros</button></div>
 <div className="adminTools"><div className="guestSearchField"><input value={filter} onChange={e=>{setFilter(e.target.value);setVisibleCount(12)}} placeholder="Buscar número, núcleo ou convidado" aria-label="Buscar convidado ou núcleo"/>{filter&&<button type="button" className="guestSearchClearInline" onClick={()=>{setFilter('');setVisibleCount(12)}} aria-label="Limpar campo de busca">×</button>}</div><span aria-live="polite">{shown.length} de {families.length} núcleos</span></div>
 <div className="statusFilters" role="group" aria-label="Filtrar status">{[['all','Todos'],['confirmed','Confirmados'],['pending','Aguardando'],['partial','Parciais'],['declined','Não irão']].map(([key,label])=><button type="button" key={key} className={statusFilter===key?'active':''} aria-pressed={statusFilter===key} onClick={()=>{setStatusFilter(key);setVisibleCount(12)}}>{label}<b>{statusCounts[key]}</b></button>)}</div>
