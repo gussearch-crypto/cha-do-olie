@@ -26,7 +26,23 @@ const presenceLabel=v=>v==='yes'?'Confirmado':v==='no'?'Não irá':'A confirmar'
 const resetToken=async f=>{if(!confirm(`Gerar um novo token para ${f.display_name}? O token anterior deixará de funcionar.`))return;const pin=newPin();try{await api({action:'adminSetPin',adminCode:code,familyId:f.id,pin});setFamilies(v=>v.map(x=>x.id===f.id?{...x,invite_pin_plain:pin}:x))}catch{setError('Não foi possível resetar o token.')}};
 const setInviteSent=async(f,next)=>{setFamilies(v=>v.map(x=>x.id===f.id?{...x,invite_sent:next,invite_sent_at:next?new Date().toISOString():null}:x));try{await api({action:'adminSetInviteSent',adminCode:code,familyId:f.id,inviteSent:next})}catch{setFamilies(v=>v.map(x=>x.id===f.id?{...x,invite_sent:!next,invite_sent_at:f.invite_sent_at}:x));setError('Não foi possível atualizar o controle de envio.')}};
 const deleteFamily=async f=>{if(!confirm(`Excluir o núcleo “${f.display_name}” e todos os seus convidados? Esta ação não pode ser desfeita.`))return;try{await api({action:'adminDeleteFamily',adminCode:code,familyId:f.id});setFamilies(v=>v.filter(x=>x.id!==f.id));if(editing?.id===f.id)setEditing(null)}catch{setError('Não foi possível excluir o núcleo familiar.')}};
-const addFamily=async()=>{const guests=newGuests.filter(g=>g.name.trim()).map(g=>({name:g.name.trim(),isChild:g.isChild}));if(!displayName.trim()||!guests.length){setError('Informe o nome do núcleo e pelo menos um convidado.');return}setSaving(true);try{await api({action:'adminCreateFamily',adminCode:code,displayName:displayName.trim(),groupName:groupName.trim(),guests,pin:newPin()});setDisplayName('');setGroupName('');setNewGuests([{name:'',isChild:false}]);setShowAdd(false);await load(code)}catch{setError('Não foi possível adicionar o novo núcleo.')}finally{setSaving(false)}};
+const addFamily=async()=>{const guests=newGuests.filter(g=>g.name.trim()).map(g=>({name:g.name.trim(),isChild:g.isChild}));if(!displayName.trim()||!guests.length){setError('Informe o nome do núcleo e pelo menos um convidado.');return}setSaving(true);setError('');let created=false;try{
+ await api({action:'adminCreateFamily',adminCode:code,displayName:displayName.trim(),groupName:groupName.trim(),guests,pin:newPin()});
+ created=true;
+ // Releitura oficial imediata: atualiza a lista React e todos os indicadores
+ // sem depender de recarregar a página ou do observador de DOM.
+ const refreshed=await api({action:'adminList',adminCode:code});
+ if(!Array.isArray(refreshed.families))throw Error('invalid_family_list');
+ setFamilies(refreshed.families);
+ setFilter('');setStatusFilter('all');setSentFilter('all');setGuestGroup('all');setPersonFilter('all');setSortOrder('number');
+ setVisibleCount(Math.max(12,refreshed.families.length));
+ window.dispatchEvent(new Event('oliver-clear-advanced'));
+ window.dispatchEvent(new Event('oliver-admin-guests'));
+ setDisplayName('');setGroupName('');setNewGuests([{name:'',isChild:false}]);setShowAdd(false);
+ scrollToPanel('.guestList');
+ }catch{
+  setError(created?'Núcleo cadastrado, mas não foi possível atualizar a lista automaticamente. Use Atualizar dados para conferir o cadastro antes de tentar novamente.':'Não foi possível adicionar o novo núcleo.');
+ }finally{setSaving(false)}};
 const scrollToPanel=(selector,offset=18)=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const el=document.querySelector(selector);if(!el)return;const y=el.getBoundingClientRect().top+window.scrollY-offset;window.scrollTo({top:y,behavior:'smooth'})}));
 const beginEdit=f=>{
  setEditing({id:f.id,displayName:f.display_name,groupName:f.group_name||'',
