@@ -255,3 +255,31 @@ button.guestConsolidatedCard:hover{background:#ecf2e4;border-color:#adc4a1}
     min-height:42px;
   }
 }
+
+
+/* Sprint 7 — correção da distribuição das ações, respeitando colunas reais. */
+@media(min-width:901px){
+  .adminPage .guestRowCompact .guestMoreMenu{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+.adminPage .guestRowCompact .guestMoreMenu>button,
+.adminPage .guestRowCompact .guestMoreMenu>.inviteSentControl{
+  grid-column:auto;
+  justify-self:stretch;
+  align-self:stretch;
+  max-width:none;
+}
+.adminPage .guestRowCompact .guestMoreMenu>.reminderMeta{
+  grid-column:1/-1;
+}
+@media(max-width:690px){
+  .adminPage .guestRowCompact .guestActions>.guestExtraToggle{
+    grid-column:1/-1;
+    width:100%;
+  }
+  .adminPage .guestRowCompact .guestMoreMenu>button,
+  .adminPage .guestRowCompact .guestMoreMenu>.inviteSentControl{
+    grid-column:1/-1;
+  }
+}
