@@ -30,7 +30,8 @@ test('interface integra filtros e preserva edição por senha',()=>{
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
  assert.match(admin,/className="confirmationFilter guestFilterPanel"/);
  assert.match(admin,/className="guestAdvancedFilters"/);
- assert.match(admin,/className="guestMoreActions"/);
+ assert.match(admin,/className="guestExtraToggle"/);
+ assert.match(admin,/className="guestSecondaryPanel"/);
  assert.match(admin,/<Pencil\/> Editar<\/button>/);
  assert.match(admin,/confirmationCode=window\.prompt/);
  assert.match(html,/admin-guest-refresh\.css/);
