@@ -31,3 +31,34 @@ export function filterGuestFamilies(families=[],{search='',status='all',sent='al
   return Number.isFinite(an)&&Number.isFinite(bn)?an-bn||original.get(a)-original.get(b):original.get(a)-original.get(b);
  });
 }
+
+
+/**
+ * Resumo consolidado para a aba Convidados.
+ * Não conta crianças abaixo de 5 anos nas vagas; inclui pendências de idade
+ * separadamente para evitar apresentar a ocupação como definitiva.
+ * Núcleos marcados como teste são excluídos do planejamento.
+ */
+export function guestOverview(families=[],capacity=100){
+ const valid=families.filter(f=>f.is_test!==true&&normalizedGuestText(f.group_name)!=='teste');
+ const people=valid.flatMap(f=>Array.isArray(f.guests)?f.guests:[]);
+ const confirmed=people.filter(g=>g.attendance==='yes');
+ const pending=people.filter(g=>!['yes','no'].includes(g.attendance));
+ const declined=people.filter(g=>g.attendance==='no');
+ const child=g=>g.person_type==='child';
+ const underFive=g=>child(g)&&g.child_age_group==='under_5';
+ const olderChildren=people.filter(g=>child(g)&&g.child_age_group==='five_or_more');
+ const underFiveAll=people.filter(underFive);
+ const unknownChildAge=confirmed.filter(g=>child(g)&&!['under_5','five_or_more'].includes(g.child_age_group)).length;
+ const counted=confirmed.filter(g=>!underFive(g)).length;
+ const state={confirmed:0,pending:0,partial:0,declined:0};
+ valid.forEach(f=>state[guestFamilyStatus(f)]++);
+ return {
+  capacity,available:Math.max(0,capacity-counted),overCapacity:Math.max(0,counted-capacity),
+  counted,confirmed:confirmed.length,pending:pending.length,declined:declined.length,
+  families:valid.length,people:people.length,
+  adults:people.filter(g=>!child(g)).length,olderChildren:olderChildren.length,
+  underFive:underFiveAll.length,confirmedUnderFive:confirmed.filter(underFive).length,
+  unknownChildAge,states:state
+ };
+}
