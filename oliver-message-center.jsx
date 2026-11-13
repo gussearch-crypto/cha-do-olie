@@ -86,7 +86,7 @@ export default function OliverMessageCenter({families=[],adminCode,messageApi}){
  return <section id="oliver-message-center" className="olieMessageCenter adminTabbedBlock" aria-label="Central de Mensagens do Oliver">
   <details className="olieMessageDisclosure">
    <summary className="olieMessageIntro olieMessageToggle">
-    <div><span className="eyebrow">SPRINT 6 · COMUNICAÇÃO</span><h2><MessageCircle size={24}/> Central de Mensagens</h2>
+    <div><span className="eyebrow">COMUNICAÇÃO COM CONVIDADOS</span><h2><MessageCircle size={24}/> Central de Mensagens</h2>
      <p>Convites, lembretes e modelos personalizados. Abra somente quando precisar.</p></div>
     <span className="olieMessageTag">Exibir / ocultar <ChevronDown size={17} aria-hidden="true"/></span>
    </summary>
