@@ -13,8 +13,8 @@ test('configuração admite até três e as quatro dinâmicas',()=>{
  assert.equal(awardSettings({winner_count:100,winner_rule:'invalid'}).count,1);
  assert.equal(awardSettings({winner_rule:'invalid'}).rule,'overall_score');
 });
-function testPix(){
- const merchant='0014br.gov.bcb.pix0116test@example.com';
+function testPix(domain='br.gov.bcb.pix'){
+ const merchant='0014'+domain+'0116test@example.com';
  const raw='00020101021126'+String(merchant.length).padStart(2,'0')+merchant+'5204000053039865802BR5911EXEMPLO PIX6009SAO PAULO6304';
  let crc=0xffff;
  for(const ch of raw){crc^=ch.charCodeAt(0)<<8;for(let i=0;i<8;i++)crc=crc&0x8000?((crc<<1)^0x1021)&0xffff:(crc<<1)&0xffff;}
@@ -23,6 +23,7 @@ function testPix(){
 test('valida CRC de código PIX emitido pelo banco sem rede externa',()=>{
  const sample=testPix();
  assert.equal(validPixPayload(sample),true);
+ assert.equal(validPixPayload(testPix('BR.GOV.BCB.PIX')),true); // Nubank e outros bancos podem usar o identificador em maiúsculas.
  assert.equal(validPixPayload(sample.slice(0,-4)+'FFFF'),false);
  assert.equal(validPixPayload('000201chave@banco'),false);
  assert.equal(validPixPayload(''),false);
