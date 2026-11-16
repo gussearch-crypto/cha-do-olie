@@ -65,7 +65,7 @@ test('dados de conferência do recebedor são exibidos somente no componente PIX
  assert.match(shared,/institution=\{pixInstitution\}/);
  assert.match(admin,/Nome do recebedor/);
  assert.match(admin,/Instituição financeira/);
- assert.match(admin,/pixReceiverName:pixReceiverName/);
+ assert.match(admin,/setGiftSimulation\(\{message,url,pixPayload,pixEnabled,pixReceiverName,pixInstitution\}\)/);
  assert.match(online,/pixReceiverName=\{giftConfig\.pixReceiverName\}/);
  const edge=readFileSync(new URL('../supabase/functions/oliver-games/index.ts',import.meta.url),'utf8');
  assert.match(edge,/remote_pix_receiver_name:receiverName/);
