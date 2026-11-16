@@ -26,7 +26,7 @@ const sortForAwards=(rows:any[],settings:any)=>{
  const rule=awardRule(settings);
  if(rule==="overall_score")return rows;
  const key=rule==="closest_datetime"?"differenceMinutes":rule==="closest_weight"?"differenceGrams":"differenceCm";
- return [...rows].sort((a,b)=>a[key]-b[key]||b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||a.name.localeCompare(b.name,"pt-BR"));
+ return [...rows].sort((a,b)=>a[key]-b[key]||b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||Date.parse(a.registeredAt||"9999-12-31")-Date.parse(b.registeredAt||"9999-12-31")||String(a.id).localeCompare(String(b.id)));
 };
 const validPixPayload=(v:string)=>{
  if(v.length<45||v.length>1500||!v.startsWith("000201")||!v.includes("br.gov.bcb.pix")||!/6304[0-9A-Fa-f]{4}$/.test(v))return false;
@@ -46,7 +46,7 @@ function birthRank(rows:any[],official:any){
   const minutes=Math.abs(start-end)/60000,grams=Math.abs(Number(r.weight_g)-Number(official.weight)),cm=Math.abs(Number(r.length_cm)-Number(official.length));
   const dateTimePoints=point(200,minutes,20160),weightPoints=point(100,grams,500),lengthPoints=point(100,cm,5);
   return {id:r.id,name:r.participant_name,source:r.participation_source||"cha",contact:r.contact_whatsapp||null,contactStatus:r.prize_contact_status||"pending",contactedAt:r.prize_contacted_at||null,registeredAt:r.created_at||null,guessDate:r.birth_date,guessTime:String(r.birth_time).slice(0,5),guessWeight:r.weight_g,guessLength:r.length_cm,differenceMinutes:minutes,differenceGrams:grams,differenceCm:cm,dateTimePoints,weightPoints,lengthPoints,total:dateTimePoints+weightPoints+lengthPoints};
- }).filter(x=>Number.isFinite(x.total)).sort((a,b)=>b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||a.name.localeCompare(b.name,"pt-BR"));
+ }).filter(x=>Number.isFinite(x.total)).sort((a,b)=>b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||Date.parse(a.registeredAt||"9999-12-31")-Date.parse(b.registeredAt||"9999-12-31")||String(a.id).localeCompare(String(b.id)));
 }
 Deno.serve(async req=>{if(req.method==="OPTIONS")return new Response("ok",{headers:cors});if(req.method!=="POST")return reply({error:"method_not_allowed"},405);
 try {const b=await req.json(),db=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);const action=String(b.action||"");
