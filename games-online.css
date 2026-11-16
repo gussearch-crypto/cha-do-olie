@@ -245,3 +245,14 @@
  .olieRemotePage .olieRemoteGameGuideTags span{padding:6px 7px}
  .olieRemotePage .olieRemoteTabs button{font-size:12px}
 }
+
+
+/* Presentes online · PIX opcional após registro do palpite. */
+.olieRemotePix{display:grid;justify-items:center;gap:12px;width:100%;box-sizing:border-box;max-width:520px;padding:18px 16px;border:1px solid #dce5cf;border-radius:16px;background:#f6f9f0;text-align:center;color:#44583a}
+.olieRemotePixTitle{display:flex;align-items:center;gap:8px;color:#526d40;font-size:1rem}
+.olieRemotePix p{margin:0;line-height:1.5;font-size:.9rem;color:#60715b}
+.olieRemotePixQR{max-width:100%;width:224px;height:224px;object-fit:contain;border:8px solid white;border-radius:12px;box-sizing:content-box}
+.olieRemotePixLoading{display:grid;justify-items:center;gap:7px;padding:32px 12px;color:#6f8165}
+.olieRemotePixCopy{width:100%;max-width:300px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:normal}
+.olieRemotePix>small{max-width:450px;font-size:.73rem;line-height:1.5;color:#68775f}
+@media(max-width:550px){.olieRemotePix{padding:15px 11px}.olieRemotePixQR{width:195px;height:195px;border-width:6px}}
