@@ -772,3 +772,10 @@
  .olieGiftSimulationScreen .olieRemoteGift .olieRemotePrimary,
  .olieGiftSimulationScreen .olieRemoteGift .olieRemoteOutline{width:100%}
 }
+
+
+/* Campos editáveis de conferência PIX no painel. */
+.oliePixRecipientAdmin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.oliePixRecipientAdmin label{min-width:0;display:grid;gap:7px;font-size:.83rem;color:#45593b}
+.oliePixRecipientAdmin input{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border-radius:10px;border:1px solid #cbd6be;background:#fffdf8;color:#324c31;font:inherit}
+@media(max-width:620px){.oliePixRecipientAdmin{grid-template-columns:1fr}}
