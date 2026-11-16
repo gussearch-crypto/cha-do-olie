@@ -20,7 +20,7 @@ export function validPixPayload(value){
  const text=String(value??'').trim();
  if(text.length<45||text.length>1500||!text.startsWith('000201')||!text.includes('br.gov.bcb.pix')||!/6304[0-9a-f]{4}$/i.test(text))return false;
  let crc=0xFFFF;
- for(const ch of text.slice(0,-4).toUpperCase()){
+ for(const ch of text.slice(0,-4)){
   crc^=ch.charCodeAt(0)<<8;
   for(let i=0;i<8;i++)crc=(crc&0x8000)?((crc<<1)^0x1021)&0xFFFF:(crc<<1)&0xFFFF;
  }
