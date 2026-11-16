@@ -14,6 +14,29 @@ function ranking(rows:any[],key:string,actual:any,isDate=false){if(actual===null
 const validBirthTime=(v:any)=>typeof v==="string"&&/^([01]\d|2[0-3]):[0-5]\d$/.test(v);
 const normalizePhone=(v:any)=>String(v||"").replace(/\D/g,"");
 const validPhone=(v:any)=>/^\d{11}$/.test(normalizePhone(v))&&normalizePhone(v).slice(0,2)!=="00"&&normalizePhone(v)[2]==="9";
+const ruleLabels:Record<string,string>={
+ overall_score:"Maior pontuação geral",
+ closest_datetime:"Mais próximo da data e horário",
+ closest_weight:"Mais próximo do peso",
+ closest_length:"Mais próximo do comprimento"
+};
+const countWinners=(settings:any)=>Math.min(3,Math.max(1,Number(settings?.winner_count)||1));
+const awardRule=(settings:any)=>Object.hasOwn(ruleLabels,String(settings?.winner_rule))?String(settings.winner_rule):"overall_score";
+const sortForAwards=(rows:any[],settings:any)=>{
+ const rule=awardRule(settings);
+ if(rule==="overall_score")return rows;
+ const key=rule==="closest_datetime"?"differenceMinutes":rule==="closest_weight"?"differenceGrams":"differenceCm";
+ return [...rows].sort((a,b)=>a[key]-b[key]||b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||a.name.localeCompare(b.name,"pt-BR"));
+};
+const validPixPayload=(v:string)=>{
+ if(v.length<45||v.length>1500||!v.startsWith("000201")||!v.includes("br.gov.bcb.pix")||!/6304[0-9A-Fa-f]{4}$/.test(v))return false;
+ let crc=0xffff;
+ for(const ch of v.slice(0,-4).toUpperCase()){
+  crc^=ch.charCodeAt(0)<<8;
+  for(let i=0;i<8;i++)crc=(crc&0x8000)?((crc<<1)^0x1021)&0xffff:(crc<<1)&0xffff;
+ }
+ return crc.toString(16).toUpperCase().padStart(4,"0")===v.slice(-4).toUpperCase();
+};
 const birthOfficialStarted=(settings:any,officialTime:any)=>settings.actual_birth_date!=null||settings.actual_weight_g!=null||settings.actual_length_cm!=null||Boolean(officialTime)||settings.results_published||settings.birth_date_revealed||settings.weight_revealed||settings.length_revealed||settings.jackpot_revealed;
 function birthRank(rows:any[],official:any){
  const point=(max:number,diff:number,ref:number)=>max/(1+diff/ref);
@@ -35,7 +58,11 @@ if(action==="adminGiftSet"){
   const url=b.remote_gift_url.trim(),message=b.remote_gift_message.trim();
   if(url.length>2048||message.length>600)return reply({error:"gift_content_too_long"},400);
   if(url){try{const parsed=new URL(url);if(parsed.protocol!=="https:"||!parsed.hostname||parsed.username||parsed.password||/\s/.test(url))return reply({error:"invalid_gift_url"},400);}catch{return reply({error:"invalid_gift_url"},400);}}
-  const {error}=await db.from("oliver_game_settings").update({remote_gift_url:url,remote_gift_message:message,updated_at:new Date().toISOString()}).eq("id",1);
+  const pixPayload=String(b.remote_pix_payload??"").trim();
+  const pixEnabled=b.remote_pix_enabled===true;
+  if(pixPayload&&!validPixPayload(pixPayload))return reply({error:"invalid_pix_payload"},400);
+  if(pixEnabled&&!pixPayload)return reply({error:"pix_code_required"},400);
+  const {error}=await db.from("oliver_game_settings").update({remote_gift_url:url,remote_gift_message:message,remote_pix_payload:pixPayload,remote_pix_enabled:pixEnabled,updated_at:new Date().toISOString()}).eq("id",1);
   return error?reply({error:"gift_save_failed"},500):reply({ok:true});
 }
 if(action==="adminBirthToggle"){
@@ -62,7 +89,7 @@ if(action==="adminBirthToggle"){
  await db.from("oliver_game_access_history").insert({game:"birth",operation:"closed",details:{closed_at:now}});
  return reply({ok:true,birth_open:false,birth_closed_at:now});
 }
-if(action==="remoteGameStatus"){const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();const closed=!!config.birth_closed_at||!config.birth_open||birthOfficialStarted(config,announcement?.birth_time);return reply({open:!closed,phase:config.results_published?"revealed":closed?"closed":"open",closed_at:config.birth_closed_at||null,results_published:!!config.results_published,remote_gift_url:config.remote_gift_url||"",remote_gift_message:config.remote_gift_message||""});}
+if(action==="remoteGameStatus"){const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();const closed=!!config.birth_closed_at||!config.birth_open||birthOfficialStarted(config,announcement?.birth_time);return reply({open:!closed,phase:config.results_published?"revealed":closed?"closed":"open",closed_at:config.birth_closed_at||null,results_published:!!config.results_published,remote_gift_url:config.remote_gift_url||"",remote_gift_message:config.remote_gift_message||"",remote_pix_enabled:!!config.remote_pix_enabled&&!!config.remote_pix_payload,remote_pix_payload:config.remote_pix_enabled?config.remote_pix_payload||"":"" ,winner_count:countWinners(config),winner_rule:awardRule(config),winner_rule_label:ruleLabels[awardRule(config)]});}
 if(action==="remoteBirthSubmit"){
  if(!config.birth_open||config.birth_closed_at||config.actual_birth_date!=null||config.actual_weight_g!=null||config.actual_length_cm!=null||config.results_published||config.birth_date_revealed||config.weight_revealed||config.length_revealed||config.jackpot_revealed)return reply({error:"game_closed"},409);
  const name=String(b.name||"").trim().replace(/\s+/g," ");
@@ -237,6 +264,14 @@ if(action==="adminDemoBirthRanking"){
  const ranking=birthRank(guesses||[],official);
  return reply({ready:true,demo:true,official,ranking,total:ranking.length});
 }
+if(action==="adminAwardSettings"){
+ if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
+ if(config.results_published)return reply({error:"award_settings_locked"},409);
+ const winnerCount=Number(b.winner_count),rule=String(b.winner_rule||"");
+ if(!Number.isInteger(winnerCount)||winnerCount<1||winnerCount>3||!Object.hasOwn(ruleLabels,rule))return reply({error:"invalid_award_settings"},400);
+ const {error}=await db.from("oliver_game_settings").update({winner_count:winnerCount,winner_rule:rule,updated_at:new Date().toISOString()}).eq("id",1);
+ return error?reply({error:"award_save_failed"},500):reply({ok:true,winner_count:winnerCount,winner_rule:rule});
+}
 if(action==="adminBirthRanking"||action==="publicBirthRanking"){
  const isAdmin=action==="adminBirthRanking";
  if(isAdmin&&!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
@@ -246,9 +281,9 @@ if(action==="adminBirthRanking"||action==="publicBirthRanking"){
  if(!official.date||!official.time||official.weight==null||official.length==null)return reply({ready:false,ranking:[]});
  const {data:guesses,error}=await db.from("oliver_game_guesses").select(isAdmin?"id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm,contact_whatsapp,prize_contact_status,prize_contacted_at,created_at":"id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm,created_at").not("birth_date","is",null);
  if(error)return reply({error:"ranking_failed"},500);
- const ranked=birthRank(guesses||[],official);
+ const ranked=sortForAwards(birthRank(guesses||[],official),config);
  const missingTime=(guesses||[]).filter((row:any)=>!row.birth_time).length;
- return reply({ready:true,official,ranking:isAdmin?ranked:ranked.slice(0,3).map((r:any)=>({name:r.name,registeredAt:r.registeredAt,total:r.total,dateTimePoints:r.dateTimePoints,weightPoints:r.weightPoints,lengthPoints:r.lengthPoints,differenceMinutes:r.differenceMinutes,differenceGrams:r.differenceGrams,differenceCm:r.differenceCm})),total:ranked.length,missingTime:isAdmin?missingTime:undefined,published:!!config.results_published});
+ return reply({ready:true,official,ranking:isAdmin?ranked:ranked.slice(0,countWinners(config)).map((r:any)=>({name:r.name,registeredAt:r.registeredAt,total:r.total,dateTimePoints:r.dateTimePoints,weightPoints:r.weightPoints,lengthPoints:r.lengthPoints,differenceMinutes:r.differenceMinutes,differenceGrams:r.differenceGrams,differenceCm:r.differenceCm})),total:ranked.length,winner_count:countWinners(config),winner_rule:awardRule(config),winner_rule_label:ruleLabels[awardRule(config)],missingTime:isAdmin?missingTime:undefined,published:!!config.results_published});
 }
 if(action==="searchGuests"){const q=String(b.query||"").trim();if(q.length<2)return reply({items:[]});const {data,error}=await db.from("guests").select("id,family_id,name").ilike("name","%"+q.replace(/[%_]/g,"")+"%").limit(12);if(error)return reply({error:"search_failed"},500);const ids=[...new Set((data||[]).map((g:any)=>g.family_id))];const {data:fams}=await db.from("families").select("id,display_name").in("id",ids.length?ids:["00000000-0000-0000-0000-000000000000"]);return reply({items:(data||[]).map((g:any)=>({id:g.id,name:g.name,family:(fams||[]).find((f:any)=>f.id===g.family_id)?.display_name||"Família"}))})}
 const bucket="oliver-birth";
