@@ -737,3 +737,16 @@
  .oliverGamesAdmin .olieGamesPhaseLinks{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
  .oliverGamesAdmin .olieGamesPhaseLinks :is(button,a){width:100%;min-height:46px}
 }
+
+
+/* Configuração de vencedores e presente PIX (painel Jogos). */
+.olieAwardConfigGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:15px 0}
+.olieAwardConfigGrid label{display:grid;gap:7px;min-width:0;font-size:.83rem;font-weight:700;color:#506443}
+.olieAwardConfigGrid select{width:100%;min-width:0;min-height:44px;border:1px solid #cdd8be;border-radius:10px;padding:9px 12px;background:#fffdf7;color:#354a2f;font:inherit}
+.olieAwardConfigNote{background:#f3f7ec;border:1px solid #dce7d3;border-radius:12px;padding:12px;color:#576c4a;line-height:1.5}
+.olieGiftPixConfig{display:grid;gap:10px;background:#f4f7ed;border:1px solid #d9e2cd;border-radius:12px;padding:16px}
+.olieGiftPixConfig textarea{width:100%;min-height:90px;box-sizing:border-box;resize:vertical;overflow-wrap:anywhere;font-family:monospace}
+.olieGiftPixConfig>small{line-height:1.5;font-size:.76rem;color:#6c7962}
+.olieGiftPixConfig .olieGiftPixToggle{display:flex;align-items:center;gap:10px;font-size:.86rem;font-weight:700}
+.olieGiftPixConfig .olieGiftPixToggle input{width:19px;height:19px;accent-color:#627748}
+@media(max-width:650px){.olieAwardConfigGrid{grid-template-columns:1fr}.olieGiftPixConfig{padding:13px}}
