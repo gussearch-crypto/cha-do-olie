@@ -31,7 +31,7 @@ const sortForAwards=(rows:any[],settings:any)=>{
 const validPixPayload=(v:string)=>{
  if(v.length<45||v.length>1500||!v.startsWith("000201")||!v.includes("br.gov.bcb.pix")||!/6304[0-9A-Fa-f]{4}$/.test(v))return false;
  let crc=0xffff;
- for(const ch of v.slice(0,-4).toUpperCase()){
+ for(const ch of v.slice(0,-4)){
   crc^=ch.charCodeAt(0)<<8;
   for(let i=0;i<8;i++)crc=(crc&0x8000)?((crc<<1)^0x1021)&0xffff:(crc<<1)&0xffff;
  }
@@ -117,7 +117,7 @@ if(action==="lookupBirthByContact"){
  let result:any=null;
  if(published){
  const {data:all}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm").not("birth_date","is",null);
- const ranking=birthRank(all||[],official);
+ const ranking=sortForAwards(birthRank(all||[],official),config);
  const idx=ranking.findIndex((r:any)=>r.id===guess.id);
  if(idx>=0){const x=ranking[idx];result={position:idx+1,totalParticipants:ranking.length,total:x.total,dateTimePoints:x.dateTimePoints,weightPoints:x.weightPoints,lengthPoints:x.lengthPoints,differenceMinutes:x.differenceMinutes,differenceGrams:x.differenceGrams,differenceCm:x.differenceCm,official};}
  }
