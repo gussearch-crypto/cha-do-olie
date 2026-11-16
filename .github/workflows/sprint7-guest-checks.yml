@@ -8,6 +8,13 @@ on:
       - 'tests/guest-filters.test.mjs'
       - 'tests/guest-overview.test.mjs'
       - 'tests/message-templates.test.mjs'
+      - 'tests/game-awards.test.mjs'
+      - 'game-awards.mjs'
+      - 'pix-gift.jsx'
+      - 'games-online.jsx'
+      - 'games.jsx'
+      - 'admin-games.jsx'
+      - 'supabase/functions/oliver-games/index.ts'
       - '.github/workflows/sprint7-guest-checks.yml'
   pull_request:
     paths:
@@ -32,4 +39,4 @@ jobs:
         with:
           node-version: '22'
       - name: Testar regras de convidados sem acessar dados reais
-        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs
+        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs tests/game-awards.test.mjs
