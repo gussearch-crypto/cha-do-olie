@@ -152,7 +152,7 @@ if(action==="adminResultPublication"||action==="adminPrizeContact"){
  const {data:all,error:readError}=await db.from("oliver_game_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm").not("birth_date","is",null);
  if(readError)return reply({error:"read_failed"},500);
  const official={date:config.actual_birth_date,time:String(announcement.birth_time).slice(0,5),weight:config.actual_weight_g,length:config.actual_length_cm};
- if(!birthRank(all||[],official).slice(0,3).some((r:any)=>r.id===guessId))return reply({error:"not_a_winner"},403);
+ if(!sortForAwards(birthRank(all||[],official),config).slice(0,countWinners(config)).some((r:any)=>r.id===guessId))return reply({error:"not_a_winner"},403);
  const {error}=await db.from("oliver_game_guesses").update({prize_contact_status:status,prize_contacted_at:status==="pending"?null:new Date().toISOString()}).eq("id",guessId);
  return error?reply({error:"save_failed"},500):reply({ok:true});
 }
