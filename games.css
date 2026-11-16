@@ -750,3 +750,25 @@
 .olieGiftPixConfig .olieGiftPixToggle{display:flex;align-items:center;gap:10px;font-size:.86rem;font-weight:700}
 .olieGiftPixConfig .olieGiftPixToggle input{width:19px;height:19px;accent-color:#627748}
 @media(max-width:650px){.olieAwardConfigGrid{grid-template-columns:1fr}.olieGiftPixConfig{padding:13px}}
+
+
+/* Preview segura da mensagem/PIX dos Jogos Online, sem escrita no banco. */
+.olieGiftPreviewHint{display:block;margin-top:10px;font-size:.78rem;line-height:1.5;color:#65745c}
+.olieGiftSimulationError{padding:11px 13px;margin:8px 0;border:1px solid #e4b9a5;border-radius:10px;background:#fff1eb;color:#9b4332;line-height:1.5}
+.olieGiftSimulation{margin-top:16px;padding:16px;border:1px solid #cddbbd;border-radius:16px;background:#f7f9f1;min-width:0}
+.olieGiftSimulationHead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;color:#425a36;font-size:.89rem}
+.olieGiftSimulationHead span{font-size:.67rem;letter-spacing:.06em;color:#576e45;border:1px solid #c9d7b8;border-radius:999px;padding:5px 9px;background:#eaf0e2;white-space:nowrap}
+.olieGiftSimulationScreen{margin:14px auto 8px;max-width:640px;min-width:0;padding:18px 15px;border:1px solid #e7e3d7;border-radius:16px;background:#fffdf8}
+.olieGiftSimulationScreen .olieRemoteGift{margin:0;padding-top:0;border-top:0;text-align:center}
+.olieGiftSimulationScreen .olieRemoteGift>p{white-space:pre-line;overflow-wrap:anywhere;margin:0;text-align:center}
+.olieGiftSimulationScreen .olieRemoteGift .olieRemotePrimary{max-width:100%;overflow-wrap:anywhere}
+.olieGiftSimulationScreen .olieRemoteGift .olieRemotePix{max-width:510px}
+.olieGiftSimulationFoot{font-size:.75rem;color:#6d7d62;line-height:1.5;margin:10px 0}
+.olieGiftSimulationClose{appearance:none;border:1px solid #cdd5c1;border-radius:10px;padding:9px 14px;color:#485d3a;background:#fffdf9;cursor:pointer;font-weight:700}
+.olieGiftSimulationClose:hover{background:#edf2e6}
+@media(max-width:640px){
+ .olieGiftSimulation{padding:12px}
+ .olieGiftSimulationScreen{padding:13px 10px}
+ .olieGiftSimulationScreen .olieRemoteGift .olieRemotePrimary,
+ .olieGiftSimulationScreen .olieRemoteGift .olieRemoteOutline{width:100%}
+}
