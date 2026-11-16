@@ -136,7 +136,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
           <small>{settings.remote_pix_enabled?(validPixPayload(settings.remote_pix_payload)?'PIX pronto para salvar.':'Código PIX ausente ou inválido.'):'PIX oculto até ser habilitado.'}</small>
         </div>
         <div className="olieGiftAdminPreview"><strong>Prévia para quem participou</strong><p>{settings.remote_gift_message||'Nenhuma mensagem configurada.'}</p>{settings.remote_gift_url?<span className="olieGiftPreviewLink">Ver sugestões de presentes ↗</span>:<small>Botão de link oculto.</small>}{settings.remote_pix_enabled&&validPixPayload(settings.remote_pix_payload)?<small>QR Code PIX e Copia e Cola visíveis após registrar o palpite.</small>:<small>PIX não exibido.</small>}</div>
-        <button type="button" className="olieGiftAdminSave" disabled={saving} onClick={saveOnlineGift}>{saving?'Salvando...':'Salvar mensagem e link'}</button>
+        <button type="button" className="olieGiftAdminSave" disabled={saving||isPreviewGamesHost(window.location.hostname)} onClick={saveOnlineGift}>{saving?'Salvando...':'Salvar presentes e PIX'}</button>{isPreviewGamesHost(window.location.hostname)&&<small>Prévia de leitura: PIX e presentes só poderão ser salvos no painel oficial após a publicação coordenada do backend.</small>}
       </div>
     </details>
   </div>}
@@ -173,7 +173,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
       </label>
     </div>
     <p className="olieAwardConfigNote">Selecionado: {winnerText(awardSettings(settings).count)} · {AWARD_RULES.find(r=>r.value===awardSettings(settings).rule)?.label}. Em caso de empate absoluto, vence o palpite registrado primeiro. Alterações após publicar exigem retirar o resultado do ar.</p>
-    <button className="revealButton" type="button" disabled={saving||!!settings.results_published} onClick={saveAwards}>{saving?'Salvando...':'Salvar regra da premiação'}</button>
+    <button className="revealButton" type="button" disabled={saving||!!settings.results_published||isPreviewGamesHost(window.location.hostname)} onClick={saveAwards}>{saving?'Salvando...':'Salvar regra da premiação'}</button>{isPreviewGamesHost(window.location.hostname)&&<small className="olieAwardPreviewNote">Prévia de leitura: a gravação desta configuração será liberada após a homologação e a publicação do backend.</small>}
    </div>
    <div className="gameCard"><h3>Chegada do Oliver — Dados oficiais e anúncio</h3><p>Data, horário, peso e comprimento são usados tanto para o anúncio do nascimento quanto para apurar os palpites da chegada.</p><div className="gameForm">{fields.filter(([key])=>key!=="belly_cm").map(([key,label,type])=><label key={key}>{label}<input type={type} step={type==="number"?"0.1":undefined} value={settings[key]??""} onChange={e=>update(key,e.target.value)}/></label>)}<label>Horário oficial do nascimento (necessário para o ranking)<input type="time" value={birthTime} onChange={e=>setBirthTime(e.target.value)}/></label></div><button className="revealButton" disabled={saving} onClick={saveOfficialAndBirth}>Salvar dados do nascimento</button><p>Ao salvar qualquer dado oficial de nascimento, os novos palpites serão bloqueados. A apuração será privada: os resultados só aparecerão aos participantes depois de clicar em Publicar ranking. A foto e o anúncio continuam independentes.</p></div>
    <BirthRankingAdmin adminCode={code} refreshKey={settings?.updated_at}/>
