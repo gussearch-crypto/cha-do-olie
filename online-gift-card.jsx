@@ -4,7 +4,7 @@ import PixGift from './pix-gift.jsx';
 import './games-online.css';
 
 /** A única apresentação de presentes usada no registro real e na simulação administrativa. */
-export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPayload=''}){
+export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPayload='',pixReceiverName='',pixInstitution=''}){
  const [addressOpen,setAddressOpen]=useState(false);
  if(!message&&!url&&!pixEnabled)return null;
  return <div className="olieRemoteGift">
@@ -12,7 +12,7 @@ export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPa
   <h3>Quer enviar um carinho para o Oliver?</h3>
   {message&&<p>{message}</p>}
   {url&&<a className="olieRemotePrimary" href={url} target="_blank" rel="noopener noreferrer">Ver lista de presentes</a>}
-  <PixGift enabled={pixEnabled} payload={pixPayload}/>
+  <PixGift enabled={pixEnabled} payload={pixPayload} receiverName={pixReceiverName} institution={pixInstitution}/>
   <button type="button" className="olieRemoteOutline" onClick={()=>setAddressOpen(v=>!v)}><Package size={18}/> {addressOpen?'Ocultar informações de entrega':'Ver sugestão de fraldas e entrega'}</button>
   {addressOpen&&<div className="olieRemoteAddress">
     <p><strong>Sugestão:</strong> um pacote de fraldas tamanho M ou G, conforme sua preferência.</p>
