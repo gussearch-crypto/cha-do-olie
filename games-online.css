@@ -256,3 +256,11 @@
 .olieRemotePixCopy{width:100%;max-width:300px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:normal}
 .olieRemotePix>small{max-width:450px;font-size:.73rem;line-height:1.5;color:#68775f}
 @media(max-width:550px){.olieRemotePix{padding:15px 11px}.olieRemotePixQR{width:195px;height:195px;border-width:6px}}
+
+
+/* Dados para conferência do destinatário PIX. */
+.olieRemotePixRecipient{display:grid;width:100%;box-sizing:border-box;gap:0;border:1px solid #d2dfc4;border-radius:12px;background:#fffefa;overflow:hidden;text-align:left}
+.olieRemotePixRecipient>div{min-width:0;display:grid;gap:4px;padding:12px 14px}
+.olieRemotePixRecipient>div+div{border-top:1px solid #e3e9d9}
+.olieRemotePixRecipient span{color:#718168;font-size:.73rem;font-weight:700}
+.olieRemotePixRecipient strong{color:#405634;font-size:.91rem;line-height:1.35;overflow-wrap:anywhere}
