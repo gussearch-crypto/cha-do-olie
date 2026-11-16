@@ -29,7 +29,7 @@ const sortForAwards=(rows:any[],settings:any)=>{
  return [...rows].sort((a,b)=>a[key]-b[key]||b.total-a.total||a.differenceMinutes-b.differenceMinutes||a.differenceGrams-b.differenceGrams||a.differenceCm-b.differenceCm||Date.parse(a.registeredAt||"9999-12-31")-Date.parse(b.registeredAt||"9999-12-31")||String(a.id).localeCompare(String(b.id)));
 };
 const validPixPayload=(v:string)=>{
- if(v.length<45||v.length>1500||!v.startsWith("000201")||!v.includes("br.gov.bcb.pix")||!/6304[0-9A-Fa-f]{4}$/.test(v))return false;
+ if(v.length<45||v.length>1500||!v.startsWith("000201")||!/br\.gov\.bcb\.pix/i.test(v)||!/6304[0-9A-Fa-f]{4}$/.test(v))return false;
  let crc=0xffff;
  for(const ch of v.slice(0,-4)){
   crc^=ch.charCodeAt(0)<<8;
