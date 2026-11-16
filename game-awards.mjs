@@ -18,7 +18,7 @@ export function winnerText(count=1){
 /** Check the integrity of a bank-issued Pix BR Code, without sending data to third parties. */
 export function validPixPayload(value){
  const text=String(value??'').trim();
- if(text.length<45||text.length>1500||!text.startsWith('000201')||!text.includes('br.gov.bcb.pix')||!/6304[0-9a-f]{4}$/i.test(text))return false;
+ if(text.length<45||text.length>1500||!text.startsWith('000201')||!/br\.gov\.bcb\.pix/i.test(text)||!/6304[0-9a-f]{4}$/i.test(text))return false;
  let crc=0xFFFF;
  for(const ch of text.slice(0,-4)){
   crc^=ch.charCodeAt(0)<<8;
