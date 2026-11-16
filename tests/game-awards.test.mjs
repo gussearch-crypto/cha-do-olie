@@ -37,6 +37,17 @@ test('API vincula número de vencedores ao ranking público e à consulta',()=>{
 });
 test('formulário público informa opção PIX e acesso gratuito',()=>{
  const online=readFileSync(new URL('../games-online.jsx',import.meta.url),'utf8');
- assert.match(online,/<PixGift enabled=\{giftConfig\.pixEnabled\}/);
+ assert.match(online,/<OnlineGiftCard message=\{giftConfig\.message\}/);
+ const shared=readFileSync(new URL('../online-gift-card.jsx',import.meta.url),'utf8');
+ assert.match(shared,/<PixGift enabled=\{pixEnabled\}/);
  assert.match(online,/nenhuma compra, PIX ou presente é necessário/);
+});
+
+test('simulação de presentes está disponível sem gravação em Preview',()=>{
+ const admin=readFileSync(new URL('../admin-games.jsx',import.meta.url),'utf8');
+ assert.match(admin,/onClick=\{isPreviewGamesHost\(window\.location\.hostname\)\?simulateOnlineGift:saveOnlineGift\}/);
+ assert.match(admin,/Simular mensagem e PIX/);
+ assert.match(admin,/Simulação local/);
+ const safety=readFileSync(new URL('../games-admin-safety.mjs',import.meta.url),'utf8');
+ assert.doesNotMatch(safety,/READ_ONLY_GAME_ACTIONS[\s\S]*['"]adminGiftSet['"]/);
 });
