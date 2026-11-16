@@ -51,3 +51,24 @@ test('simulação de presentes está disponível sem gravação em Preview',()=>
  const safety=readFileSync(new URL('../games-admin-safety.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(safety,/READ_ONLY_GAME_ACTIONS[\s\S]*['"]adminGiftSet['"]/);
 });
+
+test('dados de conferência do recebedor são exibidos somente no componente PIX',()=>{
+ const pix=readFileSync(new URL('../pix-gift.jsx',import.meta.url),'utf8');
+ const shared=readFileSync(new URL('../online-gift-card.jsx',import.meta.url),'utf8');
+ const admin=readFileSync(new URL('../admin-games.jsx',import.meta.url),'utf8');
+ const online=readFileSync(new URL('../games-online.jsx',import.meta.url),'utf8');
+ assert.match(pix,/Recebedor/);
+ assert.match(pix,/Instituição/);
+ assert.match(pix,/receiverName\|\|'Não informado'/);
+ assert.match(pix,/antes de pagar/i);
+ assert.match(shared,/receiverName=\{pixReceiverName\}/);
+ assert.match(shared,/institution=\{pixInstitution\}/);
+ assert.match(admin,/Nome do recebedor/);
+ assert.match(admin,/Instituição financeira/);
+ assert.match(admin,/pixReceiverName:pixReceiverName/);
+ assert.match(online,/pixReceiverName=\{giftConfig\.pixReceiverName\}/);
+ const edge=readFileSync(new URL('../supabase/functions/oliver-games/index.ts',import.meta.url),'utf8');
+ assert.match(edge,/remote_pix_receiver_name:receiverName/);
+ assert.match(edge,/remote_pix_institution:institution/);
+ assert.match(edge,/pix_recipient_required/);
+});
