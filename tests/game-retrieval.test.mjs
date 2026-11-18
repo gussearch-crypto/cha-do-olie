@@ -64,3 +64,19 @@ test('API aceita nome simples e telefone de 10 ou 11 dígitos no cadastro e cons
  assert.match(online,/sobrenome opcional/);
  assert.match(online,/maxLength=\{22\}/);
 });
+
+test('consulta bem-sucedida convida a presentear sem exigir contribuição',()=>{
+ const resultSection=online.slice(online.indexOf('{lookupResult&&<div className="olieRemoteLookupResult">'),online.indexOf('</section>:<>{receipt?'));
+ assert.ok(resultSection.length>1000);
+ assert.match(resultSection,/Palpites registrados não podem ser alterados/);
+ assert.match(resultSection,/\(giftConfig\.message\|\|giftConfig\.url\|\|giftConfig\.pixEnabled\)&&<OnlineGiftCard/);
+ assert.match(resultSection,/pixPayload=\{giftConfig\.pixPayload\}/);
+ assert.match(resultSection,/pixReceiverName=\{giftConfig\.pixReceiverName\}/);
+ assert.match(resultSection,/pixInstitution=\{giftConfig\.pixInstitution\}/);
+ assert.match(resultSection,/reminder\/>/);
+ const gift=readFileSync(new URL('../online-gift-card.jsx',import.meta.url),'utf8');
+ assert.match(gift,/Ainda não presenteou o Oliver/);
+ assert.match(gift,/Presentear é opcional e não altera seus palpites nem a classificação/);
+ assert.match(gift,/<PixGift enabled=\{pixEnabled\}/);
+ assert.match(gift,/Ver lista de presentes/);
+});
