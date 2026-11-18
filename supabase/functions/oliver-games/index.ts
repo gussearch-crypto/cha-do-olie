@@ -12,7 +12,7 @@ function aggregate(rows:any[],key:string){const vals=rows.map(r=>r[key]).filter(
 function ranking(rows:any[],key:string,actual:any,isDate=false){if(actual===null||actual===undefined)return [];return rows.filter(r=>r[key]!==null).map(r=>({name:r.participant_name,guess:r[key],difference:isDate?Math.abs((Date.parse(r[key]+"T12:00:00Z")-Date.parse(actual+"T12:00:00Z"))/86400000):Math.abs(Number(r[key])-Number(actual))})).sort((a,b)=>a.difference-b.difference||a.name.localeCompare(b.name));}
 
 const validBirthTime=(v:any)=>typeof v==="string"&&/^([01]\d|2[0-3]):[0-5]\d$/.test(v);
-const normalizePhone=(v:any)=>String(v||"").replace(/\D/g,"");
+const normalizePhone=(v:any)=>{const digits=String(v||"").replace(/\D/g,"");return digits.length===13&&digits.startsWith("55")?digits.slice(2):digits};
 const validPhone=(v:any)=>/^\d{11}$/.test(normalizePhone(v))&&normalizePhone(v).slice(0,2)!=="00"&&normalizePhone(v)[2]==="9";
 const ruleLabels:Record<string,string>={
  overall_score:"Maior pontuação geral",
@@ -52,6 +52,12 @@ Deno.serve(async req=>{if(req.method==="OPTIONS")return new Response("ok",{heade
 try {const b=await req.json(),db=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);const action=String(b.action||"");
 const {data:config,error:ce}=await db.from("oliver_game_settings").select("*").eq("id",1).single();if(ce)return reply({error:"settings_unavailable"},500);
 
+if(action==="adminListGuesses"){
+ if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
+ const {data:rows,error}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm,belly_cm,created_at,outside_guest_list,guest_id").order("created_at",{ascending:false});
+ if(error)return reply({error:"guesses_read_failed"},500);
+ return reply({ok:true,settings:config,guesses:rows||[]});
+}
 if(action==="adminGiftSet"){
   if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
   if(typeof b.remote_gift_url!=="string"||typeof b.remote_gift_message!=="string")return reply({error:"invalid_gift_fields"},400);
@@ -108,11 +114,13 @@ if(action==="remoteBirthSubmit"){
  return reply({ok:true,guess});
 }
 if(action==="lookupBirthByContact"){
- const name=norm(String(b.name||"").trim()),phone=normalizePhone(b.whatsapp);
- if(name.length<3||name.split(" ").length<2||!validPhone(phone))return reply({error:"invalid_lookup"},400);
- const {data:matches,error}=await db.from("oliver_game_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm,participation_source").eq("contact_whatsapp",phone).not("birth_date","is",null).limit(30);
+ const name=norm(String(b.name||"").trim()),phone=normalizePhone(b.whatsapp),guessId=String(b.guessId||"").trim();
+ if(!validPhone(phone)||(guessId?!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(guessId):(name.length<3||name.split(" ").length<2)))return reply({error:"invalid_lookup"},400);
+ let q=db.from("oliver_game_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm,participation_source").eq("contact_whatsapp",phone).not("birth_date","is",null);
+ if(guessId)q=q.eq("id",guessId);
+ const {data:matches,error}=await q.limit(guessId?1:30);
  if(error)return reply({error:"lookup_failed"},500);
- const guess=(matches||[]).find((r:any)=>norm(r.participant_name)===name);
+ const guess=guessId?(matches||[])[0]:(matches||[]).find((r:any)=>norm(r.participant_name)===name);
  if(!guess)return reply({error:"guess_not_found"},404);
  const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();
  const official={date:config.actual_birth_date,time:announcement?.birth_time?.slice(0,5),weight:config.actual_weight_g,length:config.actual_length_cm};
