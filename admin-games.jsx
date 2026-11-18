@@ -55,7 +55,16 @@ function AdminGames(){const [section,setSection]=useState('overview'),[focusCont
   setGuesses(d.guesses);setBirthAccessHistory(d.birth_access_history||[]);
   setGuessesLoaded(true);setGuessLoadError('');
  }catch(e){
-  setGuessLoadError(e.message==='unauthorized'?'Seu acesso administrativo expirou. Entre novamente no painel.':'Não foi possível atualizar os palpites no servidor. Os registros existentes não foram apagados. Tente atualizar os dados.');
+  // Consulta de contingência: a lista permanece disponível mesmo se o resumo falhar.
+  try{
+   const d=await api({action:'adminListGuesses',adminCode:code});
+   if(!d.settings||!Array.isArray(d.guesses))throw Error('invalid_response');
+   setSettings(d.settings);setSavedBellyMeasure(d.settings.belly_cm??null);
+   setGuesses(d.guesses);setGuessesLoaded(true);
+   setGuessLoadError('');
+  }catch(fallbackError){
+   setGuessLoadError(e.message==='unauthorized'||fallbackError.message==='unauthorized'?'Seu acesso administrativo expirou. Entre novamente no painel.':'Não foi possível carregar os palpites do Supabase. Nenhum registro foi apagado. Tente novamente.');
+  }
  }finally{setGuessesLoading(false)}
  try{const b=await api({action:'adminBirthGet',adminCode:code});setBirthTime(b.announcement?.birth_time?.slice(0,5)||'')}
  catch(e){/* Erro ao consultar anúncio não deve impedir a lista de palpites. */}
