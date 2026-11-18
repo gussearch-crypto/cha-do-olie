@@ -779,3 +779,30 @@
 .oliePixRecipientAdmin label{min-width:0;display:grid;gap:7px;font-size:.83rem;color:#45593b}
 .oliePixRecipientAdmin input{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border-radius:10px;border:1px solid #cbd6be;background:#fffdf8;color:#324c31;font:inherit}
 @media(max-width:620px){.oliePixRecipientAdmin{grid-template-columns:1fr}}
+
+/* Painel de palpites online visível na aba Palpites, independente da auditoria. */
+.oliverGamesAdmin .olieOnlineEntries{display:grid;gap:15px;min-width:0;background:#fffdf8;border:1px solid #d5e0ca;border-radius:16px}
+.oliverGamesAdmin .olieOnlineEntriesHead{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.oliverGamesAdmin .olieOnlineEntriesHead h3{margin:0;color:#3d5835}
+.oliverGamesAdmin .olieOnlineEntriesHead h3 span{font-weight:600;color:#657d57}
+.oliverGamesAdmin .olieOnlineEntriesHead p{font-size:.8rem;line-height:1.5;color:#6c7b63;margin:6px 0 0}
+.oliverGamesAdmin .olieOnlineEntriesRefresh{min-height:43px;padding:9px 15px;border-radius:10px;background:#eef3e7;border:1px solid #bbd0ab;color:#435d36;cursor:pointer;font-weight:700;white-space:nowrap}
+.oliverGamesAdmin .olieOnlineEntriesRefresh:disabled{opacity:.55;cursor:wait}
+.oliverGamesAdmin .olieOnlineEntriesError{padding:12px;border:1px solid #e4bca9;border-radius:10px;background:#fff0eb;color:#964938;line-height:1.5}
+.oliverGamesAdmin .olieOnlineEntriesEmpty{padding:14px;background:#f4f6ef;border-radius:10px;color:#66775c}
+.oliverGamesAdmin .olieOnlineEntriesList{display:grid;gap:10px}
+.oliverGamesAdmin .olieOnlineEntry{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:14px;border:1px solid #e1e8d8;border-radius:12px;background:#fcfcf8}
+.oliverGamesAdmin .olieOnlineEntry>div:first-child{display:grid;gap:5px;min-width:160px}
+.oliverGamesAdmin .olieOnlineEntry strong{color:#405a38;font-size:.94rem}
+.oliverGamesAdmin .olieOnlineEntry small{color:#748368;font-size:.73rem;line-height:1.5}
+.oliverGamesAdmin .olieOnlineEntry dl{display:flex;flex-wrap:wrap;gap:9px 18px;margin:0}
+.oliverGamesAdmin .olieOnlineEntry dl>div{display:grid;gap:5px}
+.oliverGamesAdmin .olieOnlineEntry dt{font-size:.69rem;color:#748368}
+.oliverGamesAdmin .olieOnlineEntry dd{font-size:.85rem;margin:0;font-weight:700;color:#425b38}
+.oliverGamesAdmin .olieOnlineEntriesFoot{font-size:.75rem;line-height:1.5;margin:0;color:#708066}
+@media(max-width:680px){
+ .oliverGamesAdmin .olieOnlineEntries{padding:14px}
+ .oliverGamesAdmin .olieOnlineEntriesRefresh{width:100%}
+ .oliverGamesAdmin .olieOnlineEntry{align-items:start}
+ .oliverGamesAdmin .olieOnlineEntry dl{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+}
