@@ -8,17 +8,23 @@ export function isValidBirthDate(value){
 export function isValidBirthTime(value){
   return typeof value==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
-export function isValidBirthPhone(value){
+export function normalizeBirthPhone(value){
   const digits=String(value??'').replace(/\D/g,'');
-  return /^\d{11}$/.test(digits)&&digits.slice(0,2)!=='00'&&digits[2]==='9';
+  return (digits.length===12||digits.length===13)&&digits.startsWith('55')?digits.slice(2):digits;
+}
+export function isValidBirthPhone(value){
+  const digits=normalizeBirthPhone(value);
+  if(digits.length!==10&&digits.length!==11)return false;
+  if(digits.slice(0,2)==='00')return false;
+  return digits.length===11?digits[2]==='9':/^[2-9]$/.test(digits[2]);
 }
 export function isValidBirthName(value){
   const clean=String(value??'').trim().replace(/\s+/g,' ');
-  return clean.length>=3&&clean.length<=100&&clean.split(' ').length>=2;
+  return clean.length>=2&&clean.length<=100&&/\p{L}/u.test(clean);
 }
 export function validateBirthGuess({name,whatsapp,date,time,weight,length}){
-  if(!isValidBirthName(name))return 'Informe nome e sobrenome para identificar seu palpite.';
-  if(!isValidBirthPhone(whatsapp))return 'Informe um WhatsApp celular válido, com DDD e 11 dígitos.';
+  if(!isValidBirthName(name))return 'Informe seu nome (mínimo de 2 caracteres). O sobrenome é opcional.';
+  if(!isValidBirthPhone(whatsapp))return 'Informe um telefone válido com DDD, usando 10 ou 11 dígitos.';
   if(!isValidBirthDate(date))return 'Escolha uma data válida no calendário.';
   if(!isValidBirthTime(time))return 'Informe um horário válido entre 00:00 e 23:59.';
   if(!Number.isFinite(Number(weight))||Number(weight)<100||Number(weight)>7000)return 'Informe um peso válido, entre 0,100 e 7,000 kg.';
