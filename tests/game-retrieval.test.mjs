@@ -40,4 +40,7 @@ test('palpites online ficam visíveis na aba Palpites e podem ser atualizados',(
  assert.match(admin,/id="olie-remote-received"/);
  assert.match(admin,/onClick=\{load\} disabled=\{guessesLoading\}/);
  assert.match(style,/\.olieOnlineEntriesList\{/);
+ assert.match(admin,/WhatsApp final/);
+ assert.match(admin,/String\(g\.contact_whatsapp\)\.slice\(-4\)/);
+ assert.match(edge,/guest_id,contact_whatsapp/);
 });
