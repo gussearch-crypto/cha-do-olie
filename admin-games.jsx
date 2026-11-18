@@ -206,7 +206,7 @@ return <section className="oliverGamesAdmin oliverGamesAdminFocused" style={{pad
     {guessLoadError&&<p className="olieOnlineEntriesError" role="alert">{guessLoadError}</p>}
     {!guessesLoaded&&!guessLoadError?<p role="status">Consultando palpites no servidor...</p>:guessesLoaded&&remoteGuesses.length===0?<p className="olieOnlineEntriesEmpty">Nenhum palpite online encontrado na última consulta ao Supabase.</p>:<div className="olieOnlineEntriesList">
       {[...remoteGuesses].sort((a,b)=>Date.parse(b.created_at||0)-Date.parse(a.created_at||0)).map(g=><article key={g.id} className="olieOnlineEntry">
-        <div><strong>{g.participant_name||'Participante sem nome'}</strong><small>Registrado em {g.created_at?new Date(g.created_at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'data indisponível'} · Online</small></div>
+        <div><strong>{g.participant_name||'Participante sem nome'}</strong><small>Registrado em {g.created_at?new Date(g.created_at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'data indisponível'} · Online{g.contact_whatsapp?' · WhatsApp final '+String(g.contact_whatsapp).slice(-4):''}</small></div>
         <dl><div><dt>Nascimento</dt><dd>{g.birth_date?g.birth_date.split('-').reverse().join('/'):'—'} {g.birth_time?'às '+String(g.birth_time).slice(0,5):''}</dd></div><div><dt>Peso previsto</dt><dd>{g.weight_g??'—'} g</dd></div><div><dt>Comprimento</dt><dd>{g.length_cm??'—'} cm</dd></div></dl>
       </article>)}
     </div>}
