@@ -21,7 +21,7 @@ test('consulta exige apenas WhatsApp com DDD e aceita prefixo +55',()=>{
  assert.match(edge,/\.eq\("contact_whatsapp",phone\)/);
  assert.match(edge,/if\(guessId\)query=query\.eq\("id",guessId\)/);
  assert.match(online,/Informe apenas o telefone com DDD utilizado no cadastro/);
- assert.match(online,/action:'lookupBirthByContact',whatsapp:lookupPhone/);
+ assert.match(online,/action:'lookupBirthByContact',whatsapp:normalizeBirthPhone\(lookupPhone\)/);
  assert.doesNotMatch(online,/lookupName|lookupProtocol/);
 });
 
