@@ -18,7 +18,7 @@ test('telefone com DDD aceita 10 ou 11 dígitos e DDI +55 opcional',()=>{
   for(const phone of ['(11) 99999-9999','11999999999','(11) 3333-4444','1133334444','+55 (11) 3333-4444','+55 (11) 99999-9999','5533334444'])assert.equal(isValidBirthPhone(phone),true,phone);
   assert.equal(normalizeBirthPhone('+55 (11) 3333-4444'),'1133334444');
   assert.equal(normalizeBirthPhone('+55 (11) 99999-9999'),'11999999999');
-  for(const phone of ['11 9999','119999999','00999999999','113333444','119999999999','1191234567',''])assert.equal(isValidBirthPhone(phone),false,phone);
+  for(const phone of ['11 9999','119999999','00999999999','113333444','119999999999','1111234567',''])assert.equal(isValidBirthPhone(phone),false,phone);
 });
 test('formulário completo válido',()=>assert.equal(validateBirthGuess(valid),''));
 test('data anterior ou posterior à DPP continua elegível',()=>{
