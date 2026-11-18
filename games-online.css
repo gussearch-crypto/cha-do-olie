@@ -313,3 +313,10 @@
 .olieRemoteProtocolLookup>label{display:grid;gap:8px;margin:12px 14px 7px;font-size:.84rem;color:#435e38}
 .olieRemoteProtocolLookup>label>input{width:100%;min-width:0;box-sizing:border-box;font-size:.86rem;padding:11px 12px;overflow-wrap:anywhere}
 .olieRemoteProtocolLookup>small{display:block;font-size:.73rem;line-height:1.5;margin:0 14px 13px;color:#718068}
+
+/* Consultas por telefone podem recuperar mais de um palpite. */
+.olieRemoteLookupResult .olieRemoteLookupRecord{display:grid;gap:12px;margin:14px 0;padding:16px 14px;border:1px solid #d9e5cd;border-radius:14px;background:#fffefa;min-width:0}
+.olieRemoteLookupResult .olieRemoteLookupRecord .olieRemoteSummary{margin:0}
+.olieRemoteLookupResult .olieRemoteLookupRecord h3{margin:8px 0 0;font-size:1.01rem}
+.olieRemoteLookupResult .olieRemoteLookupRecord p{margin:0;line-height:1.55}
+@media(max-width:580px){.olieRemoteLookupResult .olieRemoteLookupRecord{padding:12px 10px}}
