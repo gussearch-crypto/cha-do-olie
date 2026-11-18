@@ -14,14 +14,23 @@ test('os palpites online são gravados e consultados no Supabase, sem escrita em
  assert.doesNotMatch(online,/localStorage\.setItem|sessionStorage\.setItem/);
 });
 
-test('consulta exige WhatsApp e nome ou protocolo, com DDI brasileiro opcional',()=>{
+test('consulta exige apenas WhatsApp com DDD e aceita prefixo +55',()=>{
  assert.match(edge,/digits\.length===13&&digits\.startsWith\("55"\)\?digits\.slice\(2\):digits/);
- assert.match(edge,/const name=norm\(String\(b\.name\|\|""\)\.trim\(\)\),phone=normalizePhone\(b\.whatsapp\),guessId=/);
- assert.match(edge,/if\(!validPhone\(phone\)\|\|\(guessId\?/);
+ assert.match(edge,/const phone=normalizePhone\(b\.whatsapp\)/);
+ assert.match(edge,/if\(!validPhone\(phone\)/);
  assert.match(edge,/\.eq\("contact_whatsapp",phone\)/);
- assert.match(edge,/if\(guessId\)q=q\.eq\("id",guessId\)/);
- assert.match(online,/Tenho o protocolo do meu palpite/);
- assert.match(online,/guessId:lookupProtocol\.trim\(\)/);
+ assert.match(edge,/if\(guessId\)query=query\.eq\("id",guessId\)/);
+ assert.match(online,/Informe apenas o WhatsApp com DDD utilizado no cadastro/);
+ assert.match(online,/action:'lookupBirthByContact',whatsapp:lookupPhone/);
+ assert.doesNotMatch(online,/lookupName|lookupProtocol/);
+});
+
+test('consulta retorna todos os palpites de um mesmo WhatsApp, sem aceitar telefone incompleto',()=>{
+ assert.match(edge,/if\(!matches\?\.length\)return reply\(\{error:"guess_not_found"\},404\)/);
+ assert.match(edge,/const guesses=matches/);
+ assert.match(edge,/return reply\(\{ok:true,guess,guesses,published,result:results\[guess\.id\]\|\|null,results\}\)/);
+ assert.match(online,/\.map\(g=>\{const result=lookupResult\.results/);
+ assert.match(online,/g\.participant_name/);
 });
 
 test('listagem de contingência é autenticada e somente leitura',()=>{
