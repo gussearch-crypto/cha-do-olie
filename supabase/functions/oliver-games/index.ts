@@ -114,25 +114,34 @@ if(action==="remoteBirthSubmit"){
  return reply({ok:true,guess});
 }
 if(action==="lookupBirthByContact"){
- const name=norm(String(b.name||"").trim()),phone=normalizePhone(b.whatsapp),guessId=String(b.guessId||"").trim();
- if(!validPhone(phone)||(guessId?!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(guessId):(name.length<3||name.split(" ").length<2)))return reply({error:"invalid_lookup"},400);
- let q=db.from("oliver_game_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm,participation_source").eq("contact_whatsapp",phone).not("birth_date","is",null);
- if(guessId)q=q.eq("id",guessId);
- const {data:matches,error}=await q.limit(guessId?1:30);
+ const phone=normalizePhone(b.whatsapp),guessId=String(b.guessId||"").trim(),name=norm(String(b.name||"").trim());
+ if(!validPhone(phone)||(guessId&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(guessId)))return reply({error:"invalid_lookup"},400);
+ // Apenas o WhatsApp identifica o participante. Um número compartilhado pode ter mais de um palpite.
+ let query=db.from("oliver_game_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm,participation_source,created_at").eq("contact_whatsapp",phone).not("birth_date","is",null);
+ if(guessId)query=query.eq("id",guessId);
+ const {data:matches,error}=await query.order("created_at",{ascending:false}).limit(20);
  if(error)return reply({error:"lookup_failed"},500);
- const guess=guessId?(matches||[])[0]:(matches||[]).find((r:any)=>norm(r.participant_name)===name);
- if(!guess)return reply({error:"guess_not_found"},404);
+ if(!matches?.length)return reply({error:"guess_not_found"},404);
+ // Compatibilidade: clientes antigos que ainda enviam nome ou protocolo recebem o registro correspondente.
+ const guesses=matches;
+ const guess=(name?guesses.find((r:any)=>norm(r.participant_name)===name):null)||guesses[0];
  const {data:announcement}=await db.from("oliver_birth_announcement").select("birth_time").eq("id",1).maybeSingle();
  const official={date:config.actual_birth_date,time:announcement?.birth_time?.slice(0,5),weight:config.actual_weight_g,length:config.actual_length_cm};
  const published=!!config.results_published&&!!official.date&&!!official.time&&official.weight!=null&&official.length!=null;
- let result:any=null;
+ const results:any={};
  if(published){
- const {data:all}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm").not("birth_date","is",null);
- const ranking=sortForAwards(birthRank(all||[],official),config);
- const idx=ranking.findIndex((r:any)=>r.id===guess.id);
- if(idx>=0){const x=ranking[idx];result={position:idx+1,totalParticipants:ranking.length,total:x.total,dateTimePoints:x.dateTimePoints,weightPoints:x.weightPoints,lengthPoints:x.lengthPoints,differenceMinutes:x.differenceMinutes,differenceGrams:x.differenceGrams,differenceCm:x.differenceCm,official};}
+  const {data:all,error:rankingError}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm").not("birth_date","is",null);
+  if(rankingError)return reply({error:"lookup_failed"},500);
+  const ranking=birthRank(all||[],official);
+  for(const record of guesses){
+   const index=ranking.findIndex((r:any)=>r.id===record.id);
+   if(index>=0){
+    const x=ranking[index];
+    results[record.id]={position:index+1,totalParticipants:ranking.length,total:x.total,dateTimePoints:x.dateTimePoints,weightPoints:x.weightPoints,lengthPoints:x.lengthPoints,differenceMinutes:x.differenceMinutes,differenceGrams:x.differenceGrams,differenceCm:x.differenceCm,official};
+   }
+  }
  }
- return reply({ok:true,guess,published,result});
+ return reply({ok:true,guess,guesses,published,result:results[guess.id]||null,results});
 }
 if(action==="adminCompleteBirthTime"){
  if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
