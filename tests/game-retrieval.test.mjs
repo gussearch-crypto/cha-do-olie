@@ -15,12 +15,12 @@ test('os palpites online são gravados e consultados no Supabase, sem escrita em
 });
 
 test('consulta exige apenas WhatsApp com DDD e aceita prefixo +55',()=>{
- assert.match(edge,/digits\.length===13&&digits\.startsWith\("55"\)\?digits\.slice\(2\):digits/);
+ assert.match(edge,/digits\.length===12\|\|digits\.length===13/);
  assert.match(edge,/const phone=normalizePhone\(b\.whatsapp\)/);
  assert.match(edge,/if\(!validPhone\(phone\)/);
  assert.match(edge,/\.eq\("contact_whatsapp",phone\)/);
  assert.match(edge,/if\(guessId\)query=query\.eq\("id",guessId\)/);
- assert.match(online,/Informe apenas o WhatsApp com DDD utilizado no cadastro/);
+ assert.match(online,/Informe apenas o telefone com DDD utilizado no cadastro/);
  assert.match(online,/action:'lookupBirthByContact',whatsapp:lookupPhone/);
  assert.doesNotMatch(online,/lookupName|lookupProtocol/);
 });
@@ -52,4 +52,15 @@ test('palpites online ficam visíveis na aba Palpites e podem ser atualizados',(
  assert.match(admin,/WhatsApp final/);
  assert.match(admin,/String\(g\.contact_whatsapp\)\.slice\(-4\)/);
  assert.match(edge,/guest_id,contact_whatsapp/);
+});
+
+test('API aceita nome simples e telefone de 10 ou 11 dígitos no cadastro e consulta',()=>{
+ assert.match(edge,/const validParticipantName=\(v:any\)=>/);
+ assert.match(edge,/value.length>=2&&value.length<=100/);
+ assert.match(edge,/const validPhone=\(v:any\)=>/);
+ assert.match(edge,/digits.length===10\|\|digits.length===11/);
+ assert.match(edge,/if\(!validParticipantName\(name\)\)return reply/);
+ assert.match(online,/Nome do participante/);
+ assert.match(online,/sobrenome opcional/);
+ assert.match(online,/maxLength=\{22\}/);
 });
