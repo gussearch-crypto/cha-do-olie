@@ -54,7 +54,7 @@ const {data:config,error:ce}=await db.from("oliver_game_settings").select("*").e
 
 if(action==="adminListGuesses"){
  if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
- const {data:rows,error}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm,belly_cm,created_at,outside_guest_list,guest_id").order("created_at",{ascending:false});
+ const {data:rows,error}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm,belly_cm,created_at,outside_guest_list,guest_id,contact_whatsapp").order("created_at",{ascending:false});
  if(error)return reply({error:"guesses_read_failed"},500);
  return reply({ok:true,settings:config,guesses:rows||[]});
 }
