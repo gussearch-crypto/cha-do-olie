@@ -167,7 +167,7 @@
 }
 
 /* Controles internos não herdam estilos genéricos dos campos de identificação. */
-.olieRemotePredictionGrid input[type="range"]{
+.olieRemotePredictionGrid .gameScale>input[type="range"]{
   box-sizing:border-box;min-width:0;max-width:100%;height:auto;padding:0;
   border:0;background:transparent;accent-color:#6a8755;
 }
@@ -264,3 +264,42 @@
 .olieRemotePixRecipient>div+div{border-top:1px solid #e3e9d9}
 .olieRemotePixRecipient span{color:#718168;font-size:.73rem;font-weight:700}
 .olieRemotePixRecipient strong{color:#405634;font-size:.91rem;line-height:1.35;overflow-wrap:anywhere}
+
+
+/* Correção da régua de comprimento: não comprimir o slider vertical em 40px.
+ * O input permanece horizontal internamente e é rotacionado uma única vez.
+ * Comprimentos são adaptados à altura da cena em cada breakpoint. */
+.olieRemotePredictionGrid .gameVerticalScene{--olie-length-track:244px}
+.olieRemotePredictionGrid .gameVerticalControl{
+  position:relative;
+  min-width:0;
+  min-height:0;
+  align-items:center;
+  justify-content:center;
+}
+.olieRemotePredictionGrid .gameVerticalControl input[type="range"]{
+  -webkit-appearance:none;
+  appearance:none;
+  position:absolute;
+  inset:auto;
+  display:block;
+  box-sizing:border-box;
+  width:var(--olie-length-track);
+  min-width:0;
+  max-width:none;
+  height:26px;
+  min-height:26px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  transform:rotate(-90deg);
+  transform-origin:center center;
+  cursor:pointer;
+}
+@media(max-width:600px){
+  .olieRemotePredictionGrid .gameVerticalScene{--olie-length-track:204px}
+}
+@media(max-width:430px){
+  .olieRemotePredictionGrid .gameVerticalScene{--olie-length-track:188px}
+}
