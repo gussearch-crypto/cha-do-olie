@@ -303,3 +303,13 @@
 @media(max-width:430px){
   .olieRemotePredictionGrid .gameVerticalScene{--olie-length-track:188px}
 }
+
+/* Consulta opcional por protocolo e WhatsApp, sem expor palpites de terceiros. */
+.olieRemoteProtocolLookup{border:1px solid #d9e3ce;border-radius:12px;background:#f7f9f2;overflow:hidden}
+.olieRemoteProtocolLookup>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;box-sizing:border-box;padding:12px 14px;cursor:pointer;font-size:.86rem;font-weight:700;color:#516844}
+.olieRemoteProtocolLookup>summary::after{content:"▾";font-size:.85rem;color:#718562}
+.olieRemoteProtocolLookup[open]>summary::after{content:"▴"}
+.olieRemoteProtocolLookup[open]>summary{border-bottom:1px solid #dfe7d5}
+.olieRemoteProtocolLookup>label{display:grid;gap:8px;margin:12px 14px 7px;font-size:.84rem;color:#435e38}
+.olieRemoteProtocolLookup>label>input{width:100%;min-width:0;box-sizing:border-box;font-size:.86rem;padding:11px 12px;overflow-wrap:anywhere}
+.olieRemoteProtocolLookup>small{display:block;font-size:.73rem;line-height:1.5;margin:0 14px 13px;color:#718068}
