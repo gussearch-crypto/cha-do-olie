@@ -10,7 +10,7 @@ export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPa
  return <div className="olieRemoteGift">
   <Gift size={28}/>
   <h3>{reminder?'Ainda não presenteou o Oliver? 💚':'Quer enviar um carinho para o Oliver?'}</h3>
-  {reminder&&<p className="olieRemoteGiftReminder">Se ainda não teve a oportunidade, você pode contribuir com o enxoval do Oliver de maneira simples. Escolha a opção que preferir!</p>}
+  {reminder&&<p className="olieRemoteGiftReminder">Se ainda não teve a oportunidade, você pode contribuir com o enxoval do Oliver de maneira simples. Escolha a opção que preferir! <strong>Presentear é opcional e não altera seus palpites nem a classificação.</strong></p>}
   {message&&<p>{message}</p>}
   {url&&<a className="olieRemotePrimary" href={url} target="_blank" rel="noopener noreferrer">Ver lista de presentes</a>}
   <PixGift enabled={pixEnabled} payload={pixPayload} receiverName={pixReceiverName} institution={pixInstitution}/>
