@@ -4,12 +4,13 @@ import PixGift from './pix-gift.jsx';
 import './games-online.css';
 
 /** A única apresentação de presentes usada no registro real e na simulação administrativa. */
-export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPayload='',pixReceiverName='',pixInstitution=''}){
+export default function OnlineGiftCard({message='',url='',pixEnabled=false,pixPayload='',pixReceiverName='',pixInstitution='',reminder=false}){
  const [addressOpen,setAddressOpen]=useState(false);
  if(!message&&!url&&!pixEnabled)return null;
  return <div className="olieRemoteGift">
   <Gift size={28}/>
-  <h3>Quer enviar um carinho para o Oliver?</h3>
+  <h3>{reminder?'Ainda não presenteou o Oliver? 💚':'Quer enviar um carinho para o Oliver?'}</h3>
+  {reminder&&<p className="olieRemoteGiftReminder">Se ainda não teve a oportunidade, você pode contribuir com o enxoval do Oliver de maneira simples. Escolha a opção que preferir!</p>}
   {message&&<p>{message}</p>}
   {url&&<a className="olieRemotePrimary" href={url} target="_blank" rel="noopener noreferrer">Ver lista de presentes</a>}
   <PixGift enabled={pixEnabled} payload={pixPayload} receiverName={pixReceiverName} institution={pixInstitution}/>
