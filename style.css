@@ -15,3 +15,25 @@
 /* Background oficial: somente atrás do conteúdo abaixo do hero */
 body{background:#f5edd4!important}
 main{background:transparent!important}
+
+/* Confirmação de presença: sugestões de marcas, sem obrigatoriedade. */
+.result .gift .diaperBrands{
+  display:block;
+  margin-top:6px;
+  font-size:12px;
+  line-height:1.55;
+  color:#5a6b4b;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+.result .diaperBrandsDisclaimer{
+  margin:8px 2px 18px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #dfe4d0;
+  background:#f7f8ee;
+  color:#647158;
+  font-size:12px;
+  line-height:1.6;
+  text-align:left;
+}
