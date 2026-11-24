@@ -133,12 +133,12 @@ if(action==="lookupBirthByContact"){
  if(published){
   const {data:all,error:rankingError}=await db.from("oliver_game_guesses").select("id,participant_name,participation_source,birth_date,birth_time,weight_g,length_cm").not("birth_date","is",null);
   if(rankingError)return reply({error:"lookup_failed"},500);
-  const ranking=birthRank(all||[],official);
+  const ranking=sortForAwards(birthRank(all||[],official),config);
   for(const record of guesses){
    const index=ranking.findIndex((r:any)=>r.id===record.id);
    if(index>=0){
     const x=ranking[index];
-    results[record.id]={position:index+1,totalParticipants:ranking.length,total:x.total,dateTimePoints:x.dateTimePoints,weightPoints:x.weightPoints,lengthPoints:x.lengthPoints,differenceMinutes:x.differenceMinutes,differenceGrams:x.differenceGrams,differenceCm:x.differenceCm,official};
+    results[record.id]={position:index+1,isWinner:index<countWinners(config),winner_count:countWinners(config),winner_rule:awardRule(config),winner_rule_label:ruleLabels[awardRule(config)],totalParticipants:ranking.length,total:x.total,dateTimePoints:x.dateTimePoints,weightPoints:x.weightPoints,lengthPoints:x.lengthPoints,differenceMinutes:x.differenceMinutes,differenceGrams:x.differenceGrams,differenceCm:x.differenceCm,official};
    }
   }
  }
@@ -282,8 +282,8 @@ if(action==="adminDemoBirthRanking"){
  if(!iso(official.date)||!validBirthTime(official.time)||!finite(official.weight,100,7000)||!finite(official.length,20,75))return reply({error:"invalid_demo_values"},400);
  const {data:guesses,error}=await db.from("oliver_game_demo_guesses").select("id,participant_name,birth_date,birth_time,weight_g,length_cm,created_at").order("created_at");
  if(error)return reply({error:"demo_read_failed"},500);
- const ranking=birthRank(guesses||[],official);
- return reply({ready:true,demo:true,official,ranking,total:ranking.length});
+ const ranking=sortForAwards(birthRank(guesses||[],official),config);
+ return reply({ready:true,demo:true,official,ranking,total:ranking.length,winner_count:countWinners(config),winner_rule:awardRule(config),winner_rule_label:ruleLabels[awardRule(config)]});
 }
 if(action==="adminAwardSettings"){
  if(!(await admin(b.adminCode)))return reply({error:"unauthorized"},401);
