@@ -33,3 +33,16 @@ test('mimo não é obrigatório e aparece uma vez fora da lista de fraldas',()=>
  assert.doesNotMatch(brands,/if\(index===1/);
  assert.match(styles,/\.result \.mimoComplementar\{/);
 });
+
+test('botões de calendário mantêm estilo consistente e responsivo',()=>{
+ const invite=readFileSync(new URL('../src.jsx',import.meta.url),'utf8');
+ assert.match(invite,/className="calendarActions"/);
+ assert.match(invite,/className="primary linkbtn" href=\{googleCalendar\}/);
+ assert.match(invite,/className="calendarIcs" onClick=\{downloadCalendar\}/);
+ assert.match(styles,/\.result \.calendarPanel \.calendarActions > a,/);
+ assert.match(styles,/\.result \.calendarPanel \.calendarActions > button\{/);
+ assert.match(styles,/min-height:46px/);
+ assert.match(styles,/\.result \.calendarPanel \.calendarActions > \.calendarIcs\{/);
+ assert.match(styles,/@media\(max-width:600px\)/);
+ assert.match(styles,/flex-direction:column/);
+});
