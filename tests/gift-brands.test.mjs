@@ -22,7 +22,7 @@ test('aviso das marcas aparece uma vez após os itens e possui estilo responsivo
 
 test('mimo não é obrigatório e aparece uma vez fora da lista de fraldas',()=>{
  const invite=readFileSync(new URL('../src.jsx',import.meta.url),'utf8');
- assert.match(invite,/Esse carinho extra é totalmente opcional/);
+ assert.match(invite,/um mimo complementar, totalmente opcional/);
  assert.match(invite,/Fralda sugerida; um mimo complementar é opcional/);
  assert.match(invite,/diapers\.slice\(0,gifts\)\.map/);
  assert.match(invite,/className="mimoComplementar"/);
