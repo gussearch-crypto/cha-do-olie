@@ -13,6 +13,8 @@ on:
       - 'tests/game-retrieval.test.mjs'
       - 'tests/game-birth-validation.test.mjs'
       - 'tests/diaper-quantity.test.mjs'
+      - 'tests/award-ranking.test.mjs'
+      - 'supabase/migrations/202611240001_rank_winners_settings.sql'
       - 'gift-brands.js'
       - 'src.jsx'
       - 'supabase/functions/invite-api/index.ts'
@@ -53,4 +55,4 @@ jobs:
         with:
           node-version: '22'
       - name: Testar regras de convidados sem acessar dados reais
-        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs tests/game-awards.test.mjs tests/game-vertical-slider.test.mjs tests/game-retrieval.test.mjs tests/game-birth-validation.test.mjs tests/gift-brands.test.mjs tests/diaper-quantity.test.mjs
+        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs tests/game-awards.test.mjs tests/game-vertical-slider.test.mjs tests/game-retrieval.test.mjs tests/game-birth-validation.test.mjs tests/gift-brands.test.mjs tests/diaper-quantity.test.mjs tests/award-ranking.test.mjs
