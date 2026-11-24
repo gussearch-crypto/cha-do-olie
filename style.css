@@ -125,3 +125,74 @@ main{background:transparent!important}
   .giftChoice .diaperQuantityChoice{grid-template-columns:1fr;padding:12px}
   .giftChoice .diaperQuantityChoice select{width:100%}
 }
+
+
+/* Convite | botões de calendário com a mesma tipografia, altura e acabamento. */
+.result .calendarPanel .calendarActions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:10px;
+  margin-top:15px;
+}
+.result .calendarPanel .calendarActions > a,
+.result .calendarPanel .calendarActions > button{
+  display:inline-flex;
+  box-sizing:border-box;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex:1 1 210px;
+  min-width:0;
+  min-height:46px;
+  padding:11px 17px;
+  margin:0;
+  border:1px solid #657547;
+  border-radius:11px;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.35;
+  text-align:center;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.result .calendarPanel .calendarActions > .primary{
+  background:#657547;
+  color:#fffdf5;
+}
+.result .calendarPanel .calendarActions > .calendarIcs{
+  background:#fffdf6;
+  color:#4d623e;
+  border-color:#bfcaa9;
+}
+.result .calendarPanel .calendarActions > .primary:hover{
+  background:#506238;
+}
+.result .calendarPanel .calendarActions > .calendarIcs:hover{
+  background:#f1f5e9;
+  border-color:#8da177;
+}
+.result .calendarPanel .calendarActions > a:focus-visible,
+.result .calendarPanel .calendarActions > button:focus-visible{
+  outline:3px solid #9caf83;
+  outline-offset:3px;
+}
+.result .calendarPanel .calendarActions svg{
+  width:16px;
+  height:16px;
+  flex:0 0 16px;
+}
+@media(max-width:600px){
+  .result .calendarPanel .calendarActions{
+    flex-direction:column;
+    gap:9px;
+  }
+  .result .calendarPanel .calendarActions > a,
+  .result .calendarPanel .calendarActions > button{
+    width:100%;
+    flex:0 0 auto;
+  }
+}
