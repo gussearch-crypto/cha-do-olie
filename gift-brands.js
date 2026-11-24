@@ -57,7 +57,7 @@ function enhanceGiftResult(){
   if(!result)return;
   const gifts=[...result.querySelectorAll('.gift')];
   const qty=Math.max(1,Number(sessionStorage.getItem('oliverDiaperQty'))||gifts.length||1);
-  gifts.forEach((gift,index)=>{
+  gifts.forEach(gift=>{
     const diaperLine=gift.querySelector('b');
     if(diaperLine&&diaperLine.textContent.includes('pacote de fraldas')){
       let brands=gift.querySelector('.diaperBrands');
@@ -68,17 +68,6 @@ function enhanceGiftResult(){
       }
       const suggestedBrands='Marcas sugeridas: Huggies, Pampers, PomPom ou Turma da Mônica.';
       if(brands.textContent!==suggestedBrands)brands.textContent=suggestedBrands;
-    }
-    if(index===1&&!gift.querySelector('.optionalGiftLabel')){
-      const giftBlocks=gift.querySelectorAll('div');
-      const mimoBlock=giftBlocks[giftBlocks.length-1];
-      if(mimoBlock){
-        const label=document.createElement('small');
-        label.className='optionalGiftLabel';
-        label.textContent='OPCIONAL';
-        label.style.cssText='display:inline-block;margin-bottom:4px;font-weight:700;letter-spacing:.08em;opacity:.65';
-        mimoBlock.insertBefore(label,mimoBlock.firstChild);
-      }
     }
   });
   if(gifts.length){
