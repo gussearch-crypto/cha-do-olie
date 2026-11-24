@@ -12,6 +12,10 @@ on:
       - 'tests/game-vertical-slider.test.mjs'
       - 'tests/game-retrieval.test.mjs'
       - 'tests/game-birth-validation.test.mjs'
+      - 'tests/diaper-quantity.test.mjs'
+      - 'gift-brands.js'
+      - 'src.jsx'
+      - 'supabase/functions/invite-api/index.ts'
       - 'tests/gift-brands.test.mjs'
       - 'gift-brands.js'
       - 'style.css'
@@ -49,4 +53,4 @@ jobs:
         with:
           node-version: '22'
       - name: Testar regras de convidados sem acessar dados reais
-        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs tests/game-awards.test.mjs tests/game-vertical-slider.test.mjs tests/game-retrieval.test.mjs tests/game-birth-validation.test.mjs tests/gift-brands.test.mjs
+        run: node --test tests/guest-filters.test.mjs tests/guest-overview.test.mjs tests/message-templates.test.mjs tests/game-awards.test.mjs tests/game-vertical-slider.test.mjs tests/game-retrieval.test.mjs tests/game-birth-validation.test.mjs tests/gift-brands.test.mjs tests/diaper-quantity.test.mjs
