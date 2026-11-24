@@ -37,3 +37,45 @@ main{background:transparent!important}
   line-height:1.6;
   text-align:left;
 }
+
+
+/* Mimo complementar opcional — uma única sugestão, separada das fraldas. */
+.result .mimoComplementar{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:11px;
+  align-items:start;
+  margin:12px 0 20px;
+  padding:14px 15px;
+  border:1px solid #dce5d2;
+  border-radius:13px;
+  background:#f7f9f1;
+  text-align:left;
+}
+.result .mimoComplementar>div:not(.giftIcon){
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:0;
+}
+.result .mimoComplementar .optionalGiftLabel{
+  display:inline-block;
+  align-self:flex-start;
+  padding:3px 8px;
+  border-radius:99px;
+  background:#e4ecd9;
+  color:#536a44;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.05em;
+}
+.result .mimoComplementar b{
+  color:#485e3a;
+  font-size:14px;
+  line-height:1.4;
+}
+.result .mimoComplementar span{
+  color:#6b7762;
+  font-size:12px;
+  line-height:1.6;
+}
