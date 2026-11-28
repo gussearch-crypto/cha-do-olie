@@ -241,3 +241,12 @@
   .adminPage .reminderDialog .reminderDialogActions{display:flex;flex-direction:column;}
   .adminPage .reminderDialog .reminderDialogActions button{width:100%;font-size:14px;}
 }
+
+
+/* Ajuda contextual para exportação das categorias e presenças individuais. */
+.guestExportBar .guestExportHelp{
+  margin:4px 0 12px;
+  color:#637358;
+  font-size:12px;
+  line-height:1.55;
+}
